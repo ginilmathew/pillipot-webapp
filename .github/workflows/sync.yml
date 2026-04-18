@@ -1,6 +1,6 @@
 # ──────────────────────────────────────────────────────────────
 # Bi-directional Sync (Fork ↔ Upstream)
-#
+#hai
 # 1. Pulls from Upstream → Fork (Handles Divergence with Merge)
 # 2. Pushes from Fork → Upstream (Using UPSTREAM_TOKEN sync)
 # ──────────────────────────────────────────────────────────────
