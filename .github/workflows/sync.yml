@@ -11,17 +11,19 @@ on:
 jobs:
   sync_latest_from_upstream:
     runs-on: ubuntu-latest
+    name: Sync main with upstream
     steps:
-      - name: Checkout target repo
+      # Step 1: Checkout your fork's main branch
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
 
+      # Step 2: Sync from ginilmathew
       - name: Sync upstream changes
-        id: sync
-        uses: aieri/repo-sync@v1
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
-          source_repo: "https://github.com/ginilmathew/pillipot-webapp.git"
-          source_branch: "main"
-          destination_branch: "main"
+          upstream_repository: ginilmathew/pillipot-webapp
+          upstream_branch: main
+          target_branch: main
           github_token: ${{ secrets.GITHUB_TOKEN }}
