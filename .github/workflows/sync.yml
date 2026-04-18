@@ -18,6 +18,8 @@ jobs:
   sync:
     name: Sync changes
     runs-on: ubuntu-latest
+    # Safety Check: Only run this inside the Forked repository
+    if: github.repository == 'OfficialPillipot/pillipot-webapp'
     
     permissions:
       contents: write
