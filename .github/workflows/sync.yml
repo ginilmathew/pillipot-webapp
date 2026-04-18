@@ -21,6 +21,7 @@ jobs:
     
     permissions:
       contents: write
+      workflows: write
 
     steps:
       # ── 1. Checkout the fork ──────────────────────────────
