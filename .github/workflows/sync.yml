@@ -2,11 +2,10 @@ name: Upstream Sync
 
 permissions:
   contents: write
-  actions: write
 
 on:
   schedule:
-    - cron: "0 * * * *" # Runs every hour
+    - cron: "*/15 * * * *" # Runs roughly every 15 minutes
   workflow_dispatch:    # Allows you to run it manually
 
 jobs:
@@ -22,7 +21,6 @@ jobs:
       - name: Sync upstream changes
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
-          # Use the EXACT names the error message asked for:
           target_sync_branch: main
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
           upstream_sync_repo: ginilmathew/pillipot-webapp
