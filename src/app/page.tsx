@@ -1,46 +1,20 @@
-"use client";
-
 import Header from "@/components/layout/Header";
 import CategoryBar from "@/components/layout/CategoryBar";
 import ProductSection from "@/components/product/ProductSection";
 import Footer from "@/components/layout/Footer";
 import { getProducts, getCategories, type Product, type Category } from "@/lib/api";
-import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Zap, Gift, Truck } from "lucide-react";
 
-export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+export default async function Home() {
+  const [products, categories] = await Promise.all([getProducts(), getCategories()]);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [p, c] = await Promise.all([getProducts(), getCategories()]);
-        setProducts(p);
-        setCategories(c);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
-
-  const sections = useMemo(() => {
-    return categories.map(cat => ({
-      title: cat.name,
-      products: products.filter(p => p.categoryId === cat.id).slice(0, 5),
-      link: `/category/${cat.id}`
-    })).filter(s => s.products.length > 0);
-  }, [products, categories]);
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading Marketplace...</div>;
-
-
+  const sections = categories.map(cat => ({
+    title: cat.name,
+    products: products.filter(p => p.categoryId === cat.id).slice(0, 5),
+    link: `/category/${cat.id}`
+  })).filter(s => s.products.length > 0);
   return (
     <div className="flex flex-col min-h-screen bg-pp-surface">
       <Header />

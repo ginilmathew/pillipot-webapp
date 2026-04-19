@@ -1,39 +1,19 @@
-"use client";
-
-import { use, useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CategoryBar from "@/components/layout/CategoryBar";
 import ProductCard from "@/components/product/ProductCard";
 import { getProducts, getCategories, type Product, type Category } from "@/lib/api";
 
-export default function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [category, setCategory] = useState<Category | null>(null);
-  const [loading, setLoading] = useState(true);
+export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [pList, cList] = await Promise.all([
-          getProducts(id),
-          getCategories()
-        ]);
-        setProducts(pList);
-        const cat = cList.find(c => c.id === id);
-        if (cat) setCategory(cat);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [id]);
+  // Fetch concurrently on the server
+  const [products, cList] = await Promise.all([
+    getProducts(id),
+    getCategories()
+  ]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-
+  const category = cList.find(c => c.id === id);
   const categoryName = category?.name || "Category";
 
   return (
@@ -89,9 +69,6 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <p className="text-gray-400 text-lg font-medium mb-4">No products found in &quot;{categoryName}&quot;</p>
-                <button onClick={() => window.history.back()} className="text-pp-primary font-bold hover:underline">
-                  Go Back
-                </button>
               </div>
             )}
           </div>
