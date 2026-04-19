@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: "Shop the best products at unbeatable prices. Electronics, fashion, home & more with free delivery.",
 };
 
+import LoginModal from "@/components/auth/LoginModal";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,6 +38,7 @@ export default function RootLayout({
           <CartProvider>
             <WishlistProvider>
               {children}
+              <LoginModal />
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>

@@ -8,6 +8,10 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
+  isLoginModalOpen: boolean;
+  setIsLoginModalOpen: (open: boolean) => void;
+  isRegisterModalOpen: boolean;
+  setIsRegisterModalOpen: (open: boolean) => void;
   login: (token: string, user: User) => void;
   logout: () => void;
 }
@@ -18,6 +22,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -39,17 +45,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     init();
   }, []);
 
+  // REMOVED: Auto-redirect to login for guest browsing support
+  /*
   useEffect(() => {
     if (!loading && !user && pathname !== "/login" && pathname !== "/register") {
       router.push("/login");
     }
   }, [user, loading, pathname, router]);
+  */
 
   const loginAction = (newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem("pillipot_token", newToken);
-    router.push("/");
+    setIsLoginModalOpen(false); // Close modal on successful login
+    setIsRegisterModalOpen(false); // Close modal on successful login
   };
 
   const logoutAction = () => {
@@ -60,7 +70,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login: loginAction, logout: logoutAction }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      loading, 
+      isLoginModalOpen,
+      setIsLoginModalOpen,
+      isRegisterModalOpen,
+      setIsRegisterModalOpen,
+      login: loginAction, 
+      logout: logoutAction 
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -10,12 +10,14 @@ import { notFound } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { user, setIsLoginModalOpen } = useAuth();
   
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,8 +49,22 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     allImages.push(`data:image/svg+xml;base64,${btoa('<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="800" fill="#F3F4FB"/><path d="M400 330V470M330 400H470" stroke="#D1D5DB" stroke-width="4" stroke-linecap="round"/><circle cx="400" cy="400" r="100" stroke="#D1D5DB" stroke-width="4" stroke-dasharray="8 8"/><text x="400" y="550" text-anchor="middle" fill="#9CA3AF" font-family="sans-serif" font-size="20" font-weight="600" letter-spacing="0.1em">NO IMAGE AVAILABLE</text></svg>')}`);
   }
 
-  const handleAddToCart = () => addToCart(product);
-  const handleBuyNow = () => { addToCart(product); router.push("/checkout"); };
+  const handleAddToCart = () => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    addToCart(product);
+  };
+
+  const handleBuyNow = () => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    addToCart(product);
+    router.push("/checkout");
+  };
 
   const formatPrice = (num: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(num);
@@ -122,7 +138,14 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 )}
                 <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
                   <button
-                    onClick={(e) => { e.stopPropagation(); toggleWishlist(product); }}
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      if (!user) {
+                        setIsLoginModalOpen(true);
+                        return;
+                      }
+                      toggleWishlist(product); 
+                    }}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm border border-gray-100 ${
                       isInWishlist(product.id) ? "bg-pp-accent text-white" : "bg-white/90 backdrop-blur-sm hover:bg-pp-accent hover:text-white"
                     }`}

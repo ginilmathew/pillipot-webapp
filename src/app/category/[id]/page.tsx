@@ -81,7 +81,7 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
             </div>
 
             {products.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
                 {products.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
