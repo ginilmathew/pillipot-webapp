@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import ProductCard from "./ProductCard";
-import { Product } from "@/data/products";
+import { Product } from "@/lib/api";
 
 interface ProductSectionProps {
   title: string;
