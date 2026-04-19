@@ -5,6 +5,7 @@ import Link from "next/link";
 import { login as loginApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { Eye, EyeOff, Lock, User, ArrowRight, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +25,7 @@ export default function LoginPage() {
       const res = await loginApi(username, password);
       if (res) {
         login(res.accessToken, res.user);
+        router.push("/");
       } else {
         setError("Invalid username or password. Please try again.");
       }

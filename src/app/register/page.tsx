@@ -5,6 +5,7 @@ import Link from "next/link";
 import { register as registerApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { Eye, EyeOff, Lock, User, Mail, Phone, ArrowRight, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,6 +39,7 @@ export default function RegisterPage() {
       const res = await registerApi(formData);
       if (res) {
         login(res.accessToken, res.user);
+        router.push("/");
       } else {
         setError("Registration failed. Email or phone might already be in use.");
       }
