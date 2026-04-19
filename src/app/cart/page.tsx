@@ -56,7 +56,7 @@ export default function CartPage() {
               <div key={item.id} className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 pp-shadow hover:pp-shadow-hover transition-shadow">
                 <div className="flex items-center gap-4">
                   <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-gray-50 shrink-0">
-                    <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />
+                    <Image src={item.imageUrl || ""} alt={item.name} fill sizes="96px" className="object-cover" />
                   </div>
                   {/* Quantity */}
                   <div className="flex items-center bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
@@ -81,7 +81,7 @@ export default function CartPage() {
                   <h3 className="text-sm font-medium text-gray-900">{item.name}</h3>
                   <div className="flex items-baseline gap-2 mt-1">
                     <span className="text-lg font-bold text-gray-900">{formatPrice(item.price)}</span>
-                    {item.discount > 0 && (
+                    {(item.discount ?? 0) > 0 && item.originalPrice && (
                       <>
                         <span className="text-gray-400 line-through text-xs">{formatPrice(item.originalPrice)}</span>
                         <span className="text-pp-success font-bold text-xs">{item.discount}% Off</span>

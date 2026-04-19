@@ -63,13 +63,13 @@ export default function WishlistPage() {
               <Link href={`/product/${item.id}`}>
                 <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
                   <Image
-                    src={item.image}
+                    src={item.imageUrl || ""}
                     alt={item.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  {item.discount > 0 && (
+                  {(item.discount ?? 0) > 0 && (
                     <div className="absolute top-3 left-3 bg-pp-accent text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
                       {item.discount}% OFF
                     </div>
@@ -88,14 +88,14 @@ export default function WishlistPage() {
 
                 <div className="flex items-center gap-1.5">
                   <div className="bg-pp-success text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                    {item.rating} <Star className="w-2.5 h-2.5 fill-white" />
+                    {item.rating ?? 4.5} <Star className="w-2.5 h-2.5 fill-white" />
                   </div>
-                  <span className="text-gray-400 text-[11px]">({item.reviews.toLocaleString()})</span>
+                  <span className="text-gray-400 text-[11px]">({(item.reviews ?? 0).toLocaleString()})</span>
                 </div>
 
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold text-gray-900">{formatPrice(item.price)}</span>
-                  {item.discount > 0 && (
+                  {(item.discount ?? 0) > 0 && item.originalPrice && (
                     <span className="text-gray-400 text-xs line-through">{formatPrice(item.originalPrice)}</span>
                   )}
                 </div>
