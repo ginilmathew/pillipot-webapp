@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Globe, MessageCircle, Play, Camera, Mail, Phone, MapPin, ShieldCheck, CreditCard, Truck } from "lucide-react";
 

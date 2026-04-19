@@ -3,6 +3,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, getMe } from "@/lib/api";
 import { useRouter, usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const LoginModal = dynamic(() => import("@/components/auth/LoginModal"), { ssr: false });
 
 interface AuthContextType {
   user: User | null;
@@ -58,14 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem("pillipot_token", newToken);
-    setIsLoginModalOpen(false); // Close modal on successful login
-    setIsRegisterModalOpen(false); // Close modal on successful login
+    // Set cookie for middleware (expires in 7 days)
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = `pillipot_token=${newToken}; path=/; expires=${expires}; SameSite=Lax`;
+    
+    setIsLoginModalOpen(false);
+    setIsRegisterModalOpen(false);
   };
 
   const logoutAction = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("pillipot_token");
+    // Remove cookie
+    document.cookie = "pillipot_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     router.push("/login");
   };
 
@@ -82,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout: logoutAction 
     }}>
       {children}
+      <LoginModal />
     </AuthContext.Provider>
   );
 }

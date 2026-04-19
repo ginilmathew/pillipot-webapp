@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Trash2, Plus, Minus, ShieldCheck, ArrowRight, ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
-  const { cart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
+  const { cart, removeFromCart, updateQuantity, cartTotal, cartCount, syncingItems } = useCart();
 
   const formatPrice = (num: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -53,7 +53,12 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="flex-1 w-full flex flex-col gap-3">
             {cart.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 pp-shadow hover:pp-shadow-hover transition-shadow">
+              <div 
+                key={item.id} 
+                className={`bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 pp-shadow hover:pp-shadow-hover transition-all ${
+                  syncingItems[item.id] ? "opacity-70 pointer-events-none sm:pointer-events-auto" : "opacity-100"
+                }`}
+              >
                 <div className="flex items-center gap-4">
                   <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                     <Image
@@ -65,20 +70,29 @@ export default function CartPage() {
                     />
                   </div>
                   {/* Quantity */}
-                  <div className="flex items-center bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.cartQuantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="w-8 text-center text-sm font-bold">{item.cartQuantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.cartQuantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.cartQuantity - 1)}
+                        disabled={item.cartQuantity <= 1 || syncingItems[item.id]}
+                        className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="w-8 text-center text-sm font-bold">
+                        {syncingItems[item.id] ? "..." : item.cartQuantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.cartQuantity + 1)}
+                        disabled={item.cartQuantity >= (item.stockQuantity || 99) || syncingItems[item.id]}
+                        className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                    {item.stockQuantity && item.stockQuantity < 10 && (
+                      <span className="text-[10px] font-bold text-pp-accent">Only {item.stockQuantity} left</span>
+                    )}
                   </div>
                 </div>
 
@@ -99,7 +113,8 @@ export default function CartPage() {
 
                 <button
                   onClick={() => removeFromCart(item.id)}
-                  className="self-start text-gray-400 hover:text-pp-accent transition-colors p-2 rounded-lg hover:bg-red-50"
+                  disabled={syncingItems[item.id]}
+                  className="self-start text-gray-400 hover:text-pp-accent transition-colors p-2 rounded-lg hover:bg-red-50 disabled:opacity-30"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -136,13 +151,17 @@ export default function CartPage() {
               </div>
             </div>
 
-            <Link
-              href="/checkout"
-              className="mt-4 w-full pp-gradient text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all text-sm"
+            <button
+              onClick={() => {
+                if (Object.values(syncingItems).some(isSyncing => isSyncing)) return;
+                router.push("/checkout");
+              }}
+              disabled={Object.values(syncingItems).some(isSyncing => isSyncing)}
+              className="mt-4 w-full pp-gradient text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all text-sm disabled:opacity-50 disabled:cursor-wait"
             >
-              PROCEED TO CHECKOUT
+              {Object.values(syncingItems).some(isSyncing => isSyncing) ? "SAVING CHANGES..." : "PROCEED TO CHECKOUT"}
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
 
             <div className="mt-4 flex items-center gap-2 text-gray-400 text-[11px]">
               <ShieldCheck className="w-5 h-5 shrink-0" />

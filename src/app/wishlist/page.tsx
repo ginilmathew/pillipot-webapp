@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useWishlist } from "@/context/WishlistContext";
@@ -9,15 +10,21 @@ import Link from "next/link";
 import { Heart, ShoppingCart, Trash2, Star } from "lucide-react";
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist } = useWishlist();
+  const { wishlist, removeItem } = useWishlist();
   const { addToCart } = useCart();
+  const [movingItems, setMovingItems] = useState<Record<string, boolean>>({});
 
   const formatPrice = (num: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(num);
 
-  const handleMoveToCart = (product: any) => {
-    addToCart(product);
-    removeFromWishlist(product.id);
+  const handleMoveToCart = async (product: any) => {
+    setMovingItems(prev => ({ ...prev, [product.id]: true }));
+    try {
+      await addToCart(product);
+      await removeItem(product.id);
+    } finally {
+      setMovingItems(prev => ({ ...prev, [product.id]: false }));
+    }
   };
 
   if (wishlist.length === 0) {
@@ -48,75 +55,82 @@ export default function WishlistPage() {
     <div className="flex flex-col min-h-screen bg-pp-surface">
       <Header />
 
-      <main className="flex-1 pp-container px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">My Wishlist ({wishlist.length})</h1>
+      <main className="flex-1  px-12 py-10">
+        <div className="mb-10">
+          <h1 className="text-xl font-bold text-gray-800 tracking-tight">
+            My Wishlist <span className="font-normal text-gray-500 ml-1">{wishlist.length} {wishlist.length === 1 ? 'Item' : 'Items'}</span>
+          </h1>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {wishlist.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl border border-gray-100 pp-shadow hover:pp-shadow-hover transition-all overflow-hidden group"
+              className="bg-white rounded-sm border border-gray-100 hover:shadow-xl transition-all duration-300 relative group flex flex-col"
             >
-              {/* Image */}
-              <Link href={`/product/${item.id}`}>
-                <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
+              {/* Close/Remove Icon */}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  removeItem(item.id);
+                }}
+                className="absolute top-2 right-2 z-10 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white shadow-sm border border-gray-100 transition-all"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Image Container */}
+              <Link href={`/product/${item.id}`} className="block">
+                <div className="relative w-full aspect-[3/4] bg-gray-50 overflow-hidden">
                   <Image
                     src={item.imageUrl || ""}
                     alt={item.name}
                     fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    className="object-cover"
                   />
                   {(item.discount ?? 0) > 0 && (
-                    <div className="absolute top-3 left-3 bg-pp-accent text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                    <div className="absolute bottom-3 left-0 bg-white/90 backdrop-blur-sm text-pp-accent text-[10px] font-bold px-2 py-1 shadow-sm">
                       {item.discount}% OFF
                     </div>
                   )}
                 </div>
               </Link>
 
-              {/* Info */}
-              <div className="p-4 flex flex-col gap-2">
-                <p className="text-[11px] text-pp-primary font-semibold uppercase tracking-wider">{item.brand}</p>
-                <Link href={`/product/${item.id}`}>
-                  <h3 className="text-sm font-medium text-gray-900 line-clamp-2 hover:text-pp-primary transition-colors">
-                    {item.name}
-                  </h3>
-                </Link>
+              {/* Info Container */}
+              <div className="p-3 flex-1 flex flex-col">
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-gray-800 line-clamp-1 truncate">{item.brand || "PILLIPOT"}</h3>
+                  <p className="text-xs text-gray-500 line-clamp-1 mt-0.5 truncate">{item.name}</p>
 
-                <div className="flex items-center gap-1.5">
-                  <div className="bg-pp-success text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                    {item.rating ?? 4.5} <Star className="w-2.5 h-2.5 fill-white" />
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-sm font-bold text-gray-900">{formatPrice(item.price)}</span>
+                    {(item.discount ?? 0) > 0 && item.originalPrice && (
+                      <span className="text-[10px] text-gray-400 line-through">{formatPrice(item.originalPrice)}</span>
+                    )}
+                    {(item.discount ?? 0) > 0 && (
+                      <span className="text-[10px] text-pp-accent font-bold">({item.discount}% OFF)</span>
+                    )}
                   </div>
-                  <span className="text-gray-400 text-[11px]">({(item.reviews ?? 0).toLocaleString()})</span>
                 </div>
 
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-gray-900">{formatPrice(item.price)}</span>
-                  {(item.discount ?? 0) > 0 && item.originalPrice && (
-                    <span className="text-gray-400 text-xs line-through">{formatPrice(item.originalPrice)}</span>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={() => handleMoveToCart(item)}
-                    className="flex-1 bg-pp-primary text-white py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 hover:bg-pp-primary-dark transition-all"
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5" />
-                    Move to Cart
-                  </button>
-                  <button
-                    onClick={() => removeFromWishlist(item.id)}
-                    className="w-10 h-10 border border-gray-200 rounded-xl flex items-center justify-center text-gray-400 hover:text-pp-accent hover:border-pp-accent hover:bg-red-50 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                {/* Stars/Rating - Optional small version */}
+                <div className="mt-2 flex items-center gap-1 opacity-80">
+                  <div className="bg-pp-success text-white text-[9px] font-bold px-1 py-0.5 rounded flex items-center gap-0.5">
+                    {item.rating ?? 4.5} <Star className="w-2 h-2 fill-white" />
+                  </div>
                 </div>
               </div>
+
+              {/* Full Width Button at Bottom */}
+              <button
+                onClick={() => handleMoveToCart(item)}
+                disabled={movingItems[item.id]}
+                className="w-full bg-white border-t border-gray-100 py-3 text-[11px] font-bold text-pp-primary uppercase tracking-widest hover:bg-pp-primary hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-wait"
+              >
+                {movingItems[item.id] ? "MOVING..." : "MOVE TO BAG"}
+              </button>
             </div>
           ))}
         </div>

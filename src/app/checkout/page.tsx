@@ -46,8 +46,13 @@ export default function CheckoutPage() {
     router.push("/order-success");
   };
 
+  React.useEffect(() => {
+    if (cart.length === 0 && activeStep !== "payment") {
+      router.push("/cart");
+    }
+  }, [cart, activeStep, router]);
+
   if (cart.length === 0 && activeStep !== "payment") {
-    router.push("/cart");
     return null;
   }
 

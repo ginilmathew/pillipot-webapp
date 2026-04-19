@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useRef } from "react";
 import { type Product } from "@/lib/api";
 import Image from "next/image";
@@ -110,7 +111,7 @@ export default function ProductClient({ product }: { product: Product }) {
                     sizes="(max-width: 1024px) 100vw, 40vw"
                     className={`object-contain transition-transform duration-200 ${isHoverZoom ? "scale-200" : "scale-100"}`}
                     style={isHoverZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : {}}
-                    priority
+                    priority // Critical for LCP optimization
                   />
                   <button
                     onClick={(e) => { 
