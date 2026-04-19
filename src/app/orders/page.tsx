@@ -4,27 +4,34 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Image from "next/image";
 import { Search, ChevronRight, Package, CheckCircle2, XCircle, Truck } from "lucide-react";
-import { PRODUCTS } from "@/data/products";
+
+// Self-contained mock items to decouple from the deprecated data/products module
+const MOCK_ITEMS = [
+  { id: "1", name: "Wireless Headphones", price: 2999, brand: "Sony", imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=800" },
+  { id: "2", name: "Running Shoes", price: 4500, brand: "Nike", imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800" },
+  { id: "3", name: "Smart Watch", price: 5999, brand: "Apple", imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800" },
+  { id: "4", name: "Backpack", price: 1200, brand: "Puma", imageUrl: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=800" },
+];
 
 const MOCK_ORDERS = [
   {
     orderId: "PP1234567130",
     status: "Delivered",
     date: "Dec 12, 2025",
-    items: [PRODUCTS[0]],
+    items: [MOCK_ITEMS[0]],
   },
   {
     orderId: "PP9876543510",
     status: "Cancelled",
     date: "Jan 05, 2026",
-    items: [PRODUCTS[3]],
+    items: [MOCK_ITEMS[1]],
   },
   {
     orderId: "PP1122334455",
     status: "On the way",
     date: "Apr 15, 2026",
     expected: "Apr 22, 2026",
-    items: [PRODUCTS[5], PRODUCTS[8]],
+    items: [MOCK_ITEMS[2], MOCK_ITEMS[3]],
   },
 ];
 
@@ -67,7 +74,7 @@ export default function OrdersPage() {
                   {order.items.map((item) => (
                     <div key={item.id} className="flex gap-4 flex-1">
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-50 shrink-0">
-                        <Image src={item.image} alt={item.name} fill sizes="64px" className="object-cover" />
+                        <Image src={item.imageUrl} alt={item.name} fill sizes="64px" className="object-cover" />
                       </div>
                       <div className="flex flex-col gap-0.5">
                         <h3 className="text-sm font-medium text-gray-900 line-clamp-1">{item.name}</h3>
