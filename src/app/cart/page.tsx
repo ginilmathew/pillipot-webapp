@@ -5,9 +5,11 @@ import Footer from "@/components/layout/Footer";
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Trash2, Plus, Minus, ShieldCheck, ArrowRight, ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
+  const router = useRouter();
   const { cart, removeFromCart, updateQuantity, cartTotal, cartCount, syncingItems } = useCart();
 
   const formatPrice = (num: number) => {
