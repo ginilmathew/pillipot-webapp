@@ -32,17 +32,8 @@ const COLOR_MAP: Record<string, string> = {
   "Top Offers": "from-red-500 to-orange-400",
 };
 
-export default function CategoryBar() {
+export default function CategoryBar({ categories }: { categories: Category[] }) {
   const pathname = usePathname();
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    async function load() {
-      const cats = await getCategories();
-      setCategories(cats);
-    }
-    load();
-  }, []);
 
   const displayCategories = [
     { name: "Home", href: "/", icon: LayoutGrid, color: "from-pp-primary to-purple-400" },
