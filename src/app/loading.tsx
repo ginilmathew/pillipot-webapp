@@ -5,13 +5,25 @@ export default function HomeLoading() {
   return (
     <div className="flex flex-col min-h-screen bg-pp-surface">
       <Header />
+      
+      {/* CategoryBar Skeleton */}
+      <div className="bg-white pp-shadow border-b border-gray-100 py-3">
+        <div className="pp-container flex items-center px-4 lg:px-8 gap-8 overflow-hidden">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 min-w-[72px]">
+              <div className="w-12 h-12 rounded-2xl bg-gray-100 animate-pulse" />
+              <div className="w-10 h-2 bg-gray-100 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* Hero Banner Skeleton - Full width to match new layout */}
-      <div className="w-full h-[300px] md:h-[380px] bg-gray-200 animate-pulse border-b border-white/5" />
-
-      <main className="flex-1 pp-container px-4 pb-8">
+      <main className="flex-1 pp-container px-4 py-8">
+        {/* Banner Skeleton */}
+        <div className="w-full h-[260px] md:h-[340px] bg-gray-200 animate-pulse rounded-3xl mb-12" />
+        
         {/* Badges Skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 -mt-8 relative z-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="bg-white rounded-xl p-4 flex gap-3 border border-gray-50 h-20">
               <div className="w-10 h-10 rounded-xl bg-gray-100 animate-pulse" />
