@@ -97,10 +97,11 @@ export default function ProductClient({ product }: { product: Product }) {
                 {/* Main Image */}
                 <div 
                   ref={imageRef}
-                  className="flex-1 order-1 sm:order-2 relative aspect-[4/5] sm:aspect-square bg-white border border-gray-100 p-4 cursor-crosshair overflow-hidden"
+                  className="flex-1 order-1 sm:order-2 relative aspect-[4/5] sm:aspect-square bg-white border border-gray-100 p-4 cursor-zoom-in overflow-hidden"
                   onMouseEnter={() => setIsHoverZoom(true)}
                   onMouseLeave={() => setIsHoverZoom(false)}
                   onMouseMove={handleMouseMove}
+                  onClick={() => setZoomOpen(true)}
                 >
                   <Image
                     src={allImages[selectedIndex]}
