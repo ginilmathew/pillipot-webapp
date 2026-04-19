@@ -4,21 +4,56 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Smartphone, Shirt, Monitor, Home as HomeIcon, Tv, Plane, Sparkles, ShoppingBasket, Tag, LayoutGrid } from "lucide-react";
 
-const CATEGORIES = [
-  { name: "Home", href: "/", icon: LayoutGrid, color: "from-pp-primary to-purple-400" },
-  { name: "Top Offers", href: "/category/Top%20Offers", icon: Tag, color: "from-red-500 to-orange-400" },
-  { name: "Mobiles", href: "/category/Mobiles", icon: Smartphone, color: "from-violet-500 to-purple-400" },
-  { name: "Fashion", href: "/category/Fashion", icon: Shirt, color: "from-pink-500 to-rose-400" },
-  { name: "Electronics", href: "/category/Electronics", icon: Monitor, color: "from-blue-500 to-cyan-400" },
-  { name: "Home & Living", href: "/category/Home", icon: HomeIcon, color: "from-emerald-500 to-green-400" },
-  { name: "Appliances", href: "/category/Appliances", icon: Tv, color: "from-slate-500 to-gray-400" },
-  { name: "Travel", href: "/category/Travel", icon: Plane, color: "from-sky-500 to-blue-400" },
-  { name: "Beauty", href: "/category/Beauty", icon: Sparkles, color: "from-fuchsia-500 to-pink-400" },
-  { name: "Grocery", href: "/category/Grocery", icon: ShoppingBasket, color: "from-lime-500 to-green-400" },
-];
+import { getCategories, type Category } from "@/lib/api";
+import { useState, useEffect } from "react";
+import { Smartphone, Shirt, Monitor, Home as HomeIcon, Tv, Plane, Sparkles, ShoppingBasket, Tag, LayoutGrid } from "lucide-react";
+
+const ICON_MAP: Record<string, any> = {
+  "Mobiles": Smartphone,
+  "Fashion": Shirt,
+  "Electronics": Monitor,
+  "Home": HomeIcon,
+  "Appliances": Tv,
+  "Travel": Plane,
+  "Beauty": Sparkles,
+  "Grocery": ShoppingBasket,
+  "Top Offers": Tag,
+};
+
+const COLOR_MAP: Record<string, string> = {
+  "Mobiles": "from-violet-500 to-purple-400",
+  "Fashion": "from-pink-500 to-rose-400",
+  "Electronics": "from-blue-500 to-cyan-400",
+  "Home": "from-emerald-500 to-green-400",
+  "Appliances": "from-slate-500 to-gray-400",
+  "Travel": "from-sky-500 to-blue-400",
+  "Beauty": "from-fuchsia-500 to-pink-400",
+  "Grocery": "from-lime-500 to-green-400",
+  "Top Offers": "from-red-500 to-orange-400",
+};
 
 export default function CategoryBar() {
   const pathname = usePathname();
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const cats = await getCategories();
+      setCategories(cats);
+    }
+    load();
+  }, []);
+
+  const displayCategories = [
+    { name: "Home", href: "/", icon: LayoutGrid, color: "from-pp-primary to-purple-400" },
+    ...categories.map(c => ({
+      name: c.name,
+      href: `/category/${c.id}`,
+      icon: ICON_MAP[c.name] || Smartphone,
+      color: COLOR_MAP[c.name] || "from-pp-primary to-pp-accent"
+    }))
+  ];
+
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -28,7 +63,7 @@ export default function CategoryBar() {
   return (
     <div className="bg-white pp-shadow border-b border-gray-100">
       <div className="pp-container flex items-center justify-between px-4 lg:px-8 gap-3 overflow-x-auto no-scrollbar py-3">
-        {CATEGORIES.map((cat) => {
+        {displayCategories.map((cat) => {
           const Icon = cat.icon;
           const active = isActive(cat.href);
           return (

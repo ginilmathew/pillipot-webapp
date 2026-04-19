@@ -1,11 +1,11 @@
 "use client";
 
-import { use, useState, useRef } from "react";
+import { use, useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { PRODUCTS } from "@/data/products";
+import { getProduct, type Product } from "@/lib/api";
 import Image from "next/image";
-import { Star, ShoppingCart, Zap, ShieldCheck, Tag, Truck, RotateCcw, Heart, Share2, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { Star, ShoppingCart, Zap, ShieldCheck, Tag, Truck, RotateCcw, Heart, Share2, X, ChevronLeft, ChevronRight, ZoomIn, Play } from "lucide-react";
 import { notFound } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -16,12 +16,31 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   const router = useRouter();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const product = PRODUCTS.find((p) => p.id === id);
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
+  useEffect(() => {
+    async function load() {
+      try {
+        const p = await getProduct(id);
+        setProduct(p);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [id]);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (!product) notFound();
 
-  const allImages = product.images && product.images.length > 0 ? product.images : [product.image];
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const allImages = [product.imageUrl, product.imageUrl2, product.imageUrl3].filter(Boolean) as string[];
+  if (allImages.length === 0) allImages.push("https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?auto=format&fit=crop&q=80&w=600");
+
   const [zoomOpen, setZoomOpen] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [isHoverZoom, setIsHoverZoom] = useState(false);
@@ -203,6 +222,20 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               <h3 className="text-base font-bold text-gray-900 mb-3">Product Description</h3>
               <p className="text-gray-600 leading-relaxed text-sm">{product.description}</p>
             </div>
+
+            {/* Video */}
+            {product.videoUrl && (
+              <div className="bg-white rounded-xl border border-gray-100 p-5 pp-shadow">
+                <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Play className="w-4 h-4 text-pp-primary" /> Product Video
+                </h3>
+                <div className="aspect-video relative rounded-xl overflow-hidden bg-black/5">
+                  <video controls className="w-full h-full">
+                    <source src={product.videoUrl} />
+                  </video>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>

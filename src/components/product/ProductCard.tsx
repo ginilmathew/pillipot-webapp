@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Star, Heart } from "lucide-react";
-import { Product } from "@/data/products";
+import { Product } from "@/types";
 import { useWishlist } from "@/context/WishlistContext";
 
 interface ProductCardProps {
@@ -13,6 +13,11 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const wishlisted = isInWishlist(product.id);
+  const displayImage = product.imageUrl || product.image || "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?auto=format&fit=crop&q=80&w=600";
+  const rating = product.rating ?? 4.5;
+  const reviews = product.reviews ?? 100;
+  const discount = product.discount ?? 0;
+  const originalPrice = product.originalPrice ?? (product.price * 1.1);
 
   const formatPrice = (num: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -28,15 +33,15 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.id}`}>
         <div className="relative w-full aspect-square mb-3 overflow-hidden rounded-xl bg-gray-50">
           <Image
-            src={product.image}
+            src={displayImage}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          {product.discount > 0 && (
+          {discount > 0 && (
             <div className="absolute top-2 left-2 bg-pp-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-              {product.discount}% OFF
+              {discount}% OFF
             </div>
           )}
         </div>
@@ -63,15 +68,15 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex items-center gap-1.5 mt-auto">
           <div className="bg-pp-success text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-            {product.rating} <Star className="w-2.5 h-2.5 fill-white" />
+            {rating} <Star className="w-2.5 h-2.5 fill-white" />
           </div>
-          <span className="text-gray-400 text-[11px]">({product.reviews.toLocaleString()})</span>
+          <span className="text-gray-400 text-[11px]">({reviews.toLocaleString()})</span>
         </div>
 
         <div className="flex items-baseline gap-2 mt-1">
           <span className="text-base font-bold text-gray-900">{formatPrice(product.price)}</span>
-          {product.discount > 0 && (
-            <span className="text-gray-400 text-xs line-through">{formatPrice(product.originalPrice)}</span>
+          {discount > 0 && (
+            <span className="text-gray-400 text-xs line-through">{formatPrice(originalPrice)}</span>
           )}
         </div>
       </Link>
