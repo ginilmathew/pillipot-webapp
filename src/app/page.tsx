@@ -12,7 +12,7 @@ import BannerSlider from "@/components/home/BannerSlider";
 
 async function ProductFeed() {
   const [products, categories] = await Promise.all([getProducts(), getCategories()]);
-  
+
   const sections = categories.map(cat => ({
     title: cat.name,
     products: products.filter(p => p.categoryId === cat.id).slice(0, 5),
@@ -45,11 +45,11 @@ export default async function Home() {
         <BannerSlider banners={banners} />
       ) : (
         /* Original Hero Banner - Keep as fallback if no marketing banners are defined */
-        <div className="px-4 md:px-6 lg:px-8 pt-6">
-          <div className="relative w-full overflow-hidden mb-12 pp-gradient group cursor-pointer shadow-lg rounded-3xl">
+        <div className="px-4 md:px-6 lg:px-30 pt-6">
+          <div className="relative w-full overflow-hidden  pp-gradient group cursor-pointer shadow-lg rounded-1xl">
             <div className="pp-container px-6 lg:px-12">
               <div className="flex flex-col md:flex-row items-center min-h-[200px] md:min-h-[280px]">
-                <div className="p-8 md:p-10 lg:p-14 flex-1 z-10">
+                <div className=" flex-1 z-10">
                   <div className="flex items-center gap-2 mb-3">
                     <Zap className="w-5 h-5 text-yellow-300" />
                     <span className="text-white/80 text-xs font-bold uppercase tracking-widest">Flash Sale Live</span>
@@ -64,7 +64,7 @@ export default async function Home() {
                     Shop Now <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <div className="relative w-full md:w-[40%] h-48 md:h-[320px]">
+                <div className="relative w-full md:w-[40%] h-48 md:h-[230px]">
                   <Image
                     src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=800"
                     alt="Flash Sale"
@@ -80,9 +80,9 @@ export default async function Home() {
         </div>
       )}
 
-      <main className="flex-1 px-4 md:px-16 py-6">
+      <main className="flex-1 px-4 md:px-30 py-6">
         {/* Feature badges - Fast Static Content */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
           <div className="bg-white rounded-xl p-4 flex items-center gap-3 pp-shadow border border-gray-100">
             <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
               <Truck className="w-5 h-5 text-pp-primary" />
@@ -110,7 +110,7 @@ export default async function Home() {
               <p className="text-xs text-gray-500">7-day replacement policy</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Streaming Data Section */}
         <Suspense fallback={<ProductSectionSkeleton />}>

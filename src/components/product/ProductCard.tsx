@@ -29,6 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="bg-white flex flex-col group cursor-pointer transition-all duration-300 h-full border border-transparent hover:border-gray-200 relative p-4">
+
       {/* Image */}
       <Link href={`/product/${product.id}`}>
         <div className="relative w-full aspect-[3/4] sm:aspect-square mb-3 overflow-hidden">
@@ -39,38 +40,54 @@ export default function ProductCard({ product }: ProductCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="object-contain transition-transform duration-500 group-hover:scale-105"
           />
+
+          {/* ⭐ Rating bottom-right */}
+          <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-[#388e3c] text-white text-[10px] px-1.5 py-0.5 rounded">
+            {rating}
+            <Star className="w-2.5 h-2.5 fill-white" />
+            {/* <span className="text-gray-200 text-[10px]">
+              ({reviews.toLocaleString()})
+            </span> */}
+          </div>
         </div>
       </Link>
 
       {/* Wishlist button */}
       <button
-        onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+        onClick={(e) => {
+          e.preventDefault();
+          toggleWishlist(product);
+        }}
         className="absolute top-4 right-4 text-gray-300 hover:text-pp-accent transition-colors z-10"
       >
-        <Heart className={`w-5 h-5 ${wishlisted ? "fill-pp-accent text-pp-accent" : ""}`} />
+        <Heart
+          className={`w-5 h-5 ${wishlisted ? "fill-pp-accent text-pp-accent" : ""
+            }`}
+        />
       </button>
 
       {/* Info */}
-      <Link href={`/product/${product.id}`} className="flex flex-col gap-1.5 flex-1 items-start text-left">
+      <Link
+        href={`/product/${product.id}`}
+        className="flex flex-col gap-1.5 flex-1 items-start text-left"
+      >
         <h3 className="text-sm font-medium text-gray-900 line-clamp-1 group-hover:text-pp-primary transition-colors">
           {product.name}
         </h3>
-        
-        <p className="text-xs text-gray-500 truncate w-full">{product.brand || "Pillipot"}</p>
-
-        <div className="flex items-center gap-2">
-          <div className="bg-[#388e3c] text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
-            {rating} <Star className="w-2.5 h-2.5 fill-white" />
-          </div>
-          <span className="text-gray-400 text-[11px]">({reviews.toLocaleString()})</span>
-        </div>
 
         <div className="flex items-center gap-2 mt-auto">
-          <span className="text-base font-bold text-gray-900">{formatPrice(product.price)}</span>
+          <span className="text-base font-bold text-gray-900">
+            {formatPrice(product.price)}
+          </span>
+
           {discount > 0 && (
             <>
-              <span className="text-gray-400 text-xs line-through">{formatPrice(originalPrice)}</span>
-              <span className="text-[#388e3c] text-xs font-bold">{discount}% off</span>
+              <span className="text-gray-400 text-xs line-through">
+                {formatPrice(originalPrice)}
+              </span>
+              <span className="text-[#388e3c] text-xs font-bold">
+                {discount}% off
+              </span>
             </>
           )}
         </div>

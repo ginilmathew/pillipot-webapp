@@ -38,7 +38,7 @@ export default function Header() {
   return (
     <>
       <header className="pp-gradient sticky top-0 z-50">
-        <div className="pp-container w-full flex items-center px-4 md:px-8 h-14 md:h-16 gap-3 lg:gap-8">
+        <div className="pp-container w-full flex items-center   h-14 md:h-16 gap-3 lg:gap-8">
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -179,11 +179,10 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                    pathname === item.href
-                      ? "bg-violet-50 text-pp-primary font-bold"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${pathname === item.href
+                    ? "bg-violet-50 text-pp-primary font-bold"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <item.icon className="w-5 h-5" />
                   {item.label}
