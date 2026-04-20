@@ -81,7 +81,8 @@ const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
 
                   {banner.linkUrl && (
                     <div className="pt-2">
-                      <span className="inline-flex items-center gap-3 bg-white text-pp-primary px-5 py-4 rounded-lg font-black hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:bg-pp-primary hover:text-white transition-all duration-300 text-base shadow-xl group/btn">
+                      <span className="inline-flex items-center gap-2 sm:gap-3 bg-white text-pp-primary px-3 py-2 sm:px-5 sm:py-4 rounded-lg font-black text-sm sm:text-base shadow-lg sm:shadow-xl hover:bg-pp-primary hover:text-white sm:hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] transition-all duration-300 group/btn"
+                      >
                         Shop Now
                         <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                       </span>

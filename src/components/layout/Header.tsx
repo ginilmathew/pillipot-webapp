@@ -75,7 +75,7 @@ export default function Header() {
           {/* Mobile search toggle */}
           <button
             onClick={() => setSearchOpen(!searchOpen)}
-            className="md:hidden text-white p-1 ml-auto"
+            className="md:hidden text-white p-3 ml-auto"
           >
             <Search className="w-5 h-5" />
           </button>
