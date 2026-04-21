@@ -168,7 +168,7 @@ export default function ProductClient({ product }: { product: Product }) {
               <div className="flex items-center gap-1 bg-pp-success text-white text-sm font-bold px-2.5 py-1 rounded-lg">
                 {product.rating || 0} <Star className="w-3.5 h-3.5 fill-white" />
               </div>
-              <span className="text-gray-500 text-sm">{(product.reviews || 0).toLocaleString()} ratings & reviews</span>
+              <span className="text-gray-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings & reviews</span>
             </div>
 
             <div className="flex items-baseline gap-3">
