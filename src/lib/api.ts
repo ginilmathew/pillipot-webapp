@@ -218,6 +218,7 @@ export async function getAddresses(token: string): Promise<CustomerAddress[]> {
   const res = await fetch(`${API_URL}/customer/addresses`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  //jh
   if (!res.ok) return [];
   return res.json();
 }
