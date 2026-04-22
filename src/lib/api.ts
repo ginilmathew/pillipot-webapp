@@ -410,6 +410,7 @@ export type OrderApiItem = {
   quantity: number;
   sellingAmount: number;
   imageUrl?: string;
+  deliveryFee?: number;
 };
 
 export type OrderApiSummary = {
@@ -435,6 +436,14 @@ export async function getMyOrders(token: string): Promise<OrderApiSummary[]> {
 export type OrderApiDetail = OrderApiSummary & {
   deliveryAddress?: string;
   phone?: string;
+  currentStep: number;
+  statusSteps: string[];
+  grandTotal: number;
+  orderType: string;
+  postOffice: string;
+  district: string;
+  state: string;
+  pincode: string;
 };
 
 export async function getOrderDetails(token: string, orderId: string): Promise<OrderApiDetail | null> {
