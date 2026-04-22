@@ -12,7 +12,7 @@ import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 
 export default function MyOrdersPage() {
-  const { token, user } = useAuth();
+  const { token, user, loading } = useAuth();
   const { addToCart } = useCart();
   const { success, error } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
@@ -28,12 +28,13 @@ export default function MyOrdersPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (loading) return;
     if (!token) {
       router.push("/");
       return;
     }
     loadOrders();
-  }, [token]);
+  }, [token, loading]);
 
   const loadOrders = async () => {
     setIsLoading(true);
