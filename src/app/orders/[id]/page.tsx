@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -20,26 +20,19 @@ import {
   Calendar,
   Loader2
 } from "lucide-react";
+import useSWR from "swr";
+import { swrKeys } from "@/lib/swrKeys";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
   const { token } = useAuth();
   const router = useRouter();
-  const [order, setOrder] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (id && token) {
-      loadOrder();
-    }
-  }, [id, token]);
-
-  const loadOrder = async () => {
-    setIsLoading(true);
-    const data = await getOrderDetails(token!, id as string);
-    setOrder(data);
-    setIsLoading(false);
-  };
+  const orderId = typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
+  const { data: order, isLoading } = useSWR(
+    token && orderId ? swrKeys.orderDetails(token, orderId) : null,
+    ([, t, oid]) => getOrderDetails(t, oid),
+    { keepPreviousData: true }
+  );
 
   const formatPrice = (num: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(num);

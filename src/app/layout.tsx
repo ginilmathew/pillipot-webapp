@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import { CartProvider } from "@/context/CartContext";
-import { WishlistProvider } from "@/context/WishlistContext";
-import { AuthProvider } from "@/context/AuthContext";
-import { ToastProvider } from "@/context/ToastContext";
 import Script from 'next/script'
-import ScrollToTop from "@/components/common/ScrollToTop";
+import Providers from "./providers";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -53,18 +49,8 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-pp-surface" suppressHydrationWarning>
-        <ToastProvider>
-          <AuthProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <ScrollToTop />
-                {children}
-              </WishlistProvider>
-            </CartProvider>
-          </AuthProvider>
-        </ToastProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
 }
-

@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 import { Check, ShieldCheck, MapPin, CreditCard, Banknote, Smartphone, Plus, Trash2, Home, Briefcase, Loader2, PencilLine, Package, X } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { getAddresses, addAddress, autofillAddress, checkout, type CustomerAddress, deleteAddress, setDefaultAddress, updateAddress } from "@/lib/api";
+import { getAddresses, addAddress, autofillAddress, checkout, type CustomerAddress, deleteAddress, updateAddress } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
+import useSWR from "swr";
+import { swrKeys } from "@/lib/swrKeys";
 
 type Step = "address" | "summary" | "payment";
 
@@ -20,7 +22,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   
   const [activeStep, setActiveStep] = useState<Step>("address");
-  const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
+  // Addresses are fetched + cached via SWR to avoid refetching on re-renders/navigation.
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,28 +47,26 @@ export default function CheckoutPage() {
   const formatPrice = (num: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(num);
 
-  // Fetch addresses if logged in
-  useEffect(() => {
-    if (user && token) {
-      loadAddresses();
+  // SWR: cache + dedupe address list fetches (prevents repeated calls on re-renders/nav).
+  const {
+    data: swrAddresses = [],
+    isLoading: isAddressesLoading,
+    mutate: mutateAddresses,
+  } = useSWR(
+    token ? swrKeys.addresses(token) : null,
+    ([, t]) => getAddresses(t),
+    {
+      keepPreviousData: true,
+      onSuccess: (data) => {
+        // Initialize the selected address once, without a useEffect (avoid cascading renders).
+        if (!selectedAddressId && data.length > 0) {
+          const defaultAddr = data.find((a) => a.isDefault) || data[0];
+          if (defaultAddr) setSelectedAddressId(defaultAddr.id);
+        }
+      },
     }
-  }, [user, token]);
-
-  const loadAddresses = async () => {
-    setIsLoading(true);
-    const data = await getAddresses(token!);
-    setAddresses(data);
-    const defaultAddr = data.find(a => a.isDefault) || data[0];
-    if (defaultAddr) setSelectedAddressId(defaultAddr.id);
-    setIsLoading(false);
-  };
-  
-  // Set email from logged-in user
-  useEffect(() => {
-    if (user?.username) {
-      setFormData(prev => ({ ...prev, email: user.username }));
-    }
-  }, [user]);
+  );
+  const addresses = swrAddresses;
 
   // Phone Autofill logic
   useEffect(() => {
@@ -161,7 +161,7 @@ export default function CheckoutPage() {
     }
 
     if (res) {
-      await loadAddresses();
+      await mutateAddresses();
       setShowAddressForm(false);
       setEditAddressId(null);
       setSelectedAddressId(res.id);
@@ -207,7 +207,7 @@ export default function CheckoutPage() {
     e.stopPropagation();
     if (token) {
       await deleteAddress(token, id);
-      loadAddresses();
+      void mutateAddresses();
     }
   };
 
@@ -396,7 +396,7 @@ export default function CheckoutPage() {
                 )}
 
                 {/* Address Form (Add New or Initial for Guest) */}
-                {(showAddressForm || (addresses.length === 0 && !isLoading)) && (
+                {(showAddressForm || (addresses.length === 0 && !isAddressesLoading)) && (
                   <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-pp-primary/5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                       <div className="flex items-center gap-3">

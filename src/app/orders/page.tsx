@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import { submitReview } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
+import useSWR from "swr";
+import { swrKeys } from "@/lib/swrKeys";
 
 type OrderItem = {
   productId: string;
@@ -32,8 +34,6 @@ export default function MyOrdersPage() {
   const { token, user, loading } = useAuth();
   const { addToCart } = useCart();
   const { success, error } = useToast();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -44,12 +44,13 @@ export default function MyOrdersPage() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const router = useRouter();
 
-  async function loadOrders() {
-    setIsLoading(true);
-    const data = await getMyOrders(token!);
-    setOrders(data as Order[]);
-    setIsLoading(false);
-  }
+  const {
+    data: orders = [],
+    isLoading: isOrdersLoading,
+    mutate: mutateOrders,
+  } = useSWR(token ? swrKeys.myOrders(token) : null, ([, t]) => getMyOrders(t), {
+    keepPreviousData: true,
+  });
 
   useEffect(() => {
     if (loading) return;
@@ -57,9 +58,6 @@ export default function MyOrdersPage() {
       router.push("/");
       return;
     }
-    // The fetch is intentionally kicked off from auth readiness.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadOrders();
   }, [loading, router, token]);
 
   const handleCancelClick = (orderId: string) => {
@@ -73,7 +71,7 @@ export default function MyOrdersPage() {
     setIsCancelling(true);
     const apiSuccess = await cancelOrderApi(token, selectedOrderId);
     if (apiSuccess) {
-      await loadOrders();
+      await mutateOrders();
       setShowCancelModal(false);
       setSelectedOrderId(null);
       success("Order cancelled successfully");
@@ -151,7 +149,7 @@ export default function MyOrdersPage() {
           </div>
         </div>
 
-        {isLoading ? (
+        {isOrdersLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-10 h-10 text-pp-primary animate-spin" />
             <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Loading orders...</p>
