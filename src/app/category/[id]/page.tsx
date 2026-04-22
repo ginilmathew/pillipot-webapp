@@ -143,9 +143,12 @@ function SortLink({ label, sortKey, isActive, currentParams }: { label: string; 
   if (sortKey) query.sort = sortKey;
   else delete query.sort;
   
+  const queryString = new URLSearchParams(query as any).toString();
+  const href = `?${queryString}`;
+  
   return (
     <Link
-      href={{ query }}
+      href={href}
       scroll={false}
       className={`px-1 py-1 transition-all ${isActive ? "text-pp-primary font-black border-b-2 border-pp-primary" : "text-gray-500 font-bold hover:text-pp-primary"}`}
     >
