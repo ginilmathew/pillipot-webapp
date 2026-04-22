@@ -15,7 +15,7 @@ const mobileNav = [
   { label: "My Cart", href: "/cart", icon: ShoppingCart },
 ];
 
-export default function Header() {
+function HeaderContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -365,5 +365,13 @@ function BottomNavItem({
         </span>
       ) : null}
     </Link>
+  );
+}
+
+export default function Header() {
+  return (
+    <React.Suspense fallback={<header className="sticky top-0 z-50 h-20 border-b border-white/40 bg-white/65" />}>
+      <HeaderContent />
+    </React.Suspense>
   );
 }
