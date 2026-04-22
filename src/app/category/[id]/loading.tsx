@@ -7,15 +7,15 @@ export default function CategoryLoading() {
       <Header />
 
       {/* CategoryBar skeleton (match sticky offset + sizing) */}
-      <div className="sticky top-16 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-2xl">
-        <div className="pp-container py-2.5 md:py-3">
+      <div className="sticky top-14 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-2xl">
+        <div className="pp-container py-2 md:py-3">
           <div className="no-scrollbar flex items-center gap-3 overflow-x-auto">
             {[...Array(10)].map((_, i) => (
               <div
                 key={i}
-                className="flex min-w-[80px] flex-col items-center gap-2 rounded-[1.35rem] border border-white/40 bg-white/65 px-2.5 py-2.5 text-center md:min-w-[92px] md:rounded-[1.55rem] md:px-3 md:py-3"
+                className="flex min-w-[72px] flex-col items-center gap-1.5 rounded-[1.25rem] border border-white/40 bg-white/65 px-2 py-2 text-center md:min-w-[92px] md:gap-2 md:rounded-[1.55rem] md:px-3 md:py-3"
               >
-                <div className="h-10 w-10 rounded-xl bg-slate-100 animate-pulse md:h-12 md:w-12 md:rounded-2xl" />
+                <div className="h-9 w-9 rounded-xl bg-slate-100 animate-pulse md:h-12 md:w-12 md:rounded-2xl" />
                 <div className="h-2 w-12 rounded bg-slate-100 animate-pulse" />
               </div>
             ))}
@@ -98,4 +98,3 @@ export default function CategoryLoading() {
     </div>
   );
 }
-

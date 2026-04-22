@@ -54,21 +54,21 @@ function HeaderContent() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-white/40 bg-white/65 backdrop-blur-2xl">
-        <div className="absolute inset-x-0 top-0 h-20 pp-gradient opacity-95" />
-        <div className="absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_24%),linear-gradient(180deg,rgba(8,17,32,0.05),transparent)]" />
+        <div className="absolute inset-x-0 top-0 h-18 pp-gradient opacity-95" />
+        <div className="absolute inset-x-0 top-0 h-18 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_24%),linear-gradient(180deg,rgba(8,17,32,0.05),transparent)]" />
 
-        <div className="pp-container relative flex min-h-16 items-center gap-2.5 py-2.5">
+        <div className="pp-container relative flex min-h-14 items-center gap-2 py-2">
           <button
             onClick={() => setMenuOpen((open) => !open)}
-            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/20 bg-white/15 text-white shadow-lg shadow-black/10"
+            className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/20 bg-white/15 text-white shadow-lg shadow-black/10"
             aria-label="Open menu"
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
 
           <Link href="/" className="group flex min-w-0 items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/25 bg-white/90 shadow-[0_20px_50px_rgba(10,25,60,0.22)] transition-transform duration-300 group-hover:-translate-y-0.5">
-              <span className="bg-gradient-to-br from-pp-primary via-sky-500 to-pp-accent bg-clip-text text-xl font-black text-transparent">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-white/25 bg-white/90 shadow-[0_20px_50px_rgba(10,25,60,0.22)] transition-transform duration-300 group-hover:-translate-y-0.5">
+              <span className="bg-gradient-to-br from-pp-primary via-sky-500 to-pp-accent bg-clip-text text-lg font-black text-transparent">
                 P
               </span>
             </div>

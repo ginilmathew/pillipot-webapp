@@ -61,9 +61,9 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
   };
 
   return (
-    <div className="sticky top-16 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-2xl">
-      <div className="pp-container py-2.5 md:py-3">
-        <div className="no-scrollbar flex items-center gap-3 overflow-x-auto">
+    <div className="sticky top-14 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-2xl">
+      <div className="pp-container py-2 md:py-3">
+        <div className="no-scrollbar flex items-center gap-2.5 overflow-x-auto">
           {displayCategories.map((category) => {
             const active = isActive(category.href);
             const Icon = category.icon;
@@ -72,14 +72,14 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
               <Link
                 key={category.name}
                 href={category.href}
-                className={`group flex min-w-[80px] flex-col items-center gap-2 rounded-[1.35rem] border px-2.5 py-2.5 text-center md:min-w-[92px] md:rounded-[1.55rem] md:px-3 md:py-3 ${
+                className={`group flex min-w-[72px] flex-col items-center gap-1.5 rounded-[1.25rem] border px-2 py-2 text-center md:min-w-[92px] md:gap-2 md:rounded-[1.55rem] md:px-3 md:py-3 ${
                   active
                     ? "border-sky-200 bg-white shadow-[0_20px_40px_rgba(9,22,43,0.1)]"
                     : "border-white/40 bg-white/65 hover:border-sky-100 hover:bg-white"
                 }`}
               >
                 <div
-                  className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${category.color} shadow-lg shadow-slate-900/12 md:h-12 md:w-12 md:rounded-2xl`}
+                  className={`relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${category.color} shadow-lg shadow-slate-900/12 md:h-12 md:w-12 md:rounded-2xl`}
                 >
                   {category.imageUrl ? (
                     <Image
@@ -94,7 +94,7 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
                   )}
                 </div>
                 <span
-                  className={`text-[10px] font-bold leading-tight md:text-[11px] ${
+                  className={`text-[9px] font-bold leading-tight md:text-[11px] ${
                     active ? "text-pp-primary" : "text-slate-600 group-hover:text-slate-900"
                   }`}
                 >
