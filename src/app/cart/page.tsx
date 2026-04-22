@@ -24,20 +24,24 @@ export default function CartPage() {
     return (
       <div className="flex flex-col min-h-screen bg-pp-surface">
         <Header />
-        <main className="flex-1 pp-container flex flex-col items-center justify-center py-20 px-4">
-          <div className="w-24 h-24 rounded-full bg-violet-50 flex items-center justify-center mb-6">
-            <ShoppingBag className="w-12 h-12 text-pp-primary/40" />
+        <main className="flex-1 pp-container px-4 py-8 md:py-10">
+          <div className="mx-auto max-w-2xl rounded-[2rem] border border-white/60 bg-white/78 p-6 text-center pp-shadow md:p-8">
+            <div className="mb-5 flex justify-center">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#edf4ff] md:h-24 md:w-24">
+                <ShoppingBag className="h-10 w-10 text-pp-primary/40 md:h-12 md:w-12" />
+              </div>
+            </div>
+            <h2 className="mb-2 text-2xl font-black tracking-[-0.04em] text-slate-950 md:text-3xl">Your cart is empty</h2>
+            <p className="mx-auto mb-6 max-w-md text-sm leading-7 text-slate-500">
+              Looks like you haven&apos;t added anything yet. Start exploring and add your favorite products to the bag.
+            </p>
+            <Link
+              href="/"
+              className="pp-button-primary inline-flex rounded-full px-8 py-3 text-sm font-bold"
+            >
+              EXPLORE PRODUCTS
+            </Link>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-          <p className="text-gray-500 mb-8 text-center max-w-xs">
-            Looks like you haven&apos;t added anything yet. Start exploring!
-          </p>
-          <Link
-            href="/"
-            className="pp-gradient text-white px-10 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
-          >
-            EXPLORE PRODUCTS
-          </Link>
         </main>
         <Footer />
       </div>
@@ -48,109 +52,111 @@ export default function CartPage() {
     <div className="flex flex-col min-h-screen bg-pp-surface">
       <Header />
 
-      <main className="flex-1 pp-container px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Shopping Cart ({cartCount})</h1>
+      <main className="flex-1 pp-container px-4 py-5 md:py-6">
+        <div className="mb-5 rounded-[1.6rem] border border-white/60 bg-white/68 p-4 pp-shadow md:mb-6 md:rounded-[2rem] md:p-5">
+          <h1 className="text-2xl font-black tracking-[-0.05em] text-slate-950 md:text-3xl">Shopping Cart ({cartCount})</h1>
+          <p className="mt-2 text-sm text-slate-500">Review quantities, savings, and delivery details before checkout.</p>
+        </div>
 
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
-          {/* Cart Items */}
-          <div className="flex-1 w-full flex flex-col gap-3">
+        <div className="flex flex-col items-start gap-5 lg:flex-row lg:gap-6">
+          <div className="flex w-full flex-1 flex-col gap-3">
             {cart.map((item) => (
               <div 
                 key={item.id} 
-                className={`bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 pp-shadow hover:pp-shadow-hover transition-all ${
+                className={`flex flex-col gap-4 rounded-[1.5rem] border border-white/60 bg-white/82 p-4 pp-shadow transition-all sm:flex-row sm:items-center sm:gap-4 md:rounded-[1.8rem] md:p-5 ${
                   syncingItems[item.id] ? "opacity-70 pointer-events-none sm:pointer-events-auto" : "opacity-100"
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
+                <div className="flex items-center gap-3 sm:min-w-0 sm:flex-1">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[1rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] md:h-24 md:w-24 md:rounded-[1.2rem]">
                     {item.imageUrl ? (
                       <Image
                         src={item.imageUrl}
                         alt={item.name}
                         fill
-                        sizes="96px"
-                        className="object-cover"
+                        sizes="(max-width: 768px) 80px, 96px"
+                        className="object-contain p-2"
                       />
                     ) : (
-                      <Package className="w-8 h-8 text-gray-300" />
+                      <Package className="m-auto h-8 w-8 text-gray-300" />
                     )}
                   </div>
-                  {/* Quantity */}
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-pp-primary">{item.brand}</p>
+                    <h3 className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-slate-900 md:text-base">{item.name}</h3>
+                    <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                      <span className="text-lg font-black text-slate-950">{formatPrice(item.price)}</span>
+                      {(item.discount ?? 0) > 0 && item.originalPrice && (
+                        <>
+                          <span className="text-xs text-slate-400 line-through">{formatPrice(item.originalPrice)}</span>
+                          <span className="text-xs font-bold text-pp-success">{item.discount}% Off</span>
+                        </>
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs text-slate-400">Free delivery by Mon, Apr 22</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
+                  <div className="flex flex-col items-start gap-2 sm:items-end">
+                    <div className="flex items-center overflow-hidden rounded-full border border-slate-200 bg-slate-50">
                       <button
                         onClick={() => updateQuantity(item.id, item.cartQuantity - 1)}
                         disabled={item.cartQuantity <= 1 || syncingItems[item.id]}
-                        className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="flex h-8 w-8 items-center justify-center hover:bg-white disabled:cursor-not-allowed disabled:opacity-30"
                       >
-                        <Minus className="w-3 h-3" />
+                        <Minus className="h-3 w-3" />
                       </button>
-                      <span className="w-8 text-center text-sm font-bold">
+                      <span className="w-9 text-center text-sm font-bold">
                         {syncingItems[item.id] ? "..." : item.cartQuantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.cartQuantity + 1)}
                         disabled={item.cartQuantity >= (item.stockQuantity || 99) || syncingItems[item.id]}
-                        className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="flex h-8 w-8 items-center justify-center hover:bg-white disabled:cursor-not-allowed disabled:opacity-30"
                       >
-                        <Plus className="w-3 h-3" />
+                        <Plus className="h-3 w-3" />
                       </button>
                     </div>
                     {item.stockQuantity && item.stockQuantity < 10 && (
                       <span className="text-[10px] font-bold text-pp-accent">Only {item.stockQuantity} left</span>
                     )}
                   </div>
-                </div>
 
-                <div className="flex-1 flex flex-col gap-1">
-                  <p className="text-[10px] text-pp-primary font-bold uppercase tracking-wider">{item.brand}</p>
-                  <h3 className="text-sm font-medium text-gray-900">{item.name}</h3>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-lg font-bold text-gray-900">{formatPrice(item.price)}</span>
-                    {(item.discount ?? 0) > 0 && item.originalPrice && (
-                      <>
-                        <span className="text-gray-400 line-through text-xs">{formatPrice(item.originalPrice)}</span>
-                        <span className="text-pp-success font-bold text-xs">{item.discount}% Off</span>
-                      </>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">Free delivery by Mon, Apr 22</p>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    disabled={syncingItems[item.id]}
+                    className="rounded-xl p-2 text-slate-400 hover:bg-red-50 hover:text-pp-accent disabled:opacity-30"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
-
-                <button
-                  onClick={() => removeFromCart(item.id)}
-                  disabled={syncingItems[item.id]}
-                  className="self-start text-gray-400 hover:text-pp-accent transition-colors p-2 rounded-lg hover:bg-red-50 disabled:opacity-30"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
               </div>
             ))}
           </div>
 
-          {/* Price Details */}
-          <div className="lg:w-[350px] w-full sticky top-20">
-            <div className="bg-white rounded-2xl border border-gray-100 pp-shadow overflow-hidden">
-              <h2 className="text-xs font-bold text-gray-400 tracking-widest p-5 border-b border-gray-100 uppercase">Price Details</h2>
-              <div className="p-5 space-y-4">
-                <div className="flex justify-between text-sm text-gray-700">
+          <div className="w-full lg:sticky lg:top-20 lg:w-[330px]">
+            <div className="overflow-hidden rounded-[1.6rem] border border-white/60 bg-white/82 pp-shadow md:rounded-[1.8rem]">
+              <h2 className="border-b border-slate-100 p-4 text-xs font-black uppercase tracking-[0.22em] text-slate-400 md:p-5">Price Details</h2>
+              <div className="space-y-4 p-4 md:p-5">
+                <div className="flex justify-between text-sm text-slate-700">
                   <span>Price ({cartCount} item{cartCount > 1 ? 's' : ''})</span>
                   <span>{formatPrice(cartMrpTotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-700">Discount</span>
+                  <span className="text-slate-700">Discount</span>
                   <span className="text-pp-success font-semibold">- {formatPrice(cartMrpTotal - cartTotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-700">Delivery</span>
+                  <span className="text-slate-700">Delivery</span>
                   <span className="text-pp-success font-semibold uppercase">Free</span>
                 </div>
-                <div className="border-t border-dashed border-gray-200 pt-4 flex justify-between text-base font-bold text-gray-900">
+                <div className="flex justify-between border-t border-dashed border-slate-200 pt-4 text-base font-black text-slate-950">
                   <span>Total</span>
                   <span>{formatPrice(cartTotal)}</span>
                 </div>
               </div>
-              <div className="p-4 bg-green-50/50 border-t border-gray-100">
+              <div className="border-t border-slate-100 bg-green-50/60 p-4">
                 <p className="text-pp-success font-semibold text-xs text-center">
                   🎉 You save {formatPrice(cartMrpTotal - cartTotal)} on this order
                 </p>
@@ -163,13 +169,13 @@ export default function CartPage() {
                 router.push("/checkout");
               }}
               disabled={Object.values(syncingItems).some(isSyncing => isSyncing)}
-              className="mt-4 w-full pp-gradient text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all text-sm disabled:opacity-50 disabled:cursor-wait"
+              className="pp-button-primary mt-4 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold disabled:cursor-wait disabled:opacity-50"
             >
               {Object.values(syncingItems).some(isSyncing => isSyncing) ? "SAVING CHANGES..." : "PROCEED TO CHECKOUT"}
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            <div className="mt-4 flex items-center gap-2 text-gray-400 text-[11px]">
+            <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-400">
               <ShieldCheck className="w-5 h-5 shrink-0" />
               <span>Safe & secure payments. 100% authentic products.</span>
             </div>

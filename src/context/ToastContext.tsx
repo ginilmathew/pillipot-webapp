@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
 
 type ToastType = "success" | "error" | "info";
 
@@ -33,9 +33,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const success = useCallback((message: string) => addToast(message, "success"), [addToast]);
   const error = useCallback((message: string) => addToast(message, "error"), [addToast]);
+  const value = useMemo(() => ({ toast: addToast, success, error }), [addToast, success, error]);
 
   return (
-    <ToastContext.Provider value={{ toast: addToast, success, error }}>
+    <ToastContext.Provider value={value}>
       {children}
       {/* Toast Container - Myntra Style (Bottom Center) */}
       <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none">

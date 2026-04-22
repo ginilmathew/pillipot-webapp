@@ -1,10 +1,10 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useState, useRef, useLayoutEffect } from "react";
 import { type Product } from "@/lib/api";
 import Image from "next/image";
-import { Star, ShoppingCart, Zap, ShieldCheck, Tag, Truck, RotateCcw, Heart, Share2, X, ChevronLeft, ChevronRight, ZoomIn, Play } from "lucide-react";
+import Link from "next/link";
+import { Star, ShoppingCart, Zap, ShieldCheck, Tag, Truck, RotateCcw, Heart, X, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useRouter } from "next/navigation";
@@ -64,41 +64,39 @@ export default function ProductClient({ product }: { product: Product }) {
 
   return (
     <>
-    <div className="bg-[#f1f3f6] min-h-screen">
-      <main className="max-w-[1280px] mx-auto bg-white min-h-screen shadow-sm border-x border-gray-200">
+    <div className="min-h-screen bg-pp-surface">
+      <main className="pp-container pb-10 pt-6">
+        <div className="overflow-hidden rounded-[2rem] border border-white/60 bg-white/72 pp-shadow">
         
-        {/* Breadcrumb & Back Button */}
-        <div className="px-4 pt-4 flex items-center justify-between">
+        <div className="flex items-center justify-between px-4 pt-4">
           <button 
             onClick={() => router.back()}
-            className="group flex items-center gap-1 text-gray-500 hover:text-pp-primary transition-all text-xs font-medium bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100 hover:border-pp-primary/30 hover:bg-pp-primary/[0.02]"
+            className="group flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-500 hover:border-sky-100 hover:bg-[#edf4ff] hover:text-pp-primary"
           >
             <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" /> 
             Back
           </button>
-          <nav className="text-xs text-gray-500 flex items-center gap-1.5 opacity-80">
-            <a href="/" className="hover:text-blue-600">Home</a>
-            <span className="text-gray-300">›</span>
-            <a href={`/category/${product.categoryId}`} className="hover:text-blue-600 truncate max-w-[150px]">View Series</a>
-            <span className="text-gray-300">›</span>
-            <span className="text-gray-700 font-medium truncate max-w-[200px]">{product.name}</span>
+          <nav className="hidden items-center gap-1.5 text-xs text-slate-500 opacity-80 sm:flex">
+            <Link href="/" className="hover:text-blue-600">Home</Link>
+            <span className="text-slate-300">›</span>
+            <Link href={`/category/${product.categoryId}`} className="truncate max-w-[150px] hover:text-blue-600">View Series</Link>
+            <span className="text-slate-300">›</span>
+            <span className="truncate max-w-[200px] font-medium text-slate-700">{product.name}</span>
           </nav>
         </div>
 
-        <div className="flex flex-col lg:flex-row p-4 gap-6">
+        <div className="flex flex-col gap-5 p-4 sm:gap-6 lg:flex-row">
           
-          {/* Left Column: Fixed/Sticky Gallery & Actions */}
           <div className="lg:w-[40%] flex flex-col gap-4">
             <div className="lg:sticky lg:top-4 flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row gap-3">
-                {/* Thumbnails - Vertical on Desktop */}
                 <div className="flex sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-y-auto no-scrollbar sm:max-h-[450px]">
                   {allImages.map((img, i) => (
                     <button
                       key={i}
                       onClick={() => setSelectedIndex(i)}
-                      className={`relative w-14 h-14 shrink-0 rounded border transition-all p-1 bg-white ${
-                        selectedIndex === i ? "border-[#2874f0] shadow-sm" : "border-gray-200 hover:border-gray-300"
+                      className={`relative h-14 w-14 shrink-0 rounded-2xl border p-1 transition-all bg-white ${
+                        selectedIndex === i ? "border-[#2874f0] shadow-sm" : "border-slate-200 hover:border-slate-300"
                       }`}
                     >
                       <Image src={img} alt={`${product.name} view ${i + 1}`} fill sizes="56px" className="object-contain" />
@@ -106,10 +104,9 @@ export default function ProductClient({ product }: { product: Product }) {
                   ))}
                 </div>
 
-                {/* Main Image */}
                 <div 
                   ref={imageRef}
-                  className="flex-1 order-1 sm:order-2 relative aspect-[4/5] sm:aspect-square bg-white border border-gray-100 p-4 cursor-zoom-in overflow-hidden"
+                  className="relative order-1 aspect-[4/5] flex-1 cursor-zoom-in overflow-hidden rounded-[1.8rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-4 sm:order-2 sm:aspect-square"
                   onMouseEnter={() => setIsHoverZoom(true)}
                   onMouseLeave={() => setIsHoverZoom(false)}
                   onMouseMove={handleMouseMove}
@@ -130,8 +127,8 @@ export default function ProductClient({ product }: { product: Product }) {
                       if (!user) { setIsLoginModalOpen(true); return; }
                       toggleWishlist(product); 
                     }}
-                    className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all bg-white border border-gray-100 shadow-sm ${
-                      isInWishlist(product.id) ? "text-red-500" : "text-gray-300 hover:text-red-500"
+                    className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm transition-all ${
+                      isInWishlist(product.id) ? "text-red-500" : "text-slate-300 hover:text-red-500"
                     }`}
                   >
                     <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
@@ -139,17 +136,16 @@ export default function ProductClient({ product }: { product: Product }) {
                 </div>
               </div>
 
-              {/* Action Buttons - Brand Matching Colors */}
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button 
                   onClick={handleAddToCart} 
-                  className="flex-1 bg-white text-pp-primary border-2 border-pp-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-pp-primary/5 transition-all duration-300 text-sm shadow-sm"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-full border border-sky-100 bg-[#edf4ff] py-4 text-sm font-bold text-pp-primary"
                 >
                   <ShoppingCart className="w-5 h-5" /> ADD TO CART
                 </button>
                 <button 
                   onClick={handleBuyNow} 
-                  className="flex-1 pp-gradient text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-[0_10px_20px_rgba(108,60,225,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm"
+                  className="pp-button-primary flex flex-1 items-center justify-center gap-2 rounded-full py-4 text-sm font-bold"
                 >
                   <Zap className="w-5 h-5" /> BUY NOW
                 </button>
@@ -157,33 +153,31 @@ export default function ProductClient({ product }: { product: Product }) {
             </div>
           </div>
 
-          {/* Right Column: Details Scrollable */}
           <div className="lg:w-[60%] flex flex-col gap-6">
             <div>
               <p className="text-pp-primary text-xs font-bold uppercase tracking-widest mb-1">{product.brand || "Pillipot"}</p>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-relaxed">{product.name}</h1>
+              <h1 className="text-xl font-black leading-tight tracking-[-0.05em] text-slate-950 sm:text-2xl md:text-4xl">{product.name}</h1>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-1 bg-pp-success text-white text-sm font-bold px-2.5 py-1 rounded-lg">
                 {product.rating || 0} <Star className="w-3.5 h-3.5 fill-white" />
               </div>
-              <span className="text-gray-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings & reviews</span>
+              <span className="text-slate-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings & reviews</span>
             </div>
 
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-black text-gray-900">{formatPrice(product.price)}</span>
+            <div className="flex flex-wrap items-baseline gap-3">
+              <span className="text-3xl font-black tracking-[-0.05em] text-slate-950 md:text-4xl">{formatPrice(product.price)}</span>
               {(product.discount ?? 0) > 0 && (
                 <>
-                  <span className="text-gray-400 line-through text-lg">{formatPrice(product.originalPrice || product.price)}</span>
+                  <span className="text-slate-400 line-through text-lg">{formatPrice(product.originalPrice || product.price)}</span>
                   <span className="text-pp-success text-base font-bold">Save {formatPrice((product.originalPrice || product.price) - product.price)}</span>
                 </>
               )}
             </div>
 
-            {/* Offers */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 pp-shadow">
-              <h3 className="font-bold text-gray-900 mb-3 text-sm">🎉 Available Offers</h3>
+            <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
+              <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-slate-900">Available Offers</h3>
               <ul className="space-y-2.5">
                 {[
                   "10% instant discount on Pillipot Pay, up to ₹1,000",
@@ -191,7 +185,7 @@ export default function ProductClient({ product }: { product: Product }) {
                   "Free delivery on this item",
                   "Buy 2, get extra ₹250 off on next purchase",
                 ].map((offer, i) => (
-                  <li key={i} className="flex gap-2.5 text-sm text-gray-700">
+                  <li key={i} className="flex gap-2.5 text-sm text-slate-700">
                     <Tag className="w-4 h-4 text-pp-primary shrink-0 mt-0.5" />
                     <span>{offer}</span>
                   </li>
@@ -199,35 +193,32 @@ export default function ProductClient({ product }: { product: Product }) {
               </ul>
             </div>
 
-            {/* Services */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white rounded-xl border border-gray-100 p-3 md:p-4 flex flex-col items-center gap-2 text-center">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
                 <Truck className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />
-                <span className="text-[10px] md:text-xs font-semibold text-gray-700">Free Delivery</span>
+                <span className="text-[9px] font-semibold text-slate-700 md:text-xs">Free Delivery</span>
               </div>
-              <div className="bg-white rounded-xl border border-gray-100 p-3 md:p-4 flex flex-col items-center gap-2 text-center">
+              <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
                 <RotateCcw className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />
-                <span className="text-[10px] md:text-xs font-semibold text-gray-700">7 Day Returns</span>
+                <span className="text-[9px] font-semibold text-slate-700 md:text-xs">7 Day Returns</span>
               </div>
-              <div className="bg-white rounded-xl border border-gray-100 p-3 md:p-4 flex flex-col items-center gap-2 text-center">
+              <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
                 <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />
-                <span className="text-[10px] md:text-xs font-semibold text-gray-700">1 Year Warranty</span>
+                <span className="text-[9px] font-semibold text-slate-700 md:text-xs">1 Year Warranty</span>
               </div>
             </div>
 
-            {/* Description */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 pp-shadow">
-              <h3 className="text-base font-bold text-gray-900 mb-3">Product Description</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">{product.description}</p>
+            <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
+              <h3 className="mb-3 text-base font-black text-slate-950">Product Description</h3>
+              <p className="text-sm leading-7 text-slate-600">{product.description}</p>
             </div>
 
-            {/* Video */}
             {product.videoUrl && (
-              <div className="bg-white rounded-xl border border-gray-100 p-5 pp-shadow">
-                <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
+                <h3 className="mb-3 flex items-center gap-2 text-base font-black text-slate-950">
                   <Play className="w-4 h-4 text-pp-primary" /> Product Video
                 </h3>
-                <div className="aspect-video relative rounded-xl overflow-hidden bg-black/5">
+                <div className="relative aspect-video overflow-hidden rounded-[1.4rem] bg-black/5">
                   <video controls className="w-full h-full">
                     <source src={product.videoUrl} />
                   </video>
@@ -235,6 +226,7 @@ export default function ProductClient({ product }: { product: Product }) {
               </div>
             )}
           </div>
+        </div>
         </div>
       </main>
     </div>

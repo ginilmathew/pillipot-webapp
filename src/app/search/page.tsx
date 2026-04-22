@@ -3,8 +3,6 @@ import Footer from "@/components/layout/Footer";
 import CategoryBar from "@/components/layout/CategoryBar";
 import { getProducts, getCategories } from "@/lib/api";
 import SearchResultsClient from "./SearchResultsClient";
-import { Suspense } from "react";
-import { ProductSectionSkeleton } from "@/components/skeletons/ProductSkeleton";
 
 export default async function SearchPage({
   searchParams,
@@ -12,7 +10,10 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const categories = await getCategories();
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts(undefined, q),
+  ]);
   
   return (
     <div className="flex flex-col min-h-screen bg-pp-surface">
@@ -29,18 +30,10 @@ export default async function SearchPage({
           </p>
         </div>
 
-        <Suspense fallback={<ProductSectionSkeleton />}>
-          <SearchResults query={q} />
-        </Suspense>
+        <SearchResultsClient products={products} query={q} />
       </main>
 
       <Footer />
     </div>
   );
-}
-
-async function SearchResults({ query }: { query: string }) {
-  const products = await getProducts(undefined, query);
-  
-  return <SearchResultsClient products={products} query={query} />;
 }

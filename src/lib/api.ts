@@ -1,6 +1,33 @@
 const isProd = process.env.NODE_ENV === "production";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || (isProd ? "https://api.pillipot.com/v1/api" : "http://localhost:3000/v1/api");
 
+type PublicFetchOptions = {
+  revalidate?: number;
+  tags?: string[];
+};
+
+type ApiErrorShape = {
+  message?: string | string[];
+  error?: string;
+};
+
+async function fetchJson<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, options);
+  if (!res.ok) {
+    throw new Error(`Request failed: ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+async function fetchPublicJson<T>(path: string, options: PublicFetchOptions = {}): Promise<T> {
+  const { revalidate = 300, tags = [] } = options;
+
+  return fetchJson<T>(path, {
+    cache: "force-cache",
+    next: { revalidate, tags },
+  });
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -18,9 +45,14 @@ export interface Banner {
 }
 
 export async function getBanners(): Promise<Banner[]> {
-  const res = await fetch(`${API_URL}/banners/active`, { next: { revalidate: 60 } });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    return await fetchPublicJson<Banner[]>("/banners/active", {
+      revalidate: 300,
+      tags: ["banners"],
+    });
+  } catch {
+    return [];
+  }
 }
 
 export interface Product {
@@ -45,15 +77,25 @@ export interface Product {
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const res = await fetch(`${API_URL}/customer/categories`, { next: { revalidate: 60 } });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    return await fetchPublicJson<Category[]>("/customer/categories", {
+      revalidate: 3600,
+      tags: ["categories"],
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function getSubcategories(categoryId: string): Promise<Category[]> {
-  const res = await fetch(`${API_URL}/customer/categories/${categoryId}/subcategories`, { next: { revalidate: 60 } });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    return await fetchPublicJson<Category[]>(`/customer/categories/${categoryId}/subcategories`, {
+      revalidate: 3600,
+      tags: ["categories", `category:${categoryId}`, `subcategories:${categoryId}`],
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function getProducts(
@@ -74,20 +116,35 @@ export async function getProducts(
   if (minRating) params.append("minRating", minRating.toString());
   if (sort) params.append("sort", sort);
   
-  const url = params.toString() 
-    ? `${API_URL}/customer/products?${params.toString()}`
-    : `${API_URL}/customer/products`;
-    
-  const res = await fetch(url, { next: { revalidate: 10 } });
-  if (!res.ok) return [];
-  return res.json();
+  const query = params.toString();
+  const path = query ? `/customer/products?${query}` : "/customer/products";
+
+  const tags = ["products"];
+  if (categoryId) tags.push(`category:${categoryId}`);
+  if (subcategoryId) tags.push(`subcategory:${subcategoryId}`);
+  if (search) tags.push(`search:${search.toLowerCase()}`);
+
+  try {
+    return await fetchPublicJson<Product[]>(path, {
+      revalidate: search ? 60 : 300,
+      tags,
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function getProduct(id: string): Promise<Product | null> {
-  const res = await fetch(`${API_URL}/customer/products/${id}`, { next: { revalidate: 10 } });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    return await fetchPublicJson<Product>(`/customer/products/${id}`, {
+      revalidate: 300,
+      tags: ["products", `product:${id}`],
+    });
+  } catch {
+    return null;
+  }
 }
+
 export interface User {
   id: string;
   username: string;
@@ -95,59 +152,73 @@ export interface User {
   role: string;
 }
 
+export type RegisterDto = Record<string, string>;
+
 export async function login(username: string, password: string): Promise<{ accessToken: string; user: User } | null> {
-  const res = await fetch(`${API_URL}/auth/customer/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    return await fetchJson<{ accessToken: string; user: User }>("/auth/customer/login", {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+  } catch {
+    return null;
+  }
 }
 
-export async function register(dto: any): Promise<{ accessToken: string; user: User } | null> {
-  const res = await fetch(`${API_URL}/auth/customer/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dto),
-  });
-  if (!res.ok) return null;
-  return res.json();
+export async function register(dto: RegisterDto): Promise<{ accessToken: string; user: User } | null> {
+  try {
+    return await fetchJson<{ accessToken: string; user: User }>("/auth/customer/register", {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto),
+    });
+  } catch {
+    return null;
+  }
 }
 
 export async function getMe(token: string): Promise<User | null> {
-  const res = await fetch(`${API_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    return await fetchJson<User>("/auth/me", {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    return null;
+  }
 }
 
 // Wishlist
 export async function fetchWishlist(token: string): Promise<Product[]> {
-  const res = await fetch(`${API_URL}/customer/wishlist`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    return await fetchJson<Product[]>("/customer/wishlist", {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function toggleWishlistApi(token: string, productId: string): Promise<{ status: "added" | "removed" }> {
-  const res = await fetch(`${API_URL}/customer/wishlist/toggle`, {
+  return fetchJson<{ status: "added" | "removed" }>("/customer/wishlist/toggle", {
     method: "POST",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ productId }),
   });
-  if (!res.ok) throw new Error("Failed to toggle wishlist");
-  return res.json();
 }
 
 export async function clearWishlistApi(token: string): Promise<boolean> {
   const res = await fetch(`${API_URL}/customer/wishlist/clear`, {
     method: "DELETE",
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.ok;
@@ -161,40 +232,49 @@ export interface CartItemApi {
 }
 
 export async function fetchCart(token: string): Promise<CartItemApi[]> {
-  const res = await fetch(`${API_URL}/customer/cart`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    return await fetchJson<CartItemApi[]>("/customer/cart", {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    return [];
+  }
 }
 
-export async function addToCartApi(token: string, productId: string, quantity: number = 1): Promise<any> {
-  const res = await fetch(`${API_URL}/customer/cart`, {
+export type CartMutationResponse = {
+  success?: boolean;
+  message?: string;
+};
+
+export async function addToCartApi(token: string, productId: string, quantity: number = 1): Promise<CartMutationResponse> {
+  return fetchJson<CartMutationResponse>("/customer/cart", {
     method: "POST",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ productId, quantity }),
   });
-  return res.json();
 }
 
-export async function updateCartQuantityApi(token: string, productId: string, quantity: number): Promise<any> {
-  const res = await fetch(`${API_URL}/customer/cart/quantity`, {
+export async function updateCartQuantityApi(token: string, productId: string, quantity: number): Promise<CartMutationResponse> {
+  return fetchJson<CartMutationResponse>("/customer/cart/quantity", {
     method: "PATCH",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ productId, quantity }),
   });
-  return res.json();
 }
 
 export async function clearCartApi(token: string): Promise<boolean> {
   const res = await fetch(`${API_URL}/customer/cart`, {
     method: "DELETE",
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.ok;
@@ -215,49 +295,76 @@ export interface CustomerAddress {
 }
 
 export async function getAddresses(token: string): Promise<CustomerAddress[]> {
-  const res = await fetch(`${API_URL}/customer/addresses`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  //jh
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    return await fetchJson<CustomerAddress[]>("/customer/addresses", {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function addAddress(token: string, data: Partial<CustomerAddress>): Promise<CustomerAddress | null> {
-  const res = await fetch(`${API_URL}/customer/addresses`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    return await fetchJson<CustomerAddress>("/customer/addresses", {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    return null;
+  }
 }
 
-export async function autofillAddress(phone: string): Promise<any | null> {
-  const res = await fetch(`${API_URL}/customer/autofill?phone=${phone}`);
-  if (!res.ok) return null;
-  return res.json();
+export type AutofillAddressResponse = Partial<CustomerAddress> & {
+  found?: boolean;
+};
+
+export async function autofillAddress(phone: string): Promise<AutofillAddressResponse | null> {
+  try {
+    return await fetchJson<AutofillAddressResponse>(`/customer/autofill?phone=${encodeURIComponent(phone)}`, {
+      cache: "no-store",
+    });
+  } catch {
+    return null;
+  }
 }
 
-export async function checkout(cart: any[], customerInfo: any): Promise<{ orderId: string }> {
+export type CheckoutCartItem = {
+  id: string;
+  cartQuantity?: number;
+  quantity?: number;
+  price: number;
+  name?: string;
+};
+
+export type CheckoutCustomerInfo = Partial<CustomerAddress> & {
+  email?: string;
+  paymentMethod?: string;
+};
+
+export async function checkout(cart: CheckoutCartItem[], customerInfo: CheckoutCustomerInfo): Promise<{ orderId: string }> {
   const res = await fetch(`${API_URL}/orders/checkout`, {
     method: "POST",
+    cache: "no-store",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ cart, customerInfo }),
   });
   if (!res.ok) {
     let msg = "Something went wrong. Please try again.";
     try {
-      const data = await res.json();
+      const data = (await res.json()) as ApiErrorShape;
       if (data.message) {
         msg = Array.isArray(data.message) ? data.message[0] : data.message;
       } else if (data.error) {
         msg = data.error;
       }
-    } catch (e) {}
+    } catch {}
     throw new Error(msg);
   }
   return res.json();
@@ -266,6 +373,7 @@ export async function checkout(cart: any[], customerInfo: any): Promise<{ orderI
 export async function deleteAddress(token: string, id: string): Promise<boolean> {
   const res = await fetch(`${API_URL}/customer/addresses/${id}`, {
     method: "DELETE",
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.ok;
@@ -274,39 +382,75 @@ export async function deleteAddress(token: string, id: string): Promise<boolean>
 export async function setDefaultAddress(token: string, id: string): Promise<boolean> {
   const res = await fetch(`${API_URL}/customer/addresses/${id}/default`, {
     method: "POST",
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.ok;
 }
+
 export async function updateAddress(token: string, id: string, data: Partial<CustomerAddress>): Promise<CustomerAddress | null> {
-  const res = await fetch(`${API_URL}/customer/addresses/${id}`, {
-    method: "PATCH",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    return await fetchJson<CustomerAddress>(`/customer/addresses/${id}`, {
+      method: "PATCH",
+      cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    return null;
+  }
 }
 
-export async function getMyOrders(token: string): Promise<any[]> {
-  const res = await fetch(`${API_URL}/orders/my-orders`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return [];
-  return res.json();
+export type OrderApiItem = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  sellingAmount: number;
+  imageUrl?: string;
+};
+
+export type OrderApiSummary = {
+  orderId: string;
+  createdAt: string;
+  total: number;
+  customerName?: string;
+  status: string;
+  items: OrderApiItem[];
+};
+
+export async function getMyOrders(token: string): Promise<OrderApiSummary[]> {
+  try {
+    return await fetchJson<OrderApiSummary[]>("/orders/my-orders", {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    return [];
+  }
 }
 
-export async function getOrderDetails(token: string, orderId: string): Promise<any | null> {
-  const res = await fetch(`${API_URL}/orders/track/${orderId}`);
-  if (!res.ok) return null;
-  return res.json();
+export type OrderApiDetail = OrderApiSummary & {
+  deliveryAddress?: string;
+  phone?: string;
+};
+
+export async function getOrderDetails(token: string, orderId: string): Promise<OrderApiDetail | null> {
+  try {
+    return await fetchJson<OrderApiDetail>(`/orders/track/${orderId}`, {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    return null;
+  }
 }
 
 export async function downloadInvoice(token: string, orderId: string) {
   const res = await fetch(`${API_URL}/orders/${orderId}/invoice`, {
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` }
   });
   if (!res.ok) return;
@@ -323,20 +467,25 @@ export async function downloadInvoice(token: string, orderId: string) {
 export async function cancelOrderApi(token: string, orderId: string): Promise<boolean> {
   const res = await fetch(`${API_URL}/orders/${orderId}/cancel`, {
     method: "POST",
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.ok;
 }
 
-export async function submitReview(token: string, productId: string, rating: number, comment?: string): Promise<any> {
-  const res = await fetch(`${API_URL}/customer/reviews`, {
+export type ReviewResponse = {
+  success?: boolean;
+  message?: string;
+};
+
+export async function submitReview(token: string, productId: string, rating: number, comment?: string): Promise<ReviewResponse> {
+  return fetchJson<ReviewResponse>("/customer/reviews", {
     method: "POST",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ productId, rating, comment }),
   });
-  if (!res.ok) throw new Error("Failed to submit review");
-  return res.json();
 }

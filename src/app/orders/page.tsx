@@ -5,17 +5,34 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/context/AuthContext";
 import { getMyOrders, cancelOrderApi, downloadInvoice } from "@/lib/api";
-import { Package, Calendar, MapPin, ChevronRight, ShoppingBag, Loader2, Search, RotateCcw, AlertTriangle, Star, X, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Package, ShoppingBag, Loader2, Search, RotateCcw, AlertTriangle, Star, X, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { submitReview } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 
+type OrderItem = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  sellingAmount: number;
+  imageUrl?: string;
+};
+
+type Order = {
+  orderId: string;
+  createdAt: string;
+  total: number;
+  customerName?: string;
+  status: string;
+  items: OrderItem[];
+};
+
 export default function MyOrdersPage() {
   const { token, user, loading } = useAuth();
   const { addToCart } = useCart();
   const { success, error } = useToast();
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -27,21 +44,23 @@ export default function MyOrdersPage() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const router = useRouter();
 
+  async function loadOrders() {
+    setIsLoading(true);
+    const data = await getMyOrders(token!);
+    setOrders(data as Order[]);
+    setIsLoading(false);
+  }
+
   useEffect(() => {
     if (loading) return;
     if (!token) {
       router.push("/");
       return;
     }
+    // The fetch is intentionally kicked off from auth readiness.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadOrders();
-  }, [token, loading]);
-
-  const loadOrders = async () => {
-    setIsLoading(true);
-    const data = await getMyOrders(token!);
-    setOrders(data);
-    setIsLoading(false);
-  };
+  }, [loading, router, token]);
 
   const handleCancelClick = (orderId: string) => {
     setSelectedOrderId(orderId);
@@ -92,49 +111,39 @@ export default function MyOrdersPage() {
   const formatPrice = (num: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(num);
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "delivered": return "bg-green-100 text-green-700";
-      case "cancelled": return "bg-red-100 text-red-700";
-      case "pending": return "bg-yellow-100 text-yellow-700";
-      case "dispatch": return "bg-blue-100 text-blue-700";
-      case "packed": return "bg-violet-100 text-violet-700";
-      default: return "bg-gray-100 text-gray-700";
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-pp-surface">
       <Header />
 
-      <main className="flex-1 pp-container py-8">
+      <main className="flex-1 pp-container py-6 md:py-8">
         <div className="mb-8 space-y-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <nav className="flex text-xs font-bold text-gray-400 gap-2 mb-2 uppercase tracking-widest">
+            <div className="rounded-[1.6rem] border border-white/60 bg-white/68 p-4 pp-shadow md:min-w-[420px] md:rounded-[2rem] md:p-5">
+              <nav className="mb-2 flex gap-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
                 <span className="hover:text-pp-primary cursor-pointer" onClick={() => router.push("/")}>Your Account</span>
-                <span>›</span>
+                <span>•</span>
                 <span className="text-pp-primary">Your Orders</span>
               </nav>
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">Your Orders</h1>
+              <h1 className="text-2xl font-black tracking-[-0.05em] text-slate-950 md:text-3xl">Your Orders</h1>
+              <p className="mt-2 text-sm text-slate-500">Track current purchases, reorder items, and manage reviews from one place.</p>
             </div>
             <div className="relative group lg:w-96">
               <input
                 type="text"
                 placeholder="Search all orders..."
-                className="w-full bg-white border-2 border-gray-100 rounded-2xl py-3.5 pl-5 pr-12 outline-none focus:border-pp-primary focus:ring-4 focus:ring-pp-primary/5 transition-all text-sm font-medium"
+                className="w-full rounded-full border border-white/60 bg-white/78 py-3.5 pl-5 pr-12 text-sm font-medium outline-none pp-shadow focus:border-sky-100"
               />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-pp-dark text-white rounded-xl flex items-center justify-center hover:bg-pp-primary transition-colors">
+              <button className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-pp-dark text-white hover:bg-pp-primary">
                 <Search className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          <div className="flex gap-8 border-b border-gray-100 text-sm font-bold overflow-x-auto no-scrollbar">
+          <div className="no-scrollbar flex gap-3 overflow-x-auto rounded-full border border-white/60 bg-white/68 p-2 text-sm font-bold pp-shadow">
             {["Orders", "Buy Again", "Not Yet Shipped", "Cancelled"].map((tab, i) => (
               <button
                 key={tab}
-                className={`pb-3 whitespace-nowrap transition-colors border-b-2 ${i === 0 ? "border-pp-primary text-pp-primary" : "border-transparent text-gray-400 hover:text-gray-600"}`}
+                className={`whitespace-nowrap rounded-full px-4 py-2 transition-colors ${i === 0 ? "bg-[#edf4ff] text-pp-primary" : "text-slate-400 hover:text-slate-600"}`}
               >
                 {tab}
               </button>
@@ -148,42 +157,41 @@ export default function MyOrdersPage() {
             <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Loading orders...</p>
           </div>
         ) : orders.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center pp-shadow border border-gray-50 max-w-2xl mx-auto mt-20">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ShoppingBag className="w-10 h-10 text-gray-300" />
+          <div className="mx-auto mt-20 max-w-2xl rounded-[2rem] border border-white/60 bg-white/78 p-12 text-center pp-shadow">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50">
+              <ShoppingBag className="h-10 w-10 text-slate-300" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">No orders found</h2>
-            <p className="text-gray-500 mb-8">Looks like you haven't placed any orders yet. Start shopping to see them here!</p>
+            <h2 className="mb-2 text-2xl font-black tracking-[-0.04em] text-slate-950">No orders found</h2>
+            <p className="mb-8 text-slate-500">Looks like you haven&apos;t placed any orders yet. Start shopping to see them here!</p>
             <button
               onClick={() => router.push("/")}
-              className="pp-gradient text-white px-10 py-4 rounded-2xl font-black shadow-xl"
+              className="pp-button-primary rounded-full px-10 py-4 text-sm font-black"
             >
               START SHOPPING
             </button>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-5 md:space-y-8">
             {orders.map((order) => (
-              <div key={order.orderId} className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all">
-                {/* Amazon-style Card Header */}
-                <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
+              <div key={order.orderId} className="overflow-hidden rounded-[2rem] border border-white/60 bg-white/82 pp-shadow transition-all hover:pp-shadow-hover">
+                <div className="grid grid-cols-2 items-center gap-4 border-b border-slate-100 bg-slate-50/80 px-4 py-4 md:grid-cols-4 md:gap-6 md:px-6">
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order Placed</p>
-                    <p className="text-sm font-bold text-gray-700">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Order Placed</p>
+                    <p className="text-sm font-bold text-slate-700">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total</p>
-                    <p className="text-sm font-bold text-gray-700">{formatPrice(order.total)}</p>
+                    <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total</p>
+                    <p className="text-sm font-bold text-slate-700">{formatPrice(order.total)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Ship To</p>
-                    <p className="text-sm font-bold text-pp-primary hover:underline cursor-pointer truncate max-w-[150px]" title={order.customerName || user?.name}>
+                    <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Ship To</p>
+                    <p className="max-w-[150px] truncate text-sm font-bold text-pp-primary hover:underline cursor-pointer" title={order.customerName || user?.name}>
                       {order.customerName || user?.name}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 leading-none">Order # {order.orderId}</p>
-                    <div className="flex justify-end gap-3 mt-1 underline-offset-4 decoration-pp-primary/30">
+                    <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] leading-none text-slate-400">Order # {order.orderId}</p>
+                    <div className="mt-1 flex justify-end gap-3 underline-offset-4 decoration-pp-primary/30">
                       <button 
                         onClick={() => router.push(`/orders/${order.orderId}`)}
                         className="text-xs font-bold text-pp-primary hover:underline"
@@ -201,9 +209,8 @@ export default function MyOrdersPage() {
                   </div>
                 </div>
 
-                {/* Card Body */}
-                 <div className="p-6">
-                  <div className="flex flex-col lg:flex-row gap-8">
+                 <div className="p-4 md:p-6">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
                     <div className="flex-1 space-y-6">
                       <div className="flex items-center gap-3">
                         {order.status.toLowerCase() === 'delivered' ? (
@@ -213,7 +220,7 @@ export default function MyOrdersPage() {
                         ) : (
                           <Clock className="w-5 h-5 text-pp-primary" />
                         )}
-                        <h3 className="text-lg font-black text-gray-900">
+                        <h3 className="text-lg font-black text-slate-950">
                           {order.status.toLowerCase() === 'delivered' 
                             ? 'Delivered' 
                             : order.status.toLowerCase() === 'cancelled' 
@@ -223,9 +230,9 @@ export default function MyOrdersPage() {
                       </div>
 
                       <div className="space-y-6">
-                        {order.items.map((item: any, idx: number) => (
-                          <div key={idx} className="flex gap-5 group/item">
-                            <div className="w-24 h-24 bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm flex items-center justify-center">
+                        {order.items.map((item, idx: number) => (
+                          <div key={idx} className="group/item flex gap-3 sm:gap-5">
+                            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] shadow-sm sm:h-24 sm:w-24 sm:rounded-[1.2rem]">
                               {item.imageUrl ? (
                                 <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" />
                               ) : (
@@ -233,10 +240,10 @@ export default function MyOrdersPage() {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-black text-pp-primary hover:text-pp-primary-dark hover:underline cursor-pointer mb-1 line-clamp-2 leading-snug">
+                              <p className="mb-1 line-clamp-2 cursor-pointer text-sm font-black leading-snug text-pp-primary hover:text-pp-primary-dark hover:underline">
                                 {item.productName}
                               </p>
-                              <p className="text-xs text-gray-500 mb-3">Quantity: <span className="font-bold text-gray-700">{item.quantity}</span></p>
+                              <p className="mb-3 text-xs text-slate-500">Quantity: <span className="font-bold text-slate-700">{item.quantity}</span></p>
                                <div className="flex flex-wrap gap-2">
                                 <button 
                                   onClick={() => {
@@ -246,23 +253,23 @@ export default function MyOrdersPage() {
                                       price: item.sellingAmount / item.quantity,
                                       imageUrl: item.imageUrl,
                                       stockQuantity: 100 // Fallback
-                                    } as any);
+                                    });
                                     router.push("/cart");
                                   }}
-                                  className="flex items-center gap-1.5 bg-pp-accent-warm text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-sm hover:brightness-110 transition-all uppercase tracking-wider"
+                                  className="flex items-center gap-1.5 rounded-full bg-pp-accent-warm px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-sm transition-all hover:brightness-110"
                                 >
                                   <RotateCcw className="w-3.5 h-3.5" /> Buy it again
                                 </button>
                                 <button 
                                   onClick={() => router.push(`/product/${item.productId}`)}
-                                  className="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl text-[10px] font-black hover:bg-gray-50 transition-all uppercase tracking-wider"
+                                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-600 transition-all hover:bg-slate-50"
                                 >
                                   View Item
                                 </button>
                                 {order.status.toLowerCase() === 'delivered' && (
                                   <button 
                                     onClick={() => handleReviewClick({ id: item.productId, name: item.productName, imageUrl: item.imageUrl })}
-                                    className="px-4 py-2 bg-pp-primary/10 text-pp-primary rounded-xl text-[10px] font-black hover:bg-pp-primary hover:text-white transition-all uppercase tracking-wider"
+                                    className="rounded-full bg-[#edf4ff] px-4 py-2 text-[10px] font-black uppercase tracking-wider text-pp-primary transition-all hover:bg-pp-primary hover:text-white"
                                   >
                                     Write a review
                                   </button>
@@ -278,7 +285,7 @@ export default function MyOrdersPage() {
                         {order.status.toLowerCase() === 'pending' && (
                           <button
                             onClick={() => handleCancelClick(order.orderId)}
-                            className="w-full py-3 bg-red-500 text-white rounded-xl text-xs font-black shadow-lg hover:bg-red-600 transition-all uppercase tracking-widest text-center"
+                            className="w-full rounded-full bg-red-500 py-3 text-center text-xs font-black uppercase tracking-[0.2em] text-white shadow-lg transition-all hover:bg-red-600"
                           >
                             CANCEL
                           </button>
@@ -341,7 +348,7 @@ export default function MyOrdersPage() {
               <div className="flex gap-4 items-center p-4 bg-gray-50 rounded-2xl">
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-white border border-gray-200 shrink-0 flex items-center justify-center">
                   {reviewingProduct.imageUrl ? (
-                    <img src={reviewingProduct.imageUrl} alt={reviewingProduct.name} className="w-full h-full object-cover" />
+                                <img src={reviewingProduct.imageUrl} alt={reviewingProduct.name} className="h-full w-full object-cover" />
                   ) : (
                     <Package className="w-6 h-6 text-gray-200" />
                   )}

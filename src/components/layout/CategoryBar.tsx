@@ -2,50 +2,58 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Smartphone, Shirt, Monitor, Home as HomeIcon, Tv, Plane, Sparkles, ShoppingBasket, Tag, LayoutGrid } from "lucide-react";
-
-import { getCategories, type Category } from "@/lib/api";
-import { useState, useEffect } from "react";
+import {
+  Smartphone,
+  Shirt,
+  Monitor,
+  Home as HomeIcon,
+  Tv,
+  Plane,
+  Sparkles,
+  ShoppingBasket,
+  Tag,
+  LayoutGrid,
+} from "lucide-react";
+import type { Category } from "@/lib/api";
 import Image from "next/image";
 
-const ICON_MAP: Record<string, any> = {
-  "Mobiles": Smartphone,
-  "Fashion": Shirt,
-  "Electronics": Monitor,
-  "Home": HomeIcon,
-  "Appliances": Tv,
-  "Travel": Plane,
-  "Beauty": Sparkles,
-  "Grocery": ShoppingBasket,
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Mobiles: Smartphone,
+  Fashion: Shirt,
+  Electronics: Monitor,
+  Home: HomeIcon,
+  Appliances: Tv,
+  Travel: Plane,
+  Beauty: Sparkles,
+  Grocery: ShoppingBasket,
   "Top Offers": Tag,
 };
 
-const COLOR_MAP: Record<string, string> = {
-  "Mobiles": "from-violet-500 to-purple-400",
-  "Fashion": "from-pink-500 to-rose-400",
-  "Electronics": "from-blue-500 to-cyan-400",
-  "Home": "from-emerald-500 to-green-400",
-  "Appliances": "from-slate-500 to-gray-400",
-  "Travel": "from-sky-500 to-blue-400",
-  "Beauty": "from-fuchsia-500 to-pink-400",
-  "Grocery": "from-lime-500 to-green-400",
-  "Top Offers": "from-red-500 to-orange-400",
+const colorMap: Record<string, string> = {
+  Mobiles: "from-sky-500 to-blue-600",
+  Fashion: "from-pink-500 to-rose-500",
+  Electronics: "from-indigo-500 to-cyan-500",
+  Home: "from-emerald-500 to-teal-500",
+  Appliances: "from-slate-500 to-slate-700",
+  Travel: "from-blue-400 to-sky-500",
+  Beauty: "from-fuchsia-500 to-pink-500",
+  Grocery: "from-lime-500 to-emerald-500",
+  "Top Offers": "from-orange-500 to-red-500",
 };
 
 export default function CategoryBar({ categories }: { categories: Category[] }) {
   const pathname = usePathname();
 
   const displayCategories = [
-    { name: "Home", href: "/", icon: LayoutGrid, color: "from-pp-primary to-purple-400" },
-    ...categories.map(c => ({
-      name: c.name,
-      href: `/category/${c.id}`,
-      icon: ICON_MAP[c.name] || Smartphone,
-      color: COLOR_MAP[c.name] || "from-pp-primary to-pp-accent",
-      imageUrl: c.imageUrl
-    }))
+    { name: "Home", href: "/", icon: LayoutGrid, color: "from-[#0c1c33] via-pp-primary to-sky-400" },
+    ...categories.map((category) => ({
+      name: category.name,
+      href: `/category/${category.id}`,
+      icon: iconMap[category.name] || Smartphone,
+      color: colorMap[category.name] || "from-pp-primary to-pp-accent",
+      imageUrl: category.imageUrl,
+    })),
   ];
-
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -53,32 +61,49 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
   };
 
   return (
-    <div className="bg-white pp-shadow border-b border-gray-100 sticky top-12 md:top-14 z-40">
-      <div className="w-full flex items-center justify-start gap-2 overflow-x-auto no-scrollbar py-2 pl-[10px] pr-4">
-        {displayCategories.map((cat) => {
-          const Icon = cat.icon;
-          const active = isActive(cat.href);
-          return (
-            <Link
-              key={cat.name}
-              href={cat.href}
-              className={`flex flex-col items-center gap-1 min-w-[72px] cursor-pointer group ${active ? "scale-105" : ""}`}
-            >
-              <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${cat.color} flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300 overflow-hidden ${active ? "ring-2 ring-offset-2 ring-pp-primary shadow-md scale-90" : ""
-                }`}>
-                {(cat as any).imageUrl ? (
-                  <Image src={(cat as any).imageUrl} alt={cat.name} width={48} height={48} className="w-full h-full object-cover" />
-                ) : (
-                  <Icon className="w-4 h-4 text-white" />
-                )}
-              </div>
-              <span className={`text-[11px] font-semibold transition-colors text-center leading-tight ${active ? "text-pp-primary font-bold" : "text-gray-600 group-hover:text-pp-primary"
-                }`}>
-                {cat.name}
-              </span>
-            </Link>
-          );
-        })}
+    <div className="sticky top-16 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-2xl">
+      <div className="pp-container py-2.5 md:py-3">
+        <div className="no-scrollbar flex items-center gap-3 overflow-x-auto">
+          {displayCategories.map((category) => {
+            const active = isActive(category.href);
+            const Icon = category.icon;
+
+            return (
+              <Link
+                key={category.name}
+                href={category.href}
+                className={`group flex min-w-[80px] flex-col items-center gap-2 rounded-[1.35rem] border px-2.5 py-2.5 text-center md:min-w-[92px] md:rounded-[1.55rem] md:px-3 md:py-3 ${
+                  active
+                    ? "border-sky-200 bg-white shadow-[0_20px_40px_rgba(9,22,43,0.1)]"
+                    : "border-white/40 bg-white/65 hover:border-sky-100 hover:bg-white"
+                }`}
+              >
+                <div
+                  className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${category.color} shadow-lg shadow-slate-900/12 md:h-12 md:w-12 md:rounded-2xl`}
+                >
+                  {category.imageUrl ? (
+                    <Image
+                      src={category.imageUrl}
+                      alt={category.name}
+                      width={56}
+                      height={56}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <Icon className="h-5 w-5 text-white" />
+                  )}
+                </div>
+                <span
+                  className={`text-[10px] font-bold leading-tight md:text-[11px] ${
+                    active ? "text-pp-primary" : "text-slate-600 group-hover:text-slate-900"
+                  }`}
+                >
+                  {category.name}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

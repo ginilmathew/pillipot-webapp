@@ -1,8 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import { User, getMe } from "@/lib/api";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
 const LoginModal = dynamic(() => import("@/components/auth/LoginModal"), { ssr: false });
@@ -28,19 +28,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     async function init() {
       const savedToken = localStorage.getItem("pillipot_token");
       if (savedToken) {
-        setToken(savedToken);
         const userData = await getMe(savedToken);
         if (userData) {
+          setToken(savedToken);
           setUser(userData);
         } else {
           localStorage.removeItem("pillipot_token");
           setToken(null);
+          setUser(null);
         }
       }
       setLoading(false);
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, loading, pathname, router]);
   */
 
-  const loginAction = (newToken: string, newUser: User) => {
+  const loginAction = useCallback((newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem("pillipot_token", newToken);
@@ -68,9 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoginModalOpen(false);
     setIsRegisterModalOpen(false);
     router.refresh(); // Force re-render of server components
-  };
+  }, [router]);
 
-  const logoutAction = () => {
+  const logoutAction = useCallback(() => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("pillipot_token");
@@ -78,20 +78,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     document.cookie = "pillipot_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     router.push("/login");
     router.refresh(); // Ensure state is cleared globally
-  };
+  }, [router]);
 
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      token, 
-      loading, 
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      loading,
       isLoginModalOpen,
       setIsLoginModalOpen,
       isRegisterModalOpen,
       setIsRegisterModalOpen,
-      login: loginAction, 
-      logout: logoutAction 
-    }}>
+      login: loginAction,
+      logout: logoutAction,
+    }),
+    [
+      user,
+      token,
+      loading,
+      isLoginModalOpen,
+      isRegisterModalOpen,
+      loginAction,
+      logoutAction,
+    ]
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
       {children}
       <LoginModal />
     </AuthContext.Provider>

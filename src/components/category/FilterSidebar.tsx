@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Star } from "lucide-react";
 
 interface FilterSidebarProps {
@@ -12,7 +12,6 @@ export default function FilterSidebar({ categoryName }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "0");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "150000");
   const [minRating, setMinRating] = useState(searchParams.get("minRating") || "");
 
@@ -41,32 +40,30 @@ export default function FilterSidebar({ categoryName }: FilterSidebarProps) {
   };
 
   return (
-    <aside className="hidden lg:flex flex-col w-[280px] shrink-0 bg-white shadow-sm border border-gray-200">
-      <div className="p-4 border-b border-gray-100">
-        <h2 className="text-lg font-bold text-gray-900">Filters</h2>
+    <aside className="hidden lg:flex w-[300px] shrink-0 flex-col rounded-[1.8rem] border border-white/60 bg-white/72 pp-shadow">
+      <div className="border-b border-slate-100 p-5">
+        <h2 className="text-lg font-black tracking-[-0.03em] text-slate-950">Filters</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        {/* Category Info */}
-        <div className="p-4 border-b border-gray-100">
-          <span className="text-xs font-black text-gray-900 uppercase tracking-widest mb-4 block">Categories</span>
-          <nav className="text-sm text-gray-600 font-bold">
-            <div className="flex items-center gap-2 cursor-pointer hover:text-pp-primary transition-colors">
-              <span className="text-gray-400">‹</span> {categoryName}
+        <div className="border-b border-slate-100 p-5">
+          <span className="mb-4 block text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">Category</span>
+          <nav className="text-sm font-bold text-slate-600">
+            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-3 text-pp-primary">
+              <span className="text-slate-400">‹</span> {categoryName}
             </div>
           </nav>
         </div>
 
-        {/* Price Filter */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="border-b border-slate-100 p-5">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-black text-gray-900 uppercase tracking-widest">Price</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">Price</span>
             <button 
               onClick={() => {
                 setMaxPrice("150000");
                 updateFilters({ maxPrice: "" });
               }}
-              className="text-[10px] font-black text-pp-primary uppercase tracking-widest hover:underline"
+              className="text-[10px] font-black uppercase tracking-[0.2em] text-pp-primary hover:underline"
             >
               Clear
             </button>
@@ -81,14 +78,14 @@ export default function FilterSidebar({ categoryName }: FilterSidebarProps) {
               onChange={handlePriceChange}
               onMouseUp={handlePriceCommit}
               onTouchEnd={handlePriceCommit}
-              className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-pp-primary" 
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-100 accent-pp-primary" 
             />
             <div className="flex items-center gap-2 mt-4">
-              <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-2 py-2 text-xs font-bold text-gray-400 text-center">
+              <div className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-2 py-2 text-center text-xs font-bold text-slate-400">
                 ₹0
               </div>
-              <span className="text-gray-300">to</span>
-              <div className="flex-1 border-2 border-pp-primary/20 bg-pp-primary/5 rounded-lg px-2 py-2 text-xs font-black text-pp-primary text-center">
+              <span className="text-slate-300">to</span>
+              <div className="flex-1 rounded-xl border border-sky-100 bg-[#edf4ff] px-2 py-2 text-center text-xs font-black text-pp-primary">
                 ₹{Number(maxPrice).toLocaleString()}
                 {maxPrice === "150000" && "+"}
               </div>
@@ -96,21 +93,20 @@ export default function FilterSidebar({ categoryName }: FilterSidebarProps) {
           </div>
         </div>
 
-        {/* Ratings Filter */}
-        <div className="p-4 border-b border-gray-100">
-          <span className="text-xs font-black text-gray-900 uppercase tracking-widest mb-4 block">Customer Ratings</span>
+        <div className="border-b border-slate-100 p-5">
+          <span className="mb-4 block text-[11px] font-black uppercase tracking-[0.24em] text-slate-400">Customer Ratings</span>
           <div className="space-y-2.5">
             {[4, 3, 2, 1].map((rating) => (
               <label 
                 key={rating} 
-                className="flex items-center gap-3 group cursor-pointer"
+                className="group flex cursor-pointer items-center gap-3 rounded-2xl px-2 py-2 hover:bg-slate-50"
               >
                 <div className="relative flex items-center justify-center">
                   <input 
                     type="checkbox" 
                     checked={minRating === rating.toString()}
                     onChange={() => handleRatingChange(rating.toString())}
-                    className="peer appearance-none w-4 h-4 border-2 border-gray-200 rounded checked:bg-pp-primary checked:border-pp-primary transition-all cursor-pointer"
+                    className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-slate-200 checked:border-pp-primary checked:bg-pp-primary transition-all"
                   />
                   <div className="absolute opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none">
                     <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
@@ -118,8 +114,10 @@ export default function FilterSidebar({ categoryName }: FilterSidebarProps) {
                     </svg>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-sm font-bold text-gray-600 group-hover:text-pp-primary transition-colors">
-                  <span>{rating}★ & above</span>
+                <div className="flex items-center gap-1.5 text-sm font-bold text-slate-600 transition-colors group-hover:text-pp-primary">
+                  <span>{rating}</span>
+                  <Star className="h-3.5 w-3.5 fill-[#ffbe5c] text-[#ffbe5c]" />
+                  <span>& above</span>
                 </div>
               </label>
             ))}

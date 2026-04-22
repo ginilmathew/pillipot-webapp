@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Star, Heart } from "lucide-react";
+import { Star, Heart, ArrowUpRight } from "lucide-react";
 import { Product } from "@/lib/api";
 import { useWishlist } from "@/context/WishlistContext";
 
@@ -13,110 +13,115 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const wishlisted = isInWishlist(product.id);
-  const displayImage = product.imageUrl || `data:image/svg+xml;base64,${btoa('<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="#F3F4FB"/><path d="M200 150V250M150 200H250" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round"/><circle cx="200" cy="200" r="60" stroke="#D1D5DB" stroke-width="2" stroke-dasharray="4 4"/><text x="200" y="290" text-anchor="middle" fill="#9CA3AF" font-family="sans-serif" font-size="12" font-weight="600" letter-spacing="0.05em">NO IMAGE</text></svg>')}`;
+  const displayImage =
+    product.imageUrl ||
+    `data:image/svg+xml;base64,${btoa(
+      '<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="#EEF4FF"/><circle cx="200" cy="170" r="68" stroke="#C7D4EF" stroke-width="2" stroke-dasharray="6 6"/><path d="M200 138V202M168 170H232" stroke="#9CB2DA" stroke-width="3" stroke-linecap="round"/><text x="200" y="286" text-anchor="middle" fill="#6E86B7" font-family="sans-serif" font-size="14" font-weight="700" letter-spacing="0.08em">COMING SOON</text></svg>'
+    )}`;
+
   const rating = product.rating || 0;
   const reviewsCount = product.reviewsCount ?? 0;
   const discount = product.discount ?? 0;
-  const originalPrice = product.originalPrice ?? (product.price * 1.1);
+  const originalPrice = product.originalPrice ?? product.price * 1.1;
+  const isOutOfStock = (product.stockQuantity ?? 0) <= 0;
 
-  const formatPrice = (num: number) => {
-    return new Intl.NumberFormat("en-IN", {
+  const formatPrice = (num: number) =>
+    new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0,
     }).format(num);
-  };
-
-  const isOutOfStock = (product.stockQuantity ?? 0) <= 0;
 
   return (
-    <div className={`bg-white flex flex-col transition-all duration-300 h-full border border-gray-100/60 rounded-2xl relative p-3 sm:p-4 overflow-hidden ${
-      isOutOfStock 
-        ? "opacity-75 pointer-events-none grayscale-[0.2]" 
-        : "group cursor-pointer hover:border-pp-primary/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1"
-    }`}>
-      
-      {/* Soft gradient background behind image for premium look */}
-      <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-gray-50/50 to-transparent z-0 rounded-t-2xl pointer-events-none" />
+    <div
+      className={`group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/55 bg-white/84 p-3 pp-shadow ${
+        isOutOfStock
+          ? "opacity-75 grayscale-[0.08]"
+          : "hover:-translate-y-1.5 hover:border-sky-100 hover:pp-shadow-hover"
+      }`}
+    >
+      <div className="absolute inset-x-0 top-0 h-36 bg-[radial-gradient(circle_at_top,rgba(31,111,255,0.12),transparent_55%)]" />
 
-      {/* Image */}
-      <Link 
-        href={isOutOfStock ? "#" : `/product/${product.id}`} 
-        className="z-10 block"
-        tabIndex={isOutOfStock ? -1 : 0}
-      >
-        <div className="relative w-full aspect-[4/5] sm:aspect-square mb-4 overflow-hidden rounded-xl bg-[#F8F9FA] flex items-center justify-center p-2 group-hover:bg-white transition-colors duration-500">
-          <Image
-            src={displayImage}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            className="object-contain transition-transform duration-700 group-hover:scale-110 mix-blend-multiply"
-          />
-
-          {isOutOfStock && (
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center z-30">
-              <span className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-black tracking-widest uppercase shadow-lg">
-                Out of Stock
-              </span>
-            </div>
-          )}
-
-          {/* ⭐ Rating bottom-left instead of right for better balance */}
-          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-white/90 backdrop-blur-md shadow-sm border border-gray-100 text-gray-800 font-bold text-[11px] px-2 py-0.5 rounded-lg z-20">
-            {rating}
-            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-            {reviewsCount > 0 && (
-              <span className="text-gray-400 text-[10px] font-medium border-l border-gray-200 pl-1.5 ml-0.5">
-                {reviewsCount}
-              </span>
-            )}
-          </div>
-        </div>
-      </Link>
-
-      {/* Wishlist button (Floating) */}
       <button
         onClick={(e) => {
           e.preventDefault();
           toggleWishlist(product);
         }}
-        className={`absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-100 transition-all duration-300 z-20 ${wishlisted ? "scale-110" : "text-gray-300 hover:text-pp-accent hover:scale-110"}`}
+        className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/90 shadow-sm ${
+          wishlisted ? "text-pp-accent" : "text-slate-300 hover:text-pp-accent"
+        }`}
+        aria-label="Toggle wishlist"
       >
-        <Heart
-          className={`w-4 h-4 ${wishlisted ? "fill-pp-accent text-pp-accent" : ""}`}
-        />
+        <Heart className={`h-4 w-4 ${wishlisted ? "fill-current" : ""}`} />
       </button>
 
-      {/* Info */}
-      <Link
-        href={`/product/${product.id}`}
-        className="flex flex-col gap-1.5 flex-1 items-start text-left z-10 px-1 pb-1"
-      >
-        {product.brand && (
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-pp-primary/80">
-            {product.brand}
-          </span>
-        )}
-        <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-tight group-hover:text-pp-primary transition-colors">
-          {product.name}
-        </h3>
+      <Link href={isOutOfStock ? "#" : `/product/${product.id}`} className="relative z-10 block">
+        <div className="relative mb-4 aspect-[4/4.4] overflow-hidden rounded-[1.35rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-3">
+          <Image
+            src={displayImage}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
+            className="object-contain p-3 transition-transform duration-700 group-hover:scale-105"
+          />
 
-        <div className="flex items-center flex-wrap gap-x-2.5 gap-y-1 mt-auto pt-2">
-          <span className="text-base sm:text-lg font-black text-gray-900 tracking-tight">
-            {formatPrice(product.price)}
-          </span>
-
-          {discount > 0 && (
-            <>
-              <span className="text-gray-400 text-xs sm:text-sm line-through font-medium">
-                {formatPrice(originalPrice)}
-              </span>
-              <span className="text-pp-success text-[10px] sm:text-xs font-black uppercase tracking-wider bg-pp-success/10 px-1.5 py-0.5 rounded-md">
+          <div className="absolute left-3 top-3 flex items-center gap-2">
+            {discount > 0 ? (
+              <span className="rounded-full bg-[#081120] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">
                 {discount}% off
               </span>
-            </>
-          )}
+            ) : null}
+            {product.brand ? (
+              <span className="rounded-full border border-white/70 bg-white/82 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600">
+                {product.brand}
+              </span>
+            ) : null}
+          </div>
+
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-800 shadow-sm">
+            <Star className="h-3 w-3 fill-[#ffbe5c] text-[#ffbe5c]" />
+            {rating.toFixed(1)}
+            {reviewsCount > 0 ? <span className="text-slate-400">({reviewsCount})</span> : null}
+          </div>
+
+          {isOutOfStock ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[2px]">
+              <span className="rounded-full bg-red-500 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
+                Out of stock
+              </span>
+            </div>
+          ) : null}
+        </div>
+      </Link>
+
+      <Link href={`/product/${product.id}`} className="relative z-10 flex flex-1 flex-col px-1 pb-1">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="line-clamp-2 text-[0.98rem] font-bold leading-6 text-slate-900 group-hover:text-pp-primary">
+            {product.name}
+          </h3>
+          <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-slate-300 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-pp-primary" />
+        </div>
+
+        <p className="mt-2 line-clamp-1 text-sm text-slate-500">
+          Curated pick for everyday shopping and quick checkout.
+        </p>
+
+        <div className="mt-auto pt-4">
+          <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
+            <span className="text-xl font-black tracking-[-0.04em] text-slate-950">
+              {formatPrice(product.price)}
+            </span>
+            {discount > 0 ? (
+              <>
+                <span className="text-sm font-medium text-slate-400 line-through">
+                  {formatPrice(originalPrice)}
+                </span>
+                <span className="text-xs font-black uppercase tracking-[0.18em] text-pp-success">
+                  Save big
+                </span>
+              </>
+            ) : null}
+          </div>
         </div>
       </Link>
     </div>

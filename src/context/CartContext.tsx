@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Product, fetchCart, addToCartApi, updateCartQuantityApi, clearCartApi } from "@/lib/api";
 import { useAuth } from "./AuthContext";
 import { useToast } from "./ToastContext";
@@ -25,16 +25,17 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const { user, token } = useAuth();
+  const { user, token, loading: authLoading } = useAuth();
   const { success } = useToast();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [syncingItems, setSyncingItems] = useState<Record<string, boolean>>({});
   const syncTimers = useRef<Record<string, NodeJS.Timeout>>({});
 
-  // Load cart: from API if logged in, else localStorage
   useEffect(() => {
     const initCart = async () => {
+      if (authLoading) return;
+
       if (user && token) {
         setLoading(true);
         try {
@@ -53,11 +54,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const savedCart = localStorage.getItem("pillipot_cart");
         if (savedCart) {
           try { setCart(JSON.parse(savedCart)); } catch {}
+        } else {
+          setCart([]);
         }
       }
     };
     initCart();
-  }, [user, token]);
+  }, [authLoading, user, token]);
 
   // Save to localStorage ONLY for guests
   useEffect(() => {
@@ -67,7 +70,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart, user]);
 
   // Sync item to server with debouncing
-  const debouncedSync = (productId: string, quantity: number) => {
+  const debouncedSync = useCallback((productId: string, quantity: number) => {
     if (!user || !token) return;
 
     if (syncTimers.current[productId]) {
@@ -88,9 +91,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         delete syncTimers.current[productId];
       }
     }, 500);
-  };
+  }, [token, user]);
 
-  const addToCart = async (product: Product) => {
+  const addToCart = useCallback(async (product: Product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
@@ -104,9 +107,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, { ...product, cartQuantity: 1 }];
     });
     success("Added to cart");
-  };
+  }, [debouncedSync, success, token, user]);
 
-  const removeFromCart = async (productId: string) => {
+  const removeFromCart = useCallback(async (productId: string) => {
     setCart((prev) => prev.filter((item) => item.id !== productId));
     if (user && token) {
       try {
@@ -116,25 +119,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     }
     success("Removed from cart");
-  };
+  }, [success, token, user]);
 
-  const updateQuantity = async (productId: string, quantity: number) => {
-    const item = cart.find(i => i.id === productId);
+  const updateQuantity = useCallback(async (productId: string, quantity: number) => {
+    const item = cart.find((entry) => entry.id === productId);
     if (!item) return;
 
     const newQuantity = Math.max(1, Math.min(quantity, item.stockQuantity || 99));
     if (newQuantity === item.cartQuantity) return;
 
     setCart((prev) =>
-      prev.map((item) =>
-        item.id === productId ? { ...item, cartQuantity: newQuantity } : item
+      prev.map((entry) =>
+        entry.id === productId ? { ...entry, cartQuantity: newQuantity } : entry
       )
     );
 
     debouncedSync(productId, newQuantity);
-  };
+  }, [cart, debouncedSync]);
 
-  const clearCart = async () => {
+  const clearCart = useCallback(async () => {
     setCart([]);
     if (user && token) {
       try {
@@ -143,35 +146,49 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         console.error("Cart clear failed", error);
       }
     }
-  };
+  }, [token, user]);
 
-  const cartTotal = cart.reduce(
+  const cartTotal = useMemo(() => cart.reduce(
     (total, item) => total + item.price * item.cartQuantity,
     0
-  );
+  ), [cart]);
 
-  const cartMrpTotal = cart.reduce(
+  const cartMrpTotal = useMemo(() => cart.reduce(
     (total, item) => total + (item.originalPrice || item.price) * item.cartQuantity,
     0
+  ), [cart]);
+
+  const cartCount = useMemo(() => cart.reduce((count, item) => count + item.cartQuantity, 0), [cart]);
+
+  const value = useMemo(
+    () => ({
+      cart,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      cartTotal,
+      cartMrpTotal,
+      cartCount,
+      loading,
+      syncingItems,
+    }),
+    [
+      cart,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      cartTotal,
+      cartMrpTotal,
+      cartCount,
+      loading,
+      syncingItems,
+    ]
   );
 
-  const cartCount = cart.reduce((count, item) => count + item.cartQuantity, 0);
-
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        cartTotal,
-        cartMrpTotal,
-        cartCount,
-        loading,
-        syncingItems,
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );
