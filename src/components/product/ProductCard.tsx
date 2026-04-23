@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Star, Heart, ArrowUpRight } from "lucide-react";
+import { Star, Heart, ShoppingCart } from "lucide-react";
 import { Product } from "@/lib/api";
 import { useWishlist } from "@/context/WishlistContext";
 
@@ -34,29 +34,34 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className={`group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/55 bg-white/84 p-3 pp-shadow ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/55 bg-white pp-shadow transition-all duration-300 ${
         isOutOfStock
-          ? "opacity-75 grayscale-[0.08]"
-          : "hover:-translate-y-1.5 hover:border-sky-100 hover:pp-shadow-hover"
+          ? "opacity-70 grayscale-[0.06]"
+          : "hover:-translate-y-1 hover:border-sky-100 hover:pp-shadow-hover"
       }`}
     >
-      <div className="absolute inset-x-0 top-0 h-36 bg-[radial-gradient(circle_at_top,rgba(31,111,255,0.12),transparent_55%)]" />
-
+      {/* Wishlist button */}
       <button
         onClick={(e) => {
           e.preventDefault();
           toggleWishlist(product);
         }}
-        className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/90 shadow-sm ${
-          wishlisted ? "text-pp-accent" : "text-slate-300 hover:text-pp-accent"
+        className={`absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border bg-white shadow-sm transition-all duration-200 ${
+          wishlisted
+            ? "border-red-100 bg-red-50 text-pp-accent"
+            : "border-slate-200 text-slate-300 hover:border-red-100 hover:bg-red-50 hover:text-pp-accent"
         }`}
         aria-label="Toggle wishlist"
       >
         <Heart className={`h-4 w-4 ${wishlisted ? "fill-current" : ""}`} />
       </button>
 
-      <Link href={isOutOfStock ? "#" : `/product/${product.id}`} className="relative z-10 block">
-        <div className="relative mb-4 aspect-[4/4.4] overflow-hidden rounded-[1.35rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-3">
+      {/* Image area */}
+      <Link
+        href={isOutOfStock ? "#" : `/product/${product.id}`}
+        className="relative block"
+      >
+        <div className="relative aspect-[1/1] overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-4">
           <Image
             src={displayImage}
             alt={product.name}
@@ -65,28 +70,31 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="object-contain p-3 transition-transform duration-700 group-hover:scale-105"
           />
 
-          <div className="absolute left-3 top-3 flex items-center gap-2">
+          {/* Badges row */}
+          <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
             {discount > 0 ? (
-              <span className="rounded-full bg-[#081120] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">
-                {discount}% off
-              </span>
+              <span className="pp-badge-discount">{discount}% off</span>
             ) : null}
             {product.brand ? (
-              <span className="rounded-full border border-white/70 bg-white/82 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600">
-                {product.brand}
-              </span>
+              <span className="pp-badge-brand">{product.brand}</span>
             ) : null}
           </div>
 
-          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-800 shadow-sm">
+          {/* Rating */}
+          <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 shadow-sm">
             <Star className="h-3 w-3 fill-[#ffbe5c] text-[#ffbe5c]" />
-            {rating.toFixed(1)}
-            {reviewsCount > 0 ? <span className="text-slate-400">({reviewsCount})</span> : null}
+            <span className="text-[11px] font-bold text-slate-800">
+              {rating.toFixed(1)}
+            </span>
+            {reviewsCount > 0 ? (
+              <span className="text-[11px] text-slate-400">({reviewsCount})</span>
+            ) : null}
           </div>
 
+          {/* Out of stock overlay */}
           {isOutOfStock ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[2px]">
-              <span className="rounded-full bg-red-500 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
+            <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[2px]">
+              <span className="rounded-lg bg-slate-800 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-white">
                 Out of stock
               </span>
             </div>
@@ -94,34 +102,33 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
 
-      <Link href={`/product/${product.id}`} className="relative z-10 flex flex-1 flex-col px-1 pb-1">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 text-[0.98rem] font-bold leading-6 text-slate-900 group-hover:text-pp-primary">
-            {product.name}
-          </h3>
-          <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-slate-300 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-pp-primary" />
+      {/* Info area */}
+      <Link
+        href={`/product/${product.id}`}
+        className="flex flex-1 flex-col gap-2 p-3"
+      >
+        {/* Product name */}
+        <h3 className="line-clamp-2 text-[0.88rem] font-semibold leading-[1.45] text-slate-800 group-hover:text-pp-primary">
+          {product.name}
+        </h3>
+
+        {/* Price row */}
+        <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-0.5 pt-2">
+          <span className="pp-price-main">{formatPrice(product.price)}</span>
+          {discount > 0 ? (
+            <>
+              <span className="pp-price-strike">
+                {formatPrice(originalPrice)}
+              </span>
+              <span className="pp-price-save">Save {discount}%</span>
+            </>
+          ) : null}
         </div>
 
-        <p className="mt-2 line-clamp-1 text-sm text-slate-500">
-          Curated pick for everyday shopping and quick checkout.
-        </p>
-
-        <div className="mt-auto pt-4">
-          <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
-            <span className="text-xl font-black tracking-[-0.04em] text-slate-950">
-              {formatPrice(product.price)}
-            </span>
-            {discount > 0 ? (
-              <>
-                <span className="text-sm font-medium text-slate-400 line-through">
-                  {formatPrice(originalPrice)}
-                </span>
-                <span className="text-xs font-black uppercase tracking-[0.18em] text-pp-success">
-                  Save big
-                </span>
-              </>
-            ) : null}
-          </div>
+        {/* CTA hint */}
+        <div className="mt-1 flex items-center gap-1.5 rounded-lg border border-sky-100 bg-[#edf4ff] px-3 py-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <ShoppingCart className="h-3.5 w-3.5 text-pp-primary" />
+          <span className="text-[11px] font-bold text-pp-primary">View product</span>
         </div>
       </Link>
     </div>

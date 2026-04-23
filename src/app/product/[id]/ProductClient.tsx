@@ -9,12 +9,18 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+
+import useSWR from "swr";
+import { swrKeys } from "@/lib/swrKeys";
+import { getProductOffers } from "@/lib/api";
 
 export default function ProductClient({ product }: { product: Product }) {
   const router = useRouter();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { user, setIsLoginModalOpen } = useAuth();
+  const { success } = useToast();
   
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -61,6 +67,8 @@ export default function ProductClient({ product }: { product: Product }) {
 
   const goNext = () => setSelectedIndex((i) => (i + 1) % allImages.length);
   const goPrev = () => setSelectedIndex((i) => (i - 1 + allImages.length) % allImages.length);
+
+  const { data: offers = [] } = useSWR(swrKeys.productOffers(product.id), () => getProductOffers(product.id));
 
   return (
     <>
@@ -119,7 +127,7 @@ export default function ProductClient({ product }: { product: Product }) {
                     sizes="(max-width: 1024px) 100vw, 40vw"
                     className={`object-contain transition-transform duration-200 ${isHoverZoom ? "scale-200" : "scale-100"}`}
                     style={isHoverZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : {}}
-                    priority // Critical for LCP optimization
+                    priority 
                   />
                   <button
                     onClick={(e) => { 
@@ -176,22 +184,45 @@ export default function ProductClient({ product }: { product: Product }) {
               )}
             </div>
 
-            <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
-              <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-slate-900">Available Offers</h3>
-              <ul className="space-y-2.5">
-                {[
-                  "10% instant discount on Pillipot Pay, up to ₹1,000",
-                  "Extra 15% off on first purchase with code WELCOME15",
-                  "Free delivery on this item",
-                  "Buy 2, get extra ₹250 off on next purchase",
-                ].map((offer, i) => (
-                  <li key={i} className="flex gap-2.5 text-sm text-slate-700">
-                    <Tag className="w-4 h-4 text-pp-primary shrink-0 mt-0.5" />
-                    <span>{offer}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {offers.length > 0 && (
+              <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
+                <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-slate-900">Available Offers</h3>
+                <ul className="space-y-2.5">
+                  {offers.map((offer, i) => (
+                    <li key={i} className="flex gap-2.5 text-sm text-slate-700">
+                      <Tag className="w-4 h-4 text-pp-primary shrink-0 mt-0.5" />
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold">{offer.title}</span>
+                          {offer.minQuantity > 1 && (
+                            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-pp-primary">
+                              MIN QTY: {offer.minQuantity}
+                            </span>
+                          )}
+                        </div>
+                        {offer.description && <span className="text-xs text-slate-500 opacity-80">{offer.description}</span>}
+                        {offer.code && (
+                          <div className="mt-1 flex items-center gap-2">
+                            <span className="text-[10px] font-black tracking-widest text-pp-primary uppercase">Code: {offer.code}</span>
+                            <button 
+                              onClick={() => {
+                                if (offer.code) {
+                                  navigator.clipboard.writeText(offer.code);
+                                  success("Code copied!");
+                                }
+                              }}
+                              className="text-[10px] font-bold text-blue-600 hover:underline"
+                            >
+                              COPY
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">

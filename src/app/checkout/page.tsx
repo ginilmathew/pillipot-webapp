@@ -21,6 +21,9 @@ export default function CheckoutPage() {
   const { user, token } = useAuth();
   const router = useRouter();
   
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedOffer, setAppliedOffer] = useState<{ productId: string; discountPercentage: number; code: string } | null>(null);
+
   const [activeStep, setActiveStep] = useState<Step>("address");
   // Addresses are fetched + cached via SWR to avoid refetching on re-renders/navigation.
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -245,7 +248,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      const res = await checkout(cart, checkoutInfo);
+      const res = await checkout(cart, checkoutInfo, appliedOffer);
       clearCart();
       router.push(`/order-success?orderId=${res.orderId}`);
     } catch (err: any) {
@@ -253,6 +256,66 @@ export default function CheckoutPage() {
     }
     setIsPlacingOrder(false);
   };
+
+  // Clear applied offer if product is removed from cart
+  useEffect(() => {
+    if (appliedOffer && !cart.some(item => item.id === appliedOffer.productId)) {
+      setAppliedOffer(null);
+    }
+  }, [cart, appliedOffer]);
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    
+    setIsLoading(true);
+    let codeApplied = false;
+    
+    try {
+      const { getProductOffers } = await import("@/lib/api");
+      
+      // Check each product in cart
+      for (const item of cart) {
+        const offers = await getProductOffers(item.id);
+        const matchingOffer = offers.find(o => 
+          o.isActive && 
+          o.code?.toLowerCase() === promoCode.toLowerCase().trim()
+        );
+        
+        if (matchingOffer) {
+          if (item.cartQuantity < matchingOffer.minQuantity) {
+            error(`This code requires at least ${matchingOffer.minQuantity} units of ${item.name}`);
+            setIsLoading(false);
+            return;
+          }
+          
+          setAppliedOffer({
+            productId: item.id,
+            discountPercentage: Number(matchingOffer.discountPercentage),
+            code: matchingOffer.code || promoCode
+          });
+          codeApplied = true;
+          // toast success would be nice, but we have error toast here. 
+          // Assuming we have a way to show success or just the state change is enough.
+          break;
+        }
+      }
+      
+      if (!codeApplied) {
+        error("Invalid promo code or code not applicable to items in cart.");
+      }
+    } catch (err) {
+      error("Failed to validate promo code.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const offerProduct = appliedOffer ? cart.find(i => i.id === appliedOffer.productId) : null;
+  const offerDiscount = offerProduct 
+    ? Math.round(offerProduct.price * (appliedOffer!.discountPercentage / 100) * offerProduct.cartQuantity)
+    : 0;
+
+  const finalTotal = cartTotal - offerDiscount;
 
   const selectedAddrObj = addresses.find(a => a.id === selectedAddressId) || {
     customerName: formData.customerName,
@@ -579,7 +642,7 @@ export default function CheckoutPage() {
                               PLACING ORDER...
                             </>
                           ) : (
-                            `CONFIRM ORDER — ${formatPrice(cartTotal)}`
+                            `CONFIRM ORDER — ${formatPrice(finalTotal)}`
                           )}
                         </button>
                       </div>
@@ -615,13 +678,45 @@ export default function CheckoutPage() {
                   <span className="text-gray-700">Delivery</span>
                   <span className="text-pp-success font-semibold">Free</span>
                 </div>
+                {offerDiscount > 0 && (
+                  <div className="flex justify-between animate-in fade-in duration-300">
+                    <div className="flex flex-col">
+                      <span className="text-gray-700">Offer Discount</span>
+                      <span className="text-[10px] text-pp-primary font-bold uppercase">Code: {appliedOffer?.code}</span>
+                    </div>
+                    <span className="text-pp-success font-semibold">- {formatPrice(offerDiscount)}</span>
+                  </div>
+                )}
                 <div className="border-t border-dashed border-gray-200 pt-3 flex justify-between text-lg font-black text-gray-900">
                   <span>Total</span>
-                  <span>{formatPrice(cartTotal)}</span>
+                  <span>{formatPrice(finalTotal)}</span>
                 </div>
               </div>
+
+              <div className="p-5 border-t border-gray-100 bg-gray-50/30">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Promo Code</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      placeholder="Enter code"
+                      className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-pp-primary transition-all uppercase font-bold"
+                    />
+                    <button 
+                      onClick={handleApplyPromo}
+                      disabled={isLoading || !promoCode.trim()}
+                      className="px-4 py-2 rounded-xl bg-pp-primary text-white text-xs font-black shadow-md hover:brightness-110 disabled:grayscale transition-all"
+                    >
+                      APPLY
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="bg-pp-success/10 p-3 text-center border-t border-pp-success/10">
-                <p className="text-pp-success text-[11px] font-bold uppercase tracking-wide">You saved {formatPrice(cartMrpTotal - cartTotal)} on this order!</p>
+                <p className="text-pp-success text-[11px] font-bold uppercase tracking-wide">You saved {formatPrice(cartMrpTotal - finalTotal)} on this order!</p>
               </div>
             </div>
           </div>

@@ -61,9 +61,9 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
   };
 
   return (
-    <div className="sticky top-14 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-2xl">
-      <div className="pp-container py-1.5 md:py-2.5">
-        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto md:gap-2.5">
+    <div className="sticky top-16 z-30 border-b border-slate-200/70 bg-white/88 backdrop-blur-2xl shadow-sm">
+      <div className="pp-container py-0">
+        <div className="no-scrollbar flex items-center gap-0.5 overflow-x-auto sm:gap-1">
           {displayCategories.map((category) => {
             const active = isActive(category.href);
             const Icon = category.icon;
@@ -72,13 +72,20 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
               <Link
                 key={category.name}
                 href={category.href}
-                className={`group flex min-w-[68px] flex-col items-center gap-1.5 rounded-[1.25rem] border px-2 py-1.5 text-center md:min-w-[92px] md:gap-2 md:rounded-[1.55rem] md:px-3 md:py-2.5 ${active
-                  ? "border-sky-200 bg-white shadow-[0_20px_40px_rgba(9,22,43,0.1)]"
-                  : "border-white/40 bg-white/65 hover:border-sky-100 hover:bg-white"
-                  }`}
+                className={`group relative flex min-w-[60px] flex-col items-center gap-1.5 px-2.5 py-3 text-center transition-colors duration-150 sm:min-w-[76px] sm:px-3 md:min-w-[88px] md:py-3.5 ${
+                  active
+                    ? "text-pp-primary"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
               >
+                {/* Active indicator line */}
+                {active && (
+                  <span className="absolute bottom-0 left-3 right-3 h-[2.5px] rounded-full bg-pp-primary" />
+                )}
+
+                {/* Icon bubble */}
                 <div
-                  className={`relative flex h-6 w-6 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${category.color} shadow-lg shadow-slate-900/12 min-[360px]:h-8 min-[360px]:w-8 md:h-10 md:w-10 md:rounded-2xl`}
+                  className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${category.color} shadow-md transition-transform duration-200 group-hover:scale-105 sm:h-9 sm:w-9 md:h-10 md:w-10 md:rounded-2xl`}
                 >
                   {category.imageUrl ? (
                     <Image
@@ -89,12 +96,15 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <Icon className="h-3.5 w-3.5 text-white md:h-4 md:w-4" />
+                    <Icon className="h-4 w-4 text-white md:h-4.5 md:w-4.5" />
                   )}
                 </div>
+
+                {/* Label */}
                 <span
-                  className={`text-[5px] font-bold leading-[1.05] min-[360px]:text-[10px] md:text-[10px] ${active ? "text-pp-primary" : "text-slate-600 group-hover:text-slate-900"
-                    }`}
+                  className={`text-[10px] font-semibold leading-tight tracking-wide transition-colors ${
+                    active ? "font-bold text-pp-primary" : ""
+                  }`}
                 >
                   {category.name}
                 </span>

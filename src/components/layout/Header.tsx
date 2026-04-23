@@ -54,10 +54,10 @@ function HeaderContent() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-white/40 bg-white/65 backdrop-blur-2xl">
-        <div className="absolute inset-x-0 top-0 h-14 pp-gradient opacity-95 md:h-16" />
-        <div className="absolute inset-x-0 top-0 h-14 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_24%),linear-gradient(180deg,rgba(8,17,32,0.05),transparent)] md:h-16" />
+        <div className="absolute inset-x-0 top-0 h-16 pp-gradient opacity-95" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_24%),linear-gradient(180deg,rgba(8,17,32,0.05),transparent)]" />
 
-        <div className="pp-container relative flex min-h-14 items-center gap-1.5 py-1 min-[360px]:gap-2">
+        <div className="pp-container relative flex min-h-16 items-center gap-2 py-2">
           {/* <button
             onClick={() => setMenuOpen((open) => !open)}
             className="lg:hidden inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/20 bg-white/15 text-white shadow-lg shadow-black/10 min-[360px]:h-9 min-[360px]:w-9"
@@ -85,7 +85,7 @@ function HeaderContent() {
           </Link>
 
           <div className="ml-auto hidden items-center gap-3 md:flex">
-            <form onSubmit={handleSearch} className="relative w-[min(40vw,560px)] min-w-[248px]">
+            <form onSubmit={handleSearch} className="relative w-[min(42vw,640px)] min-w-[280px]">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/58">
                 <Search className="h-4 w-4" />
               </div>
@@ -95,11 +95,11 @@ function HeaderContent() {
                 defaultValue={initialQuery}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products, brands, categories..."
-                className="h-10 w-full rounded-full border border-white/14 bg-white/12 pl-11 pr-26 text-sm font-medium text-white outline-none placeholder:text-white/52 focus:border-white/38 focus:bg-white/18"
+                className="h-11 w-full rounded-full border border-white/14 bg-white/12 pl-11 pr-28 text-[0.875rem] font-medium text-white outline-none placeholder:text-white/48 focus:border-white/38 focus:bg-white/18"
               />
               <button
                 type="submit"
-                className="absolute right-1 top-1 inline-flex h-8 min-w-[92px] items-center justify-center gap-2 rounded-full bg-white px-4 text-xs font-bold text-[#123468] shadow-lg shadow-black/10 hover:-translate-y-0.5"
+                className="absolute right-1.5 top-1.5 inline-flex h-8 min-w-[88px] items-center justify-center gap-2 rounded-full bg-white px-4 text-xs font-bold text-[#123468] shadow-lg shadow-black/10 hover:-translate-y-0.5"
               >
                 Search
               </button>
@@ -313,13 +313,13 @@ function HeaderIconLink({
   return (
     <Link
       href={href}
-      className={`relative inline-flex h-10 min-w-[124px] items-center justify-center gap-2 rounded-full px-4 text-xs font-bold ${prominent
-        ? "border border-white/22 bg-white/14 text-white"
-        : "border border-white/14 bg-white/8 text-white/92"
+      className={`relative inline-flex h-10 min-w-[112px] items-center justify-center gap-2 rounded-full px-4 text-xs font-bold transition-all duration-200 ${prominent
+        ? "border border-white/22 bg-white/14 text-white hover:bg-white/20"
+        : "border border-white/14 bg-white/8 text-white/92 hover:bg-white/14"
         }`}
     >
       <Icon className="h-4 w-4" />
-      <span className="hidden xl:inline">{label}</span>
+      <span className="hidden lg:inline">{label}</span>
       {badge && badge > 0 ? (
         <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-pp-accent px-1 text-[10px] font-black text-white">
           {badge}
@@ -388,7 +388,7 @@ function BottomNavItem({
 
 export default function Header() {
   return (
-    <React.Suspense fallback={<header className="sticky top-0 z-50 h-20 border-b border-white/40 bg-white/65" />}>
+    <React.Suspense fallback={<header className="sticky top-0 z-50 h-16 border-b border-white/40 pp-gradient opacity-95" />}>
       <HeaderContent />
     </React.Suspense>
   );

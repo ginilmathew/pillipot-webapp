@@ -76,6 +76,16 @@ export interface Product {
   discount?: number;
 }
 
+export interface ProductOffer {
+  id: string;
+  productId: string;
+  title: string;
+  description?: string;
+  code?: string;
+  minQuantity: number;
+  discountPercentage: number;
+}
+
 export async function getCategories(): Promise<Category[]> {
   try {
     return await fetchPublicJson<Category[]>("/customer/categories", {
@@ -142,6 +152,17 @@ export async function getProduct(id: string): Promise<Product | null> {
     });
   } catch {
     return null;
+  }
+}
+
+export async function getProductOffers(productId: string): Promise<ProductOffer[]> {
+  try {
+    return await fetchPublicJson<ProductOffer[]>(`/customer/offers/product/${productId}`, {
+      revalidate: 300,
+      tags: ["offers", `productOffers:${productId}`],
+    });
+  } catch {
+    return [];
   }
 }
 
@@ -348,12 +369,12 @@ export type CheckoutCustomerInfo = Partial<CustomerAddress> & {
   paymentMethod?: string;
 };
 
-export async function checkout(cart: CheckoutCartItem[], customerInfo: CheckoutCustomerInfo): Promise<{ orderId: string }> {
+export async function checkout(cart: CheckoutCartItem[], customerInfo: CheckoutCustomerInfo, appliedOffer?: any): Promise<{ orderId: string }> {
   const res = await fetch(`${API_URL}/orders/checkout`, {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ cart, customerInfo }),
+    body: JSON.stringify({ cart, customerInfo, appliedOffer }),
   });
   if (!res.ok) {
     let msg = "Something went wrong. Please try again.";
@@ -419,6 +440,7 @@ export type OrderApiSummary = {
   total: number;
   customerName?: string;
   status: string;
+  trackingId?: string | null;
   items: OrderApiItem[];
 };
 
@@ -444,6 +466,7 @@ export type OrderApiDetail = OrderApiSummary & {
   district: string;
   state: string;
   pincode: string;
+  trackingId?: string | null;
 };
 
 export async function getOrderDetails(token: string, orderId: string): Promise<OrderApiDetail | null> {

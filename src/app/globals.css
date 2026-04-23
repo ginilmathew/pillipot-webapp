@@ -13,14 +13,33 @@
   --color-pp-dark: #081120;
   --color-pp-muted: #63708a;
   --color-pp-line: rgba(96, 119, 170, 0.16);
+
+  /* Typography scale tokens */
+  --font-size-display: clamp(2rem, 4vw, 3.25rem);
+  --font-size-heading: clamp(1.25rem, 2.5vw, 1.75rem);
+  --font-size-subheading: clamp(1rem, 1.8vw, 1.25rem);
+  --font-size-body: 0.9375rem;
+  --font-size-sm: 0.875rem;
+  --font-size-xs: 0.8125rem;
+  --line-height-tight: 1.15;
+  --line-height-body: 1.65;
+  --letter-spacing-tight: -0.035em;
+  --letter-spacing-heading: -0.028em;
 }
 
 .pp-container {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding-left: 1.1rem;
-  padding-right: 1.1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 480px) {
+  .pp-container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -32,8 +51,31 @@
 
 @media (min-width: 1024px) {
   .pp-container {
-    padding-left: 2.75rem;
-    padding-right: 2.75rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .pp-container {
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+}
+
+/* Narrower container for focused content */
+.pp-container-narrow {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .pp-container-narrow {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
@@ -96,12 +138,13 @@
 .pp-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   border-radius: 999px;
-  padding: 0.45rem 0.8rem;
-  font-size: 0.72rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   border: 1px solid rgba(96, 119, 170, 0.14);
   background: rgba(255, 255, 255, 0.72);
   color: #21304e;
@@ -132,6 +175,84 @@
   scrollbar-width: none;
 }
 
+/* ── Section heading system ── */
+.pp-section-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-pp-primary);
+}
+
+.pp-section-title {
+  font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: #081120;
+}
+
+.pp-section-divider {
+  display: block;
+  width: 3rem;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1f6fff, #0e44c5);
+  margin-top: 0.65rem;
+}
+
+/* ── Ecommerce badge system ── */
+.pp-badge-discount {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: #ff6b57;
+  color: white;
+}
+
+.pp-badge-brand {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.9);
+  color: #3b4f72;
+  border: 1px solid rgba(96,119,170,0.18);
+}
+
+/* ── Price display system ── */ 
+.pp-price-main {
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #081120;
+  line-height: 1;
+}
+
+.pp-price-strike {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #9aa8c0;
+  text-decoration: line-through;
+}
+
+.pp-price-save {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-pp-success);
+}
+
 /* Smooth page transitions */
 * {
   scroll-behavior: smooth;
@@ -148,6 +269,11 @@ html {
 
 body {
   font-family: var(--font-outfit), system-ui, -apple-system, sans-serif;
+  font-size: var(--font-size-body);
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   background: var(--color-pp-surface);
   color: #081120;
   padding-bottom: 88px;

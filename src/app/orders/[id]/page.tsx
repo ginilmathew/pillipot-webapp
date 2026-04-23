@@ -18,7 +18,9 @@ import {
   CreditCard,
   User,
   Calendar,
-  Loader2
+  Loader2,
+  Copy,
+  ExternalLink
 } from "lucide-react";
 import useSWR from "swr";
 import { swrKeys } from "@/lib/swrKeys";
@@ -150,6 +152,35 @@ export default function OrderDetailsPage() {
                   </div>
                </div>
             </div>
+
+            {/* Tracking ID — shown when admin has set one */}
+            {order.trackingId && (
+              <div className="flex flex-col gap-3 rounded-2xl border border-sky-100 bg-[#f0f7ff] p-5 sm:flex-row sm:items-center sm:gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-pp-primary/10">
+                  <Truck className="h-5 w-5 text-pp-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                    Shipment Tracking ID
+                  </p>
+                  <p className="mt-1 text-lg font-black tracking-widest text-slate-900">
+                    {order.trackingId}
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    Use this ID to track your package with the courier.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(order.trackingId!);
+                  }}
+                  className="flex items-center gap-2 self-start rounded-xl border border-sky-200 bg-white px-4 py-2 text-xs font-black uppercase tracking-wider text-pp-primary transition-all hover:bg-pp-primary hover:text-white sm:self-center"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  Copy ID
+                </button>
+              </div>
+            )}
 
             {/* Items Card */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
