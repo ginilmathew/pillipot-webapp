@@ -84,6 +84,7 @@ export interface ProductOffer {
   code?: string;
   minQuantity: number;
   discountPercentage: number;
+  isActive: boolean;
 }
 
 export async function getCategories(): Promise<Category[]> {
