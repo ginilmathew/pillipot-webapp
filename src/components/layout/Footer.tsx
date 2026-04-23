@@ -32,11 +32,7 @@ const sections = [
   },
 ];
 
-const trustPoints = [
-  { icon: ShieldCheck, title: "Verified products", note: "Trusted catalog and secure orders" },
-  { icon: CreditCard, title: "Protected checkout", note: "Encrypted payments and support" },
-  { icon: Truck, title: "Fast delivery", note: "Reliable shipping across regions" },
-];
+
 
 export default function Footer() {
   return (
@@ -44,28 +40,11 @@ export default function Footer() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(31,111,255,0.26),transparent_26%),radial-gradient(circle_at_top_right,rgba(255,190,92,0.16),transparent_16%)]" />
 
       <div className="pp-container relative py-8 md:py-10">
-        <div className="grid gap-4 rounded-[2rem] border border-white/10 bg-white/6 p-4 backdrop-blur-xl md:grid-cols-3 md:p-6">
-          {trustPoints.map((item) => (
-            <div key={item.title} className="flex items-start gap-4 rounded-[1.5rem] border border-white/8 bg-white/6 p-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white">
-                <item.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">{item.title}</p>
-                <p className="mt-1 text-sm text-white/60">{item.note}</p>
-              </div>
-            </div>
-          ))}
-        </div>
 
+        {/* 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
           <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6 backdrop-blur-xl md:p-8">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="pp-chip border-white/10 bg-white/8 text-white/86">
-                <Sparkles className="h-3.5 w-3.5" />
-                New storefront energy
-              </span>
-            </div>
+       
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {sections.map((section) => (
                 <div key={section.title}>
@@ -108,7 +87,7 @@ export default function Footer() {
                 </div>
               </div>
             </div>
-
+            
             <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/4 p-6 backdrop-blur-xl md:p-8">
               <p className="text-xs font-black uppercase tracking-[0.24em] text-white/38">Need Something Fast?</p>
               <h3 className="mt-3 text-2xl font-black tracking-[-0.04em] text-white">Start exploring the latest collections.</h3>
@@ -124,9 +103,9 @@ export default function Footer() {
               </Link>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="mt-6 flex flex-col gap-3 border-t border-white/10 py-5 text-sm text-white/42 md:flex-row md:items-center md:justify-between">
+        <div className=" flex flex-col gap-3 border-t border-white/10 py-5 text-sm text-white/42 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-pp-primary">
               <span className="text-sm font-black">P</span>

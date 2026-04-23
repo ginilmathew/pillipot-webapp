@@ -58,17 +58,17 @@ function HeaderContent() {
         <div className="absolute inset-x-0 top-0 h-14 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_24%),linear-gradient(180deg,rgba(8,17,32,0.05),transparent)] md:h-16" />
 
         <div className="pp-container relative flex min-h-14 items-center gap-1.5 py-1 min-[360px]:gap-2">
-          <button
+          {/* <button
             onClick={() => setMenuOpen((open) => !open)}
             className="lg:hidden inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/20 bg-white/15 text-white shadow-lg shadow-black/10 min-[360px]:h-9 min-[360px]:w-9"
             aria-label="Open menu"
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          </button> */}
 
           <Link href="/" className="group flex min-w-0 items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-2xl border border-white/25 bg-white/90 shadow-[0_20px_50px_rgba(10,25,60,0.22)] transition-transform duration-300 group-hover:-translate-y-0.5 min-[360px]:h-9 min-[360px]:w-9">
-              <span className="bg-gradient-to-br from-pp-primary via-sky-500 to-pp-accent bg-clip-text text-base font-black text-transparent min-[360px]:text-lg">
+              <span className="bg-linear-to-br from-pp-primary via-sky-500 to-pp-accent bg-clip-text text-base font-black text-transparent min-[360px]:text-lg">
                 P
               </span>
             </div>
@@ -78,9 +78,9 @@ function HeaderContent() {
                   pillipot
                 </span>
               </div>
-              <span className="mt-0 block max-w-[180px] truncate text-[6px] font-semibold uppercase leading-none tracking-[0.22em] text-white/68 max-[360px]:text-[5px] min-[380px]:max-w-[220px] min-[380px]:text-[7px] md:max-w-none md:text-[8px] md:tracking-[0.28em]">
+              {/* <span className="mt-0 block max-w-[180px] truncate text-[6px] font-semibold uppercase leading-none tracking-[0.22em] text-white/68 max-[360px]:text-[5px] min-[380px]:max-w-[220px] min-[380px]:text-[7px] md:max-w-none md:text-[8px] md:tracking-[0.28em]">
                 Marketplace Reimagined
-              </span>
+              </span> */}
             </div>
           </Link>
 
@@ -110,8 +110,8 @@ function HeaderContent() {
                 <button
                   onClick={() => setUserMenuOpen((open) => !open)}
                   className={`flex h-10 min-w-[148px] items-center justify-center gap-2 rounded-full border px-3 py-2 text-xs font-bold shadow-lg ${userMenuOpen
-                      ? "border-white/16 bg-white text-[#123468]"
-                      : "border-white/16 bg-white/10 text-white"
+                    ? "border-white/16 bg-white text-[#123468]"
+                    : "border-white/16 bg-white/10 text-white"
                     }`}
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/16">
@@ -215,7 +215,7 @@ function HeaderContent() {
         )}
       </header>
 
-      {menuOpen && (
+      {/* {menuOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
           <div className="absolute left-0 top-0 flex h-full w-[84vw] max-w-sm flex-col overflow-hidden border-r border-white/10 bg-[#081120] text-white animate-in slide-in-from-left">
@@ -239,8 +239,8 @@ function HeaderContent() {
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
                   className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold ${pathname === item.href
-                      ? "bg-white text-[#123468]"
-                      : "bg-white/6 text-white/84 hover:bg-white/10"
+                    ? "bg-white text-[#123468]"
+                    : "bg-white/6 text-white/84 hover:bg-white/10"
                     }`}
                 >
                   <item.icon className="h-5 w-5" />
@@ -276,7 +276,7 @@ function HeaderContent() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <nav className="fixed inset-x-3 bottom-3 z-40 rounded-[1.75rem] border border-white/50 bg-white/82 px-2 py-2 shadow-[0_20px_60px_rgba(11,24,46,0.16)] backdrop-blur-2xl md:hidden">
         <div className="grid grid-cols-5 gap-1">
@@ -314,8 +314,8 @@ function HeaderIconLink({
     <Link
       href={href}
       className={`relative inline-flex h-10 min-w-[124px] items-center justify-center gap-2 rounded-full px-4 text-xs font-bold ${prominent
-          ? "border border-white/22 bg-white/14 text-white"
-          : "border border-white/14 bg-white/8 text-white/92"
+        ? "border border-white/22 bg-white/14 text-white"
+        : "border border-white/14 bg-white/8 text-white/92"
         }`}
     >
       <Icon className="h-4 w-4" />

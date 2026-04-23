@@ -32,9 +32,9 @@ export default function CartPage() {
               </div>
             </div>
             <h2 className="mb-2 text-2xl font-black tracking-[-0.04em] text-slate-950 md:text-3xl">Your cart is empty</h2>
-            <p className="mx-auto mb-6 max-w-md text-sm leading-7 text-slate-500">
+            {/* <p className="mx-auto mb-6 max-w-md text-sm leading-7 text-slate-500">
               Looks like you haven&apos;t added anything yet. Start exploring and add your favorite products to the bag.
-            </p>
+            </p> */}
             <Link
               href="/"
               className="pp-button-primary inline-flex rounded-full px-8 py-3 text-sm font-bold"
@@ -61,11 +61,10 @@ export default function CartPage() {
         <div className="flex flex-col items-start gap-5 lg:flex-row lg:gap-6">
           <div className="flex w-full flex-1 flex-col gap-3">
             {cart.map((item) => (
-              <div 
-                key={item.id} 
-                className={`flex flex-col gap-4 rounded-[1.5rem] border border-white/60 bg-white/82 p-4 pp-shadow transition-all sm:flex-row sm:items-center sm:gap-4 md:rounded-[1.8rem] md:p-5 ${
-                  syncingItems[item.id] ? "opacity-70 pointer-events-none sm:pointer-events-auto" : "opacity-100"
-                }`}
+              <div
+                key={item.id}
+                className={`flex flex-col gap-4 rounded-[1.5rem] border border-white/60 bg-white/82 p-4 pp-shadow transition-all sm:flex-row sm:items-center sm:gap-4 md:rounded-[1.8rem] md:p-5 ${syncingItems[item.id] ? "opacity-70 pointer-events-none sm:pointer-events-auto" : "opacity-100"
+                  }`}
               >
                 <div className="flex items-center gap-3 sm:min-w-0 sm:flex-1">
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[1rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] md:h-24 md:w-24 md:rounded-[1.2rem]">

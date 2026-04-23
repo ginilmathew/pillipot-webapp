@@ -46,7 +46,7 @@ export default async function Home() {
 
       <main className="flex-1">
         <section className="pp-container pt-4 md:pt-6">
-          <div className="grid gap-4 md:grid-cols-3">
+          {/* <div className="grid gap-4 md:grid-cols-3">
             {[
               {
                 icon: Truck,
@@ -79,7 +79,7 @@ export default async function Home() {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
         </section>
 
         <section className="pp-container py-6 md:py-8">
