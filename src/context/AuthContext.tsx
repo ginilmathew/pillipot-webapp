@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import { User, getMe } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import WelcomePopup from "@/components/auth/WelcomePopup";
 
 const LoginModal = dynamic(() => import("@/components/auth/LoginModal"), { ssr: false });
 
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -48,6 +50,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     init();
   }, []);
 
+  useEffect(() => {
+    if (!loading && user && !showWelcomePopup) {
+      const welcomeShown = localStorage.getItem("pillipot_welcome_shown");
+      if (!welcomeShown) {
+        setShowWelcomePopup(true);
+      }
+    }
+  }, [loading, user, showWelcomePopup]);
+
   // REMOVED: Auto-redirect to login for guest browsing support
   /*
   useEffect(() => {
@@ -64,7 +75,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set cookie for middleware (expires in 7 days)
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
     document.cookie = `pillipot_token=${newToken}; path=/; expires=${expires}; SameSite=Lax`;
-    
+
+    const welcomeShown = localStorage.getItem("pillipot_welcome_shown");
+    if (!welcomeShown) {
+      setShowWelcomePopup(true);
+    }
     setIsLoginModalOpen(false);
     setIsRegisterModalOpen(false);
     router.refresh(); // Force re-render of server components
@@ -79,6 +94,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login");
     router.refresh(); // Ensure state is cleared globally
   }, [router]);
+
+  const closeWelcomePopup = useCallback(() => {
+    setShowWelcomePopup(false);
+    localStorage.setItem("pillipot_welcome_shown", "true");
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -107,6 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={value}>
       {children}
       <LoginModal />
+      <WelcomePopup open={showWelcomePopup} onClose={closeWelcomePopup} />
     </AuthContext.Provider>
   );
 }
