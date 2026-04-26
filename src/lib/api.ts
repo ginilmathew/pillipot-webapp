@@ -1,5 +1,5 @@
 const isProd = process.env.NODE_ENV === "production";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || (isProd ? "https://api.pillipot.com/v1/api" : "http://localhost:3000/v1/api");
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || (isProd ? "https://api.pillipot.com/v1/api" : "http://localhost:3000/v1/api");
 
 type PublicFetchOptions = {
   revalidate?: number;
@@ -561,4 +561,23 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
   } catch {
     return [];
   }
+}
+
+export async function registerVendor(data: any): Promise<{ message: string; vendorId: string }> {
+  const res = await fetch(`${API_URL}/vendor/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    let msg = "Registration failed";
+    try {
+      const errorData = await res.json();
+      msg = errorData.message || (Array.isArray(errorData.message) ? errorData.message[0] : errorData.message) || msg;
+    } catch {}
+    throw new Error(msg);
+  }
+
+  return res.json();
 }

@@ -132,6 +132,15 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+
+            <div className="mt-6">
+              <Link
+                href="/vendor/onboarding"
+                className="inline-flex items-center justify-center rounded-full bg-pp-primary px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-300"
+              >
+                Become a Vendor
+              </Link>
+            </div>
           </div>
 
           {/* Link columns */}
