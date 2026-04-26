@@ -28,7 +28,7 @@ const footerLinks = [
       { label: "Track My Order", href: "/orders" },
       { label: "Returns & Refunds", href: "/privacy-policy" },
       { label: "Shipping Info", href: "/privacy-policy" },
-      { label: "FAQs", href: "/privacy-policy" },
+      // { label: "FAQs", href: "/privacy-policy" },
     ],
   },
   {
