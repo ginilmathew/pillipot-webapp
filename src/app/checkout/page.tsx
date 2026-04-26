@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Check, ShieldCheck, MapPin, CreditCard, Banknote, Smartphone, Plus, Trash2, Home, Briefcase, Loader2, PencilLine, Package, X } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { getAddresses, addAddress, autofillAddress, checkout, type CustomerAddress, deleteAddress, updateAddress } from "@/lib/api";
+import { getAddresses, addAddress, autofillAddress, checkout, verifyPayment, type CustomerAddress, deleteAddress, updateAddress } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
 import useSWR from "swr";
 import { swrKeys } from "@/lib/swrKeys";
@@ -30,6 +30,7 @@ export default function CheckoutPage() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<"cod" | "razorpay">("cod");
   const [editAddressId, setEditAddressId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -248,7 +249,61 @@ export default function CheckoutPage() {
     }
 
     try {
-      const res = await checkout(cart, checkoutInfo, appliedOffer);
+      const res = await checkout(cart, { ...checkoutInfo, paymentMethod: selectedPayment }, appliedOffer);
+
+      if (res.paymentMethod === "razorpay" && res.razorpayOrderId) {
+        // Load Razorpay script if not loaded
+        if (!(window as any).Razorpay) {
+          await new Promise<void>((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = "https://checkout.razorpay.com/v1/checkout.js";
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Failed to load Razorpay"));
+            document.head.appendChild(s);
+          });
+        }
+
+        const options = {
+          key: res.razorpayKeyId,
+          amount: res.razorpayAmount,
+          currency: res.currency || "INR",
+          name: "Pillipot",
+          description: `Order ${res.orderId}`,
+          order_id: res.razorpayOrderId,
+          handler: async (response: any) => {
+            try {
+              await verifyPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                orderId: res.orderId,
+              });
+              clearCart();
+              router.push(`/order-success?orderId=${res.orderId}&paid=true`);
+            } catch (verifyErr: any) {
+              error(verifyErr.message || "Payment verification failed");
+            }
+            setIsPlacingOrder(false);
+          },
+          modal: {
+            ondismiss: () => {
+              setIsPlacingOrder(false);
+            },
+          },
+          prefill: {
+            name: checkoutInfo.customerName,
+            email: checkoutInfo.email,
+            contact: checkoutInfo.phone,
+          },
+          theme: { color: "#7c3aed" },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+        return; // Don't setIsPlacingOrder(false) — Razorpay modal is open
+      }
+
+      // COD flow
       clearCart();
       router.push(`/order-success?orderId=${res.orderId}`);
     } catch (err: any) {
@@ -622,35 +677,68 @@ export default function CheckoutPage() {
                   <h2 className="font-bold text-gray-900">Payment Method</h2>
                 </div>
                 <div className="p-5 space-y-3">
-                  <div className="border-2 border-pp-primary bg-violet-50/30 rounded-xl p-5">
+                  {/* COD Option */}
+                  <div
+                    onClick={() => setSelectedPayment("cod")}
+                    className={`border-2 rounded-xl p-5 cursor-pointer transition-all ${
+                      selectedPayment === "cod"
+                        ? "border-pp-primary bg-violet-50/30"
+                        : "border-gray-200 hover:border-pp-primary/30"
+                    }`}
+                  >
                     <div className="flex items-start gap-4">
-                      <input type="radio" name="payment" id="cod" className="w-4 h-4 accent-pp-primary mt-1" defaultChecked />
+                      <input type="radio" name="payment" id="cod" className="w-4 h-4 accent-pp-primary mt-1" checked={selectedPayment === "cod"} onChange={() => setSelectedPayment("cod")} />
                       <div className="flex flex-col gap-1 flex-1">
                         <label htmlFor="cod" className="text-sm font-bold text-gray-900 cursor-pointer flex items-center gap-2">
                           <Banknote className="w-4 h-4 text-pp-primary" />
                           Cash on Delivery
                         </label>
-                        <span className="text-xs text-pp-success font-semibold">Verified Safe Payment</span>
-                        <button
-                          onClick={handlePlaceOrder}
-                          disabled={isPlacingOrder}
-                          className="mt-6 pp-gradient text-white px-12 py-3.5 rounded-xl font-black shadow-lg hover:shadow-xl transition-all w-full sm:w-fit flex items-center justify-center gap-2"
-                        >
-                          {isPlacingOrder ? (
-                            <>
-                              <Loader2 className="w-5 h-5 animate-spin" />
-                              PLACING ORDER...
-                            </>
-                          ) : (
-                            `CONFIRM ORDER — ${formatPrice(finalTotal)}`
-                          )}
-                        </button>
+                        <span className="text-xs text-pp-success font-semibold">Pay when you receive</span>
                       </div>
                     </div>
                   </div>
-                  
-                  <PaymentOption icon={Smartphone} id="upi" label="UPI" subtitle="Google Pay, PhonePe, Paytm" disabled />
-                  <PaymentOption icon={CreditCard} id="card" label="Credit / Debit Card" subtitle="Visa, Mastercard, RuPay" disabled />
+
+                  {/* Razorpay Online Payment Option */}
+                  <div
+                    onClick={() => setSelectedPayment("razorpay")}
+                    className={`border-2 rounded-xl p-5 cursor-pointer transition-all ${
+                      selectedPayment === "razorpay"
+                        ? "border-pp-primary bg-violet-50/30"
+                        : "border-gray-200 hover:border-pp-primary/30"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <input type="radio" name="payment" id="razorpay" className="w-4 h-4 accent-pp-primary mt-1" checked={selectedPayment === "razorpay"} onChange={() => setSelectedPayment("razorpay")} />
+                      <div className="flex flex-col gap-1 flex-1">
+                        <label htmlFor="razorpay" className="text-sm font-bold text-gray-900 cursor-pointer flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 text-pp-primary" />
+                          Pay Online
+                        </label>
+                        <span className="text-xs text-gray-500">UPI, Credit/Debit Card, Net Banking, Wallets</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] px-2 py-0.5 bg-green-50 text-green-700 rounded font-bold">Powered by Razorpay</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Place Order Button */}
+                  <button
+                    onClick={handlePlaceOrder}
+                    disabled={isPlacingOrder}
+                    className="mt-4 pp-gradient text-white px-12 py-3.5 rounded-xl font-black shadow-lg hover:shadow-xl transition-all w-full flex items-center justify-center gap-2"
+                  >
+                    {isPlacingOrder ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        {selectedPayment === "razorpay" ? "PROCESSING..." : "PLACING ORDER..."}
+                      </>
+                    ) : (
+                      selectedPayment === "razorpay"
+                        ? `PAY ${formatPrice(finalTotal)} ONLINE`
+                        : `CONFIRM ORDER — ${formatPrice(finalTotal)}`
+                    )}
+                  </button>
                 </div>
                 <div className="p-5 bg-gray-50/50 flex items-center gap-2 text-gray-400 justify-center">
                   <ShieldCheck className="w-4 h-4" />
@@ -755,19 +843,3 @@ function InputField({ label, name, value, onChange, required = false, maxLength,
   );
 }
 
-function PaymentOption({ icon: Icon, id, label, subtitle, disabled }: any) {
-  return (
-    <div className={`border border-gray-200 rounded-xl p-4 transition-all ${disabled ? "opacity-40 cursor-not-allowed bg-gray-50/50" : "cursor-pointer hover:border-pp-primary"}`}>
-      <div className="flex items-start gap-4">
-        <input type="radio" name="payment" id={id} disabled={disabled} className="w-4 h-4 mt-1 accent-pp-primary" />
-        <div className="flex flex-col gap-0.5 items-start text-left">
-          <label htmlFor={id} className="text-sm font-bold text-gray-700 flex items-center gap-2">
-            <Icon className="w-4 h-4 text-gray-400" />
-            {label}
-          </label>
-          <span className="text-xs text-gray-400">{subtitle}</span>
-        </div>
-      </div>
-    </div>
-  );
-}

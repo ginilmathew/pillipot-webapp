@@ -33,6 +33,8 @@ type Order = {
   status: string;
   trackingId?: string | null;
   items: OrderItem[];
+  paymentMethod?: string;
+  paymentStatus?: string;
 };
 
 // ── Tab definitions ────────────────────────────────────────────────────────────
@@ -298,7 +300,7 @@ export default function MyOrdersPage() {
                   className="overflow-hidden rounded-[2rem] border border-white/60 bg-white/88 pp-shadow transition-all hover:pp-shadow-hover"
                 >
                   {/* Order meta row */}
-                  <div className="grid grid-cols-2 items-center gap-4 border-b border-slate-100 bg-slate-50/80 px-4 py-4 md:grid-cols-4 md:gap-6 md:px-6">
+                  <div className="grid grid-cols-2 items-center gap-4 border-b border-slate-100 bg-slate-50/80 px-4 py-4 md:grid-cols-5 md:gap-6 md:px-6">
                     <div>
                       <p className="mb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Order Placed</p>
                       <p className="text-sm font-bold text-slate-700">
@@ -308,6 +310,23 @@ export default function MyOrdersPage() {
                     <div>
                       <p className="mb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total</p>
                       <p className="text-sm font-bold text-slate-700">{formatPrice(order.total)}</p>
+                    </div>
+                    <div>
+                      <p className="mb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Payment</p>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider ${
+                          order.paymentMethod === "razorpay" ? "bg-indigo-50 text-indigo-700" : "bg-amber-50 text-amber-700"
+                        }`}>
+                          {order.paymentMethod === "razorpay" ? "Online" : "COD"}
+                        </span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider ${
+                          order.paymentStatus === "paid" ? "bg-green-50 text-green-700"
+                          : order.paymentStatus === "failed" ? "bg-red-50 text-red-600"
+                          : "bg-slate-100 text-slate-500"
+                        }`}>
+                          {order.paymentStatus === "paid" ? "Paid" : order.paymentStatus === "failed" ? "Failed" : "Pending"}
+                        </span>
+                      </div>
                     </div>
                     <div>
                       <p className="mb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Ship To</p>

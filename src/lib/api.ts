@@ -370,7 +370,14 @@ export type CheckoutCustomerInfo = Partial<CustomerAddress> & {
   paymentMethod?: string;
 };
 
-export async function checkout(cart: CheckoutCartItem[], customerInfo: CheckoutCustomerInfo, appliedOffer?: any): Promise<{ orderId: string }> {
+export async function checkout(cart: CheckoutCartItem[], customerInfo: CheckoutCustomerInfo, appliedOffer?: any): Promise<{
+  orderId: string;
+  paymentMethod: string;
+  razorpayOrderId?: string;
+  razorpayAmount?: number;
+  razorpayKeyId?: string;
+  currency?: string;
+}> {
   const res = await fetch(`${API_URL}/orders/checkout`, {
     method: "POST",
     cache: "no-store",
@@ -385,6 +392,31 @@ export async function checkout(cart: CheckoutCartItem[], customerInfo: CheckoutC
         msg = Array.isArray(data.message) ? data.message[0] : data.message;
       } else if (data.error) {
         msg = data.error;
+      }
+    } catch {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+export async function verifyPayment(body: {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+  orderId: string;
+}): Promise<{ success: boolean }> {
+  const res = await fetch(`${API_URL}/orders/verify-payment`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let msg = "Payment verification failed";
+    try {
+      const data = (await res.json()) as ApiErrorShape;
+      if (data.message) {
+        msg = Array.isArray(data.message) ? data.message[0] : data.message;
       }
     } catch {}
     throw new Error(msg);
@@ -444,6 +476,8 @@ export type OrderApiSummary = {
   status: string;
   trackingId?: string | null;
   items: OrderApiItem[];
+  paymentMethod?: string;
+  paymentStatus?: string;
 };
 
 export async function getMyOrders(token: string): Promise<OrderApiSummary[]> {
@@ -469,6 +503,8 @@ export type OrderApiDetail = OrderApiSummary & {
   state: string;
   pincode: string;
   trackingId?: string | null;
+  paymentMethod?: string;
+  paymentStatus?: string;
 };
 
 export async function getOrderDetails(token: string, orderId: string): Promise<OrderApiDetail | null> {
