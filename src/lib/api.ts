@@ -20,10 +20,8 @@ async function fetchJson<T>(path: string, options: RequestInit = {}): Promise<T>
 }
 
 async function fetchPublicJson<T>(path: string, options: PublicFetchOptions = {}): Promise<T> {
-  const { revalidate = 1, tags = [] } = options;
-
+  const { revalidate = 60, tags = [] } = options;
   return fetchJson<T>(path, {
-    cache: "no-store",
     next: { revalidate, tags },
   });
 }
