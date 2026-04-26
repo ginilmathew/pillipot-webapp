@@ -23,7 +23,6 @@ const footerLinks = [
     links: [
       { label: "Track My Order", href: "/orders" },
       { label: "Shipping Info", href: "/privacy-policy" },
-
     ],
   },
   {
