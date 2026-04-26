@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Mail, Lock, Loader2, ArrowRight, AlertCircle, User as UserIcon, Phone } from "lucide-react";
+import { LuX, LuMail, LuLock, LuLoaderCircle, LuArrowRight, LuCircleAlert, LuUser as UserIcon, LuPhone } from "react-icons/lu";
 import { useAuth } from "@/context/AuthContext";
 import { login as loginApi, register as registerApi } from "@/lib/api";
 
@@ -102,13 +102,13 @@ export default function AuthModal() {
           onClick={handleClose}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
         >
-          <X className="w-5 h-5" />
+          <LuX className="w-5 h-5" />
         </button>
 
         <div className="p-8">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-pp-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              {isLoginView ? <Lock className="w-8 h-8 text-pp-primary" /> : <UserIcon className="w-8 h-8 text-pp-primary" />}
+              {isLoginView ? <LuLock className="w-8 h-8 text-pp-primary" /> : <UserIcon className="w-8 h-8 text-pp-primary" />}
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
               {isLoginView ? "Sign in to continue" : "Create an account"}
@@ -122,7 +122,7 @@ export default function AuthModal() {
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 text-red-600 text-sm animate-in fade-in slide-in-from-top-2">
-              <AlertCircle className="w-5 h-5 shrink-0" />
+              <LuCircleAlert className="w-5 h-5 shrink-0" />
               <p>{error}</p>
             </div>
           )}
@@ -151,7 +151,7 @@ export default function AuthModal() {
                   <label className="text-sm font-semibold text-gray-700 ml-1">Phone Number</label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                      <Phone className="w-5 h-5" />
+                      <LuPhone className="w-5 h-5" />
                     </div>
                     <input
                       type="tel"
@@ -170,7 +170,7 @@ export default function AuthModal() {
               <label className="text-sm font-semibold text-gray-700 ml-1">Email / Username</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                  <Mail className="w-5 h-5" />
+                  <LuMail className="w-5 h-5" />
                 </div>
                 <input
                   type="text"
@@ -187,7 +187,7 @@ export default function AuthModal() {
               <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                  <Lock className="w-5 h-5" />
+                  <LuLock className="w-5 h-5" />
                 </div>
                 <input
                   type="password"
@@ -206,10 +206,10 @@ export default function AuthModal() {
               className="w-full bg-pp-primary text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-pp-primary-dark shadow-lg shadow-pp-primary/20 hover:shadow-xl hover:shadow-pp-primary/30 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 mt-4 h-14 translate-y-2 mb-2"
             >
               {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <LuLoaderCircle className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  {isLoginView ? "Sign in" : "Create Account"} <ArrowRight className="w-5 h-5" />
+                  {isLoginView ? "Sign in" : "Create Account"} <LuArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>

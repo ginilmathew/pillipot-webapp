@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { login as loginApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { Eye, EyeOff, Lock, User, ArrowRight, ShoppingBag } from "lucide-react";
+import { LuEye, LuEyeOff, LuLock, LuUser, LuArrowRight, LuShoppingBag } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -42,11 +42,22 @@ export default function LoginPage() {
       <div className="flex items-center justify-center p-8 lg:p-12 xl:p-24">
         <div className="w-full max-w-md space-y-10">
           <div className="space-y-3">
-            <Link href="/" className="inline-flex items-center gap-2 group mb-4">
-              <div className="w-10 h-10 rounded-xl pp-gradient flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <ShoppingBag className="w-6 h-6 text-white" />
+            <Link href="/" className="inline-flex items-center gap-3 group mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-[0_15px_40px_rgba(33,114,255,0.2)] border border-slate-100 group-hover:scale-110 transition-transform">
+                <span className="bg-linear-to-br from-pp-accent via-pp-primary to-pp-success bg-clip-text text-lg font-black text-transparent">
+                  P
+                </span>
               </div>
-              <span className="text-2xl font-black text-gray-900 tracking-tight">PILLIPOT</span>
+              <span className="flex items-center text-2xl font-black tracking-[-0.04em]">
+                <span className="text-pp-accent">p</span>
+                <span className="text-pp-cyan">i</span>
+                <span className="text-pp-cyan">l</span>
+                <span className="text-pp-primary">l</span>
+                <span className="text-pp-primary">i</span>
+                <span className="text-pp-accent-warm">p</span>
+                <span className="text-pp-success">o</span>
+                <span className="text-pp-accent">t</span>
+              </span>
             </Link>
             <h1 className="text-3xl font-black text-gray-900">Welcome Back</h1>
             <p className="text-gray-500 font-medium">Please enter your details to sign in to your account.</p>
@@ -64,7 +75,7 @@ export default function LoginPage() {
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Username</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                    <User className="w-5 h-5" />
+                    <LuUser className="w-5 h-5" />
                   </div>
                   <input
                     type="text"
@@ -84,7 +95,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                    <Lock className="w-5 h-5" />
+                    <LuLock className="w-5 h-5" />
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
@@ -99,7 +110,7 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-pp-primary transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <LuEyeOff className="w-5 h-5" /> : <LuEye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
@@ -117,7 +128,7 @@ export default function LoginPage() {
             >
               {loading ? "Signing in..." : (
                 <>
-                  Sign in <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  Sign in <LuArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
@@ -140,7 +151,7 @@ export default function LoginPage() {
 
         <div className="relative space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-            <ShoppingBag className="w-8 h-8 text-white" />
+            <LuShoppingBag className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-4xl xl:text-5xl font-black text-white leading-tight">
             Simplify Your <br />

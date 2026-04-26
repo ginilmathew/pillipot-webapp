@@ -6,7 +6,7 @@ import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Trash2, Plus, Minus, ShieldCheck, ArrowRight, ShoppingBag, Package } from "lucide-react";
+import { LuTrash2, LuPlus, LuMinus, LuShieldCheck, LuArrowRight, LuShoppingBag, LuPackage } from "react-icons/lu";
 
 export default function CartPage() {
   const router = useRouter();
@@ -27,8 +27,8 @@ export default function CartPage() {
         <main className="flex-1 pp-container px-4 py-8 md:py-10">
           <div className="mx-auto max-w-2xl rounded-[2rem] border border-white/60 bg-white/78 p-6 text-center pp-shadow md:p-8">
             <div className="mb-5 flex justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#edf4ff] md:h-24 md:w-24">
-                <ShoppingBag className="h-10 w-10 text-pp-primary/40 md:h-12 md:w-12" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-pp-surface-alt md:h-24 md:w-24">
+                <LuShoppingBag className="h-10 w-10 text-pp-primary/40 md:h-12 md:w-12" />
               </div>
             </div>
             <h2 className="mb-2 text-2xl font-black tracking-[-0.04em] text-slate-950 md:text-3xl">Your cart is empty</h2>
@@ -77,7 +77,7 @@ export default function CartPage() {
                         className="object-contain p-2"
                       />
                     ) : (
-                      <Package className="m-auto h-8 w-8 text-gray-300" />
+                      <LuPackage className="m-auto h-8 w-8 text-gray-300" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -104,7 +104,7 @@ export default function CartPage() {
                         disabled={item.cartQuantity <= 1 || syncingItems[item.id]}
                         className="flex h-8 w-8 items-center justify-center hover:bg-white disabled:cursor-not-allowed disabled:opacity-30"
                       >
-                        <Minus className="h-3 w-3" />
+                        <LuMinus className="h-3 w-3" />
                       </button>
                       <span className="w-9 text-center text-sm font-bold">
                         {syncingItems[item.id] ? "..." : item.cartQuantity}
@@ -114,7 +114,7 @@ export default function CartPage() {
                         disabled={item.cartQuantity >= (item.stockQuantity || 99) || syncingItems[item.id]}
                         className="flex h-8 w-8 items-center justify-center hover:bg-white disabled:cursor-not-allowed disabled:opacity-30"
                       >
-                        <Plus className="h-3 w-3" />
+                        <LuPlus className="h-3 w-3" />
                       </button>
                     </div>
                     {item.stockQuantity && item.stockQuantity < 10 && (
@@ -127,7 +127,7 @@ export default function CartPage() {
                     disabled={syncingItems[item.id]}
                     className="rounded-xl p-2 text-slate-400 hover:bg-red-50 hover:text-pp-accent disabled:opacity-30"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <LuTrash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -155,7 +155,7 @@ export default function CartPage() {
                   <span>{formatPrice(cartTotal)}</span>
                 </div>
               </div>
-              <div className="border-t border-slate-100 bg-green-50/60 p-4">
+              <div className="border-t border-slate-100 bg-pp-success/10 p-4">
                 <p className="text-pp-success font-semibold text-xs text-center">
                   🎉 You save {formatPrice(cartMrpTotal - cartTotal)} on this order
                 </p>
@@ -171,11 +171,11 @@ export default function CartPage() {
               className="pp-button-primary mt-4 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold disabled:cursor-wait disabled:opacity-50"
             >
               {Object.values(syncingItems).some(isSyncing => isSyncing) ? "SAVING CHANGES..." : "PROCEED TO CHECKOUT"}
-              <ArrowRight className="w-4 h-4" />
+              <LuArrowRight className="w-4 h-4" />
             </button>
 
             <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-400">
-              <ShieldCheck className="w-5 h-5 shrink-0" />
+              <LuShieldCheck className="w-5 h-5 shrink-0" />
               <span>Safe & secure payments. 100% authentic products.</span>
             </div>
           </div>

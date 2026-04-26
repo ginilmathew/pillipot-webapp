@@ -1,16 +1,14 @@
 import Link from "next/link";
 import {
-  Globe,
-  MessageCircle,
-  Camera,
-  Mail,
-  Phone,
-  ShieldCheck,
-  CreditCard,
-  Truck,
-  RotateCcw,
-  Share2,
-} from "lucide-react";
+  LuGlobe,
+  LuInstagram,
+  LuMessageCircle,
+  LuMail,
+  LuPhone,
+  LuShieldCheck,
+  LuCreditCard,
+  LuTruck,
+} from "react-icons/lu";
 
 const footerLinks = [
   {
@@ -18,17 +16,14 @@ const footerLinks = [
     links: [
       { label: "All Categories", href: "/" },
       { label: "Trending Now", href: "/" },
-      { label: "Fresh Drops", href: "/" },
-      { label: "Best Deals", href: "/" },
     ],
   },
   {
     title: "Help",
     links: [
       { label: "Track My Order", href: "/orders" },
-      { label: "Returns & Refunds", href: "/privacy-policy" },
       { label: "Shipping Info", href: "/privacy-policy" },
-      { label: "FAQs", href: "/privacy-policy" },
+
     ],
   },
   {
@@ -43,16 +38,15 @@ const footerLinks = [
 ];
 
 const trustBadges = [
-  { icon: Truck, label: "Free Delivery", sub: "On eligible orders" },
-  { icon: ShieldCheck, label: "Secure Payments", sub: "100% protected" },
-  { icon: CreditCard, label: "Multiple Options", sub: "Pay your way" },
+  { icon: LuTruck, label: "Free Delivery", sub: "On eligible orders" },
+  { icon: LuShieldCheck, label: "Secure Payments", sub: "100% protected" },
+  { icon: LuCreditCard, label: "Multiple Options", sub: "Pay your way" },
 ];
 
 const socialLinks = [
-  { icon: Globe, href: "https://www.pillipot.com", label: "Website" },
-  { icon: Share2, href: "#", label: "Social" },
-  { icon: Camera, href: "#", label: "YouTube" },
-  { icon: MessageCircle, href: "#", label: "WhatsApp" },
+  { icon: LuGlobe, href: "https://www.pillipot.com", label: "Website" },
+  { icon: LuInstagram, href: "https://www.instagram.com/eden_e_cart?utm_source=qr&igsh=MXNydDNvMG0wNHczag==", label: "Instagram" },
+  { icon: LuMessageCircle, href: "https://wa.me/message/HNFKP2BAWYBSJ1", label: "WhatsApp" },
 ];
 
 export default function Footer() {
@@ -85,12 +79,19 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white">
-                <span className="bg-gradient-to-br from-pp-primary via-sky-400 to-pp-accent bg-clip-text text-base font-black text-transparent">
+                <span className="bg-gradient-to-br from-pp-accent via-pp-primary to-pp-success bg-clip-text text-base font-black text-transparent">
                   P
                 </span>
               </div>
-              <span className="text-lg font-black tracking-[-0.04em] text-white">
-                pillipot
+              <span className="flex items-center text-lg font-black tracking-[-0.04em]">
+                <span className="text-pp-accent">p</span>
+                <span className="text-pp-cyan">i</span>
+                <span className="text-pp-cyan">l</span>
+                <span className="text-pp-primary">l</span>
+                <span className="text-pp-primary">i</span>
+                <span className="text-pp-accent-warm">p</span>
+                <span className="text-pp-success">o</span>
+                <span className="text-pp-accent">t</span>
               </span>
             </div>
 
@@ -105,15 +106,15 @@ export default function Footer() {
                 href="mailto:support@pillipot.com"
                 className="flex items-center gap-2.5 text-[0.8rem] text-white/55 transition-colors hover:text-white"
               >
-                <Mail className="h-3.5 w-3.5 text-white/30" />
+                <LuMail className="h-3.5 w-3.5 text-white/30" />
                 support@pillipot.com
               </a>
               <a
                 href="tel:+911234567890"
                 className="flex items-center gap-2.5 text-[0.8rem] text-white/55 transition-colors hover:text-white"
               >
-                <Phone className="h-3.5 w-3.5 text-white/30" />
-                +91 1234 567 890
+                <LuPhone className="h-3.5 w-3.5 text-white/30" />
+                +91 9024063005
               </a>
             </div>
 
@@ -171,7 +172,6 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <Link href="/privacy-policy" className="hover:text-white/70 transition-colors">Privacy</Link>
             <Link href="/privacy-policy" className="hover:text-white/70 transition-colors">Terms</Link>
-            <Link href="/privacy-policy" className="hover:text-white/70 transition-colors">Cookies</Link>
           </div>
         </div>
 

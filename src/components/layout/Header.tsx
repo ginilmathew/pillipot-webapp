@@ -3,16 +3,16 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Search, ShoppingCart, User, Heart, Menu, X, Home, Package, ChevronDown, Grid2x2, LogOut } from "lucide-react";
+import { LuSearch, LuShoppingCart, LuUser, LuHeart, LuMenu, LuX, LuHouse, LuPackage, LuChevronDown, LuGrid2X2, LuLogOut } from "react-icons/lu";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 
 const mobileNav = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "My Orders", href: "/orders", icon: Package },
-  { label: "My Wishlist", href: "/wishlist", icon: Heart },
-  { label: "My Cart", href: "/cart", icon: ShoppingCart },
+  { label: "Home", href: "/", icon: LuHouse },
+  { label: "My Orders", href: "/orders", icon: LuPackage },
+  { label: "My Wishlist", href: "/wishlist", icon: LuHeart },
+  { label: "My Cart", href: "/cart", icon: LuShoppingCart },
 ];
 
 function HeaderContent() {
@@ -68,26 +68,30 @@ function HeaderContent() {
 
           <Link href="/" className="group flex min-w-0 items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-2xl border border-white/25 bg-white/90 shadow-[0_20px_50px_rgba(10,25,60,0.22)] transition-transform duration-300 group-hover:-translate-y-0.5 min-[360px]:h-9 min-[360px]:w-9">
-              <span className="bg-linear-to-br from-pp-primary via-sky-500 to-pp-accent bg-clip-text text-base font-black text-transparent min-[360px]:text-lg">
+              <span className="bg-linear-to-br from-pp-accent via-pp-primary to-pp-success bg-clip-text text-base font-black text-transparent min-[360px]:text-lg">
                 P
               </span>
             </div>
             <div className="min-w-0 leading-none text-white">
-              <div className="flex items-center gap-2">
-                <span className="max-w-[120px] truncate text-[0.92rem] font-black tracking-[-0.04em] min-[360px]:max-w-[140px] min-[380px]:max-w-[180px] min-[380px]:text-base md:max-w-none md:text-[1.15rem]">
-                  pillipot
+              <div className="flex items-center">
+                <span className="flex items-center text-[0.92rem] font-black tracking-[-0.04em] min-[360px]:text-base md:text-[1.15rem]">
+                  <span className="text-pp-accent">p</span>
+                  <span className="text-pp-cyan">i</span>
+                  <span className="text-pp-cyan">l</span>
+                  <span className="text-pp-primary">l</span>
+                  <span className="text-pp-primary">i</span>
+                  <span className="text-pp-accent-warm">p</span>
+                  <span className="text-pp-success">o</span>
+                  <span className="text-pp-accent">t</span>
                 </span>
               </div>
-              {/* <span className="mt-0 block max-w-[180px] truncate text-[6px] font-semibold uppercase leading-none tracking-[0.22em] text-white/68 max-[360px]:text-[5px] min-[380px]:max-w-[220px] min-[380px]:text-[7px] md:max-w-none md:text-[8px] md:tracking-[0.28em]">
-                Marketplace Reimagined
-              </span> */}
             </div>
           </Link>
 
           <div className="ml-auto hidden items-center gap-3 md:flex">
             <form onSubmit={handleSearch} className="relative w-[min(42vw,640px)] min-w-[280px]">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/58">
-                <Search className="h-4 w-4" />
+                <LuSearch className="h-4 w-4" />
               </div>
               <input
                 key={`desktop-${pathname}-${initialQuery}`}
@@ -115,10 +119,10 @@ function HeaderContent() {
                     }`}
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/16">
-                    <User className="h-4 w-4" />
+                    <LuUser className="h-4 w-4" />
                   </span>
                   <span className="max-w-28 truncate">{user.name}</span>
-                  <ChevronDown className={`h-3.5 w-3.5 ${userMenuOpen ? "rotate-180" : ""}`} />
+                  <LuChevronDown className={`h-3.5 w-3.5 ${userMenuOpen ? "rotate-180" : ""}`} />
                 </button>
 
                 {userMenuOpen && (
@@ -132,7 +136,7 @@ function HeaderContent() {
                       className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-pp-primary"
                     >
                       <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-50 text-pp-primary">
-                        <User className="h-4 w-4" />
+                        <LuUser className="h-4 w-4" />
                       </span>
                       My Account
                     </Link>
@@ -142,7 +146,7 @@ function HeaderContent() {
                       className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-pp-primary"
                     >
                       <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-50 text-pp-primary">
-                        <Package className="h-4 w-4" />
+                        <LuPackage className="h-4 w-4" />
                       </span>
                       My Orders
                     </Link>
@@ -154,7 +158,7 @@ function HeaderContent() {
                       className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
                     >
                       <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-50">
-                        <LogOut className="h-4 w-4" />
+                        <LuLogOut className="h-4 w-4" />
                       </span>
                       Logout
                     </button>
@@ -166,13 +170,13 @@ function HeaderContent() {
                 onClick={() => setIsLoginModalOpen(true)}
                 className="inline-flex h-10 items-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 text-xs font-bold text-white"
               >
-                <User className="h-4 w-4" />
+                <LuUser className="h-4 w-4" />
                 Login
               </button>
             )}
 
-            <HeaderIconLink href="/wishlist" icon={Heart} label="Wishlist" badge={wishlistCount} />
-            <HeaderIconLink href="/cart" icon={ShoppingCart} label="Cart" badge={cartCount} prominent />
+            <HeaderIconLink href="/wishlist" icon={LuHeart} label="Wishlist" badge={wishlistCount} />
+            <HeaderIconLink href="/cart" icon={LuShoppingCart} label="Cart" badge={cartCount} prominent />
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:hidden">
@@ -181,11 +185,11 @@ function HeaderContent() {
               className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/20 bg-white/15 text-white shadow-lg shadow-black/10 max-[360px]:h-9 max-[360px]:w-9"
               aria-label="Search"
             >
-              <Search className="h-5 w-5" />
+              <LuSearch className="h-5 w-5" />
             </button>
 
-            <MobileIconLink href="/wishlist" icon={Heart} badge={wishlistCount} />
-            <MobileIconLink href="/cart" icon={ShoppingCart} badge={cartCount} />
+            <MobileIconLink href="/wishlist" icon={LuHeart} badge={wishlistCount} />
+            <MobileIconLink href="/cart" icon={LuShoppingCart} badge={cartCount} />
           </div>
         </div>
 
@@ -193,7 +197,7 @@ function HeaderContent() {
           <div className="relative border-t border-white/10 bg-[#081120]/55 px-4 pb-4 pt-3 backdrop-blur-2xl md:hidden">
             <form onSubmit={handleSearch} className="relative mx-auto max-w-3xl">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">
-                <Search className="h-4 w-4" />
+                <LuSearch className="h-4 w-4" />
               </div>
               <input
                 key={`mobile-${pathname}-${initialQuery}`}
@@ -280,13 +284,13 @@ function HeaderContent() {
 
       <nav className="fixed inset-x-3 bottom-3 z-40 rounded-[1.75rem] border border-white/50 bg-white/82 px-2 py-2 shadow-[0_20px_60px_rgba(11,24,46,0.16)] backdrop-blur-2xl md:hidden">
         <div className="grid grid-cols-5 gap-1">
-          <BottomNavItem href="/" icon={Home} label="Home" active={pathname === "/"} />
-          <BottomNavItem href="/wishlist" icon={Heart} label="Wishlist" active={pathname === "/wishlist"} badge={wishlistCount} />
-          <BottomNavItem href="/cart" icon={ShoppingCart} label="Cart" active={pathname === "/cart"} badge={cartCount} />
-          <BottomNavItem href="/orders" icon={Package} label="Orders" active={pathname === "/orders"} />
+          <BottomNavItem href="/" icon={LuHouse} label="Home" active={pathname === "/"} />
+          <BottomNavItem href="/wishlist" icon={LuHeart} label="Wishlist" active={pathname === "/wishlist"} badge={wishlistCount} />
+          <BottomNavItem href="/cart" icon={LuShoppingCart} label="Cart" active={pathname === "/cart"} badge={cartCount} />
+          <BottomNavItem href="/orders" icon={LuPackage} label="Orders" active={pathname === "/orders"} />
           <BottomNavItem
             href={user ? "/account" : "/login"}
-            icon={User}
+            icon={LuUser}
             label="Account"
             active={pathname === "/account"}
             onClick={!user ? () => setIsLoginModalOpen(true) : undefined}

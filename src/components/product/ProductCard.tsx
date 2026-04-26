@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Star, Heart, ShoppingCart } from "lucide-react";
+import { LuStar, LuHeart, LuShoppingCart } from "react-icons/lu";
 import { Product } from "@/lib/api";
 import { useWishlist } from "@/context/WishlistContext";
 
@@ -37,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/55 bg-white pp-shadow transition-all duration-300 ${
         isOutOfStock
           ? "opacity-70 grayscale-[0.06]"
-          : "hover:-translate-y-1 hover:border-sky-100 hover:pp-shadow-hover"
+          : "hover:-translate-y-1 hover:border-pp-cyan/30 hover:pp-shadow-hover"
       }`}
     >
       {/* Wishlist button */}
@@ -53,7 +53,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         }`}
         aria-label="Toggle wishlist"
       >
-        <Heart className={`h-4 w-4 ${wishlisted ? "fill-current" : ""}`} />
+        <LuHeart className={`h-4 w-4 ${wishlisted ? "fill-current" : ""}`} />
       </button>
 
       {/* Image area */}
@@ -82,7 +82,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Rating */}
           <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 shadow-sm">
-            <Star className="h-3 w-3 fill-[#ffbe5c] text-[#ffbe5c]" />
+            <LuStar className="h-3 w-3 fill-pp-yellow text-pp-yellow" />
             <span className="text-[11px] font-bold text-slate-800">
               {rating.toFixed(1)}
             </span>
@@ -126,8 +126,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* CTA hint */}
-        <div className="mt-1 flex items-center gap-1.5 rounded-lg border border-sky-100 bg-[#edf4ff] px-3 py-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <ShoppingCart className="h-3.5 w-3.5 text-pp-primary" />
+        <div className="mt-1 flex items-center gap-1.5 rounded-lg border border-pp-cyan/20 bg-pp-surface-alt px-3 py-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <LuShoppingCart className="h-3.5 w-3.5 text-pp-primary" />
           <span className="text-[11px] font-bold text-pp-primary">View product</span>
         </div>
       </Link>

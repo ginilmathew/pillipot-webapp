@@ -8,7 +8,7 @@ import { useCart } from "@/context/CartContext";
 import type { Product } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Trash2, Star } from "lucide-react";
+import { LuHeart, LuTrash2, LuStar } from "react-icons/lu";
 
 export default function WishlistPage() {
   const { wishlist, removeItem } = useWishlist();
@@ -34,7 +34,7 @@ export default function WishlistPage() {
         <Header />
         <main className="flex-1 pp-container flex flex-col items-center justify-center py-20 px-4">
           <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-red-50">
-            <Heart className="h-12 w-12 text-pp-accent/40" />
+            <LuHeart className="h-12 w-12 text-pp-accent/40" />
           </div>
           <h2 className="mb-2 text-3xl font-black tracking-[-0.04em] text-slate-950">Your wishlist is empty</h2>
           <p className="mb-8 max-w-xs text-center text-sm leading-7 text-slate-500">
@@ -78,7 +78,7 @@ export default function WishlistPage() {
                 }}
                 className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-slate-100 bg-white/90 text-slate-400 shadow-lg transition-all active:scale-90 hover:bg-white hover:text-red-500"
               >
-                <Trash2 className="w-4 h-4" />
+                <LuTrash2 className="w-4 h-4" />
               </button>
 
               <Link href={`/product/${item.id}`} className="block">
@@ -116,7 +116,7 @@ export default function WishlistPage() {
 
                 <div className="mt-2 flex items-center gap-1 opacity-80">
                   <div className="flex items-center gap-0.5 rounded-full bg-pp-success px-2 py-1 text-[9px] font-bold text-white">
-                    {item.rating ?? 4.5} <Star className="w-2 h-2 fill-white" />
+                    {item.rating ?? 4.5} <LuStar className="w-2 h-2 fill-white" />
                   </div>
                 </div>
               </div>

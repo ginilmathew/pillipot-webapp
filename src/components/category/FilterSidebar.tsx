@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { LuStar } from "react-icons/lu";
 
 interface FilterSidebarProps {
   categoryName: string;
@@ -85,7 +85,7 @@ export default function FilterSidebar({ categoryName }: FilterSidebarProps) {
                 ₹0
               </div>
               <span className="text-slate-300">to</span>
-              <div className="flex-1 rounded-xl border border-sky-100 bg-[#edf4ff] px-2 py-2 text-center text-xs font-black text-pp-primary">
+              <div className="flex-1 rounded-xl border border-pp-cyan/20 bg-pp-surface-alt px-2 py-2 text-center text-xs font-black text-pp-primary">
                 ₹{Number(maxPrice).toLocaleString()}
                 {maxPrice === "150000" && "+"}
               </div>
@@ -116,7 +116,7 @@ export default function FilterSidebar({ categoryName }: FilterSidebarProps) {
                 </div>
                 <div className="flex items-center gap-1.5 text-sm font-bold text-slate-600 transition-colors group-hover:text-pp-primary">
                   <span>{rating}</span>
-                  <Star className="h-3.5 w-3.5 fill-[#ffbe5c] text-[#ffbe5c]" />
+                  <LuStar className="h-3.5 w-3.5 fill-pp-yellow text-pp-yellow" />
                   <span>& above</span>
                 </div>
               </label>

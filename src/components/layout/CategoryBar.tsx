@@ -3,30 +3,30 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Smartphone,
-  Shirt,
-  Monitor,
-  Home as HomeIcon,
-  Tv,
-  Plane,
-  Sparkles,
-  ShoppingBasket,
-  Tag,
-  LayoutGrid,
-} from "lucide-react";
+  LuSmartphone,
+  LuShirt,
+  LuMonitor,
+  LuHouse as HomeIcon,
+  LuTv,
+  LuPlane,
+  LuSparkles,
+  LuShoppingBasket,
+  LuTag,
+  LuLayoutGrid,
+} from "react-icons/lu";
 import type { Category } from "@/lib/api";
 import Image from "next/image";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Mobiles: Smartphone,
-  Fashion: Shirt,
-  Electronics: Monitor,
+  Mobiles: LuSmartphone,
+  Fashion: LuShirt,
+  Electronics: LuMonitor,
   Home: HomeIcon,
-  Appliances: Tv,
-  Travel: Plane,
-  Beauty: Sparkles,
-  Grocery: ShoppingBasket,
-  "Top Offers": Tag,
+  Appliances: LuTv,
+  Travel: LuPlane,
+  Beauty: LuSparkles,
+  Grocery: LuShoppingBasket,
+  "Top Offers": LuTag,
 };
 
 const colorMap: Record<string, string> = {
@@ -45,11 +45,11 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
   const pathname = usePathname();
 
   const displayCategories = [
-    { name: "Home", href: "/", icon: LayoutGrid, color: "from-[#0c1c33] via-pp-primary to-sky-400", imageUrl: undefined },
+    { name: "Home", href: "/", icon: LuLayoutGrid, color: "from-pp-accent via-pp-primary to-pp-success", imageUrl: undefined },
     ...categories.map((category) => ({
       name: category.name,
       href: `/category/${category.id}`,
-      icon: iconMap[category.name] || Smartphone,
+      icon: iconMap[category.name] || LuSmartphone,
       color: colorMap[category.name] || "from-pp-primary to-pp-accent",
       imageUrl: category.imageUrl,
     })),

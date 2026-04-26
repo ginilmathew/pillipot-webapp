@@ -6,9 +6,9 @@ import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/context/AuthContext";
 import { getMyOrders, cancelOrderApi, downloadInvoice } from "@/lib/api";
 import {
-  Package, ShoppingBag, Loader2, Search, RotateCcw, AlertTriangle,
-  Star, X, CheckCircle2, XCircle, Clock, Truck, ExternalLink
-} from "lucide-react";
+  LuPackage, LuShoppingBag, LuLoaderCircle, LuSearch, LuRotateCcw, LuTriangleAlert,
+  LuStar, LuX, LuCircleCheck, LuCircleX, LuClock, LuTruck, LuExternalLink
+} from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { submitReview } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
@@ -205,7 +205,7 @@ export default function MyOrdersPage() {
           {/* Search */}
           <div className="relative lg:w-96">
             <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">
-              <Search className="h-4 w-4" />
+              <LuSearch className="h-4 w-4" />
             </div>
             <input
               type="text"
@@ -219,7 +219,7 @@ export default function MyOrdersPage() {
                 onClick={() => setSearchQuery("")}
                 className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
               >
-                <X className="h-4 w-4" />
+                <LuX className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -265,13 +265,13 @@ export default function MyOrdersPage() {
         {/* Orders list */}
         {isOrdersLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <Loader2 className="w-10 h-10 text-pp-primary animate-spin" />
+            <LuLoaderCircle className="w-10 h-10 text-pp-primary animate-spin" />
             <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Loading orders...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="mx-auto mt-12 max-w-lg rounded-[2rem] border border-white/60 bg-white/78 p-12 text-center pp-shadow">
             <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50">
-              <ShoppingBag className="h-10 w-10 text-slate-300" />
+              <LuShoppingBag className="h-10 w-10 text-slate-300" />
             </div>
             <h2 className="mb-2 text-xl font-black tracking-[-0.04em] text-slate-950">
               {emptyMessages[activeTab].title}
@@ -363,11 +363,11 @@ export default function MyOrdersPage() {
                         {/* Status headline */}
                         <div className="flex items-center gap-2.5">
                           {isDelivered ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                            <LuCircleCheck className="h-5 w-5 text-green-500 shrink-0" />
                           ) : isCancelled ? (
-                            <XCircle className="h-5 w-5 text-red-500 shrink-0" />
+                            <LuCircleX className="h-5 w-5 text-red-500 shrink-0" />
                           ) : (
-                            <Clock className="h-5 w-5 text-pp-primary shrink-0" />
+                            <LuClock className="h-5 w-5 text-pp-primary shrink-0" />
                           )}
                           <h3 className={`text-base font-black tracking-tight ${
                             isDelivered ? "text-green-700"
@@ -393,7 +393,7 @@ export default function MyOrdersPage() {
                         {/* Tracking ID banner — shown when admin has set a tracking ID */}
                         {order.trackingId && (
                           <div className="flex items-center gap-3 rounded-xl border border-sky-100 bg-[#f0f7ff] px-4 py-3">
-                            <Truck className="h-4 w-4 shrink-0 text-pp-primary" />
+                            <LuTruck className="h-4 w-4 shrink-0 text-pp-primary" />
                             <div className="flex-1 min-w-0">
                               <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
                                 Tracking ID
@@ -426,7 +426,7 @@ export default function MyOrdersPage() {
                                     className="h-full w-full object-cover transition-transform duration-500 group-hover/item:scale-110"
                                   />
                                 ) : (
-                                  <Package className="h-8 w-8 text-slate-200" />
+                                  <LuPackage className="h-8 w-8 text-slate-200" />
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -456,7 +456,7 @@ export default function MyOrdersPage() {
                                       }}
                                       className="flex items-center gap-1.5 rounded-full bg-pp-accent-warm px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white shadow-sm transition-all hover:brightness-110"
                                     >
-                                      <RotateCcw className="h-3.5 w-3.5" />
+                                      <LuRotateCcw className="h-3.5 w-3.5" />
                                       Buy it again
                                     </button>
                                   )}
@@ -515,7 +515,7 @@ export default function MyOrdersPage() {
           <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-8 text-center">
               <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5">
-                <AlertTriangle className="w-10 h-10 text-red-500" />
+                <LuTriangleAlert className="w-10 h-10 text-red-500" />
               </div>
               <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Cancel Order?</h3>
               <p className="text-gray-500 font-medium text-sm">Are you sure you want to cancel this order? This action cannot be undone.</p>
@@ -532,7 +532,7 @@ export default function MyOrdersPage() {
                 disabled={isCancelling}
                 className="flex-1 py-3.5 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 disabled:opacity-50"
               >
-                {isCancelling ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Yes, Cancel"}
+                {isCancelling ? <LuLoaderCircle className="w-4 h-4 animate-spin mx-auto" /> : "Yes, Cancel"}
               </button>
             </div>
           </div>
@@ -549,7 +549,7 @@ export default function MyOrdersPage() {
                 onClick={() => setShowReviewModal(false)}
                 className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <LuX className="w-5 h-5" />
               </button>
             </div>
 
@@ -559,7 +559,7 @@ export default function MyOrdersPage() {
                   {reviewingProduct.imageUrl ? (
                     <img src={reviewingProduct.imageUrl} alt={reviewingProduct.name} className="h-full w-full object-cover" />
                   ) : (
-                    <Package className="w-6 h-6 text-gray-200" />
+                    <LuPackage className="w-6 h-6 text-gray-200" />
                   )}
                 </div>
                 <p className="text-sm font-bold text-gray-900 line-clamp-2">{reviewingProduct.name}</p>
@@ -575,7 +575,7 @@ export default function MyOrdersPage() {
                       onClick={() => setRating(star)}
                       className="p-1 transition-transform active:scale-90"
                     >
-                      <Star className={`w-9 h-9 ${star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
+                      <LuStar className={`w-9 h-9 ${star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
                     </button>
                   ))}
                 </div>
@@ -604,7 +604,7 @@ export default function MyOrdersPage() {
                   disabled={isSubmittingReview || rating === 0}
                   className="flex-1 py-3.5 bg-pp-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-pp-primary-dark transition-colors shadow-lg shadow-pp-primary/20 disabled:opacity-50"
                 >
-                  {isSubmittingReview ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Submit Review"}
+                  {isSubmittingReview ? <LuLoaderCircle className="w-4 h-4 animate-spin mx-auto" /> : "Submit Review"}
                 </button>
               </div>
             </form>

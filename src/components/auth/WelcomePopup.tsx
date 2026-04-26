@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { LuX } from "react-icons/lu";
 
 interface WelcomePopupProps {
   open: boolean;
@@ -23,7 +23,7 @@ export default function WelcomePopup({ open, onClose }: WelcomePopupProps) {
             className="absolute top-4 right-4 rounded-full bg-slate-100 p-3 text-slate-600 hover:bg-slate-200 transition"
             aria-label="Close welcome popup"
           >
-            <X className="w-5 h-5" />
+            <LuX className="w-5 h-5" />
           </button>
 
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center p-8 lg:p-10">
@@ -84,7 +84,7 @@ export default function WelcomePopup({ open, onClose }: WelcomePopupProps) {
               className="absolute top-4 right-4 z-20 rounded-full bg-white/90 p-3 text-slate-700 hover:bg-white transition"
               aria-label="Close zoomed image"
             >
-              <X className="w-5 h-5" />
+              <LuX className="w-5 h-5" />
             </button>
             <img
               src="/popupwindow.png"

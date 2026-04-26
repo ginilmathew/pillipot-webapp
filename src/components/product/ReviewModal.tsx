@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Star, Loader2 } from "lucide-react";
+import { LuX, LuStar, LuLoaderCircle } from "react-icons/lu";
 import { submitReview } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -52,7 +52,7 @@ export default function ReviewModal({ isOpen, onClose, productId, productName, o
             <p className="text-sm font-bold text-gray-400 mt-1">{productName}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-900">
-            <X className="w-6 h-6" />
+            <LuX className="w-6 h-6" />
           </button>
         </div>
 
@@ -69,10 +69,10 @@ export default function ReviewModal({ isOpen, onClose, productId, productName, o
                   onMouseLeave={() => setHoveredRating(0)}
                   className="transition-all active:scale-90"
                 >
-                  <Star 
+                  <LuStar 
                     className={`w-10 h-10 ${
                       (hoveredRating || rating) >= star 
-                        ? "fill-pp-accent-warm text-pp-accent-warm" 
+                        ? "fill-pp-yellow text-pp-yellow" 
                         : "text-gray-100"
                     }`} 
                   />
@@ -107,7 +107,7 @@ export default function ReviewModal({ isOpen, onClose, productId, productName, o
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <LuLoaderCircle className="w-4 h-4 animate-spin" />
                   Submitting...
                 </>
               ) : (

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { register as registerApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { Eye, EyeOff, Lock, User, Mail, Phone, ArrowRight, ShoppingBag } from "lucide-react";
+import { LuEye, LuEyeOff, LuLock, LuUser, LuMail, LuPhone, LuArrowRight, LuShoppingBag } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
@@ -58,7 +58,7 @@ export default function RegisterPage() {
         
         <div className="relative space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-            <ShoppingBag className="w-8 h-8 text-white" />
+            <LuShoppingBag className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-4xl xl:text-5xl font-black text-white leading-tight">
             Start Your Journey <br />
@@ -72,7 +72,7 @@ export default function RegisterPage() {
         <div className="relative p-8 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 space-y-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-pp-success/20 flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-pp-success" />
+              <LuShoppingBag className="w-6 h-6 text-pp-success" />
             </div>
             <div>
               <p className="text-white font-bold">Safe & Secure</p>
@@ -86,11 +86,22 @@ export default function RegisterPage() {
       <div className="flex items-center justify-center p-8 lg:p-12 xl:p-24 overflow-y-auto">
         <div className="w-full max-w-md space-y-8 py-10">
           <div className="space-y-3">
-            <Link href="/" className="inline-flex items-center gap-2 group mb-4">
-              <div className="w-10 h-10 rounded-xl pp-gradient flex items-center justify-center shadow-lg">
-                <ShoppingBag className="w-6 h-6 text-white" />
+            <Link href="/" className="inline-flex items-center gap-3 group mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-[0_15px_40px_rgba(33,114,255,0.2)] border border-slate-100 group-hover:scale-110 transition-transform">
+                <span className="bg-linear-to-br from-pp-accent via-pp-primary to-pp-success bg-clip-text text-lg font-black text-transparent">
+                  P
+                </span>
               </div>
-              <span className="text-2xl font-black text-gray-900 tracking-tight">PILLIPOT</span>
+              <span className="flex items-center text-2xl font-black tracking-[-0.04em]">
+                <span className="text-pp-accent">p</span>
+                <span className="text-pp-cyan">i</span>
+                <span className="text-pp-cyan">l</span>
+                <span className="text-pp-primary">l</span>
+                <span className="text-pp-primary">i</span>
+                <span className="text-pp-accent-warm">p</span>
+                <span className="text-pp-success">o</span>
+                <span className="text-pp-accent">t</span>
+              </span>
             </Link>
             <h1 className="text-3xl font-black text-gray-900">Create Account</h1>
             <p className="text-gray-500 font-medium">Join us for a better shopping experience.</p>
@@ -104,14 +115,14 @@ export default function RegisterPage() {
             )}
 
             <div className="grid grid-cols-1 gap-4">
-              <InputField icon={User} label="Full Name" name="name" value={formData.name} onChange={handleInputChange} required />
-              <InputField icon={Mail} label="Email Address" name="email" type="email" value={formData.email} onChange={handleInputChange} required />
-              <InputField icon={Phone} label="Phone Number" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} required />
+              <InputField icon={LuUser} label="Full Name" name="name" value={formData.name} onChange={handleInputChange} required />
+              <InputField icon={LuMail} label="Email Address" name="email" type="email" value={formData.email} onChange={handleInputChange} required />
+              <InputField icon={LuPhone} label="Phone Number" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} required />
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                    <Lock className="w-4 h-4" />
+                    <LuLock className="w-4 h-4" />
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
@@ -125,7 +136,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                    <Lock className="w-4 h-4" />
+                    <LuLock className="w-4 h-4" />
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
@@ -157,7 +168,7 @@ export default function RegisterPage() {
             >
               {loading ? "Creating account..." : (
                 <>
-                  Create Account <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  Create Account <LuArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>

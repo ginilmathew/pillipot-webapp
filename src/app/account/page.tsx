@@ -5,7 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { User as UserIcon, Package, Heart, LogOut, Settings } from "lucide-react";
+import { LuUser as UserIcon, LuPackage, LuHeart, LuLogOut, LuSettings } from "react-icons/lu";
 import Link from "next/link";
 
 export default function AccountPage() {
@@ -49,7 +49,7 @@ export default function AccountPage() {
                 onClick={logout}
                 className="flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-5 py-2.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-100"
               >
-                <LogOut className="h-4 w-4" />
+                <LuLogOut className="h-4 w-4" />
                 Sign Out
               </button>
             </div>
@@ -58,7 +58,7 @@ export default function AccountPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <Link href="/orders" className="flex items-center gap-5 bg-white hover:bg-slate-50 border border-slate-100 p-5 md:p-6 rounded-2xl md:rounded-[1.5rem] transition-all pp-shadow hover:pp-shadow-hover group">
               <div className="w-14 h-14 rounded-[1.2rem] bg-sky-50 text-sky-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Package className="w-7 h-7" />
+                <LuPackage className="w-7 h-7" />
               </div>
               <div>
                 <h3 className="text-lg font-black text-slate-900 tracking-tight">Your Orders</h3>
@@ -68,7 +68,7 @@ export default function AccountPage() {
 
             <Link href="/wishlist" className="flex items-center gap-5 bg-white hover:bg-slate-50 border border-slate-100 p-5 md:p-6 rounded-2xl md:rounded-[1.5rem] transition-all pp-shadow hover:pp-shadow-hover group">
               <div className="w-14 h-14 rounded-[1.2rem] bg-pink-50 text-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Heart className="w-7 h-7" />
+                <LuHeart className="w-7 h-7" />
               </div>
               <div>
                 <h3 className="text-lg font-black text-slate-900 tracking-tight">Wishlist</h3>
@@ -78,7 +78,7 @@ export default function AccountPage() {
 
             <button onClick={() => {}} className="flex items-center gap-5 bg-white hover:bg-slate-50 border border-slate-100 p-5 md:p-6 rounded-2xl md:rounded-[1.5rem] transition-all pp-shadow hover:pp-shadow-hover group text-left cursor-not-allowed opacity-70">
               <div className="w-14 h-14 rounded-[1.2rem] bg-purple-50 text-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Settings className="w-7 h-7" />
+                <LuSettings className="w-7 h-7" />
               </div>
               <div>
                 <h3 className="text-lg font-black text-slate-900 tracking-tight">Account Settings</h3>
@@ -91,7 +91,7 @@ export default function AccountPage() {
               className="flex md:hidden items-center gap-5 bg-white hover:bg-red-50 border border-slate-100 p-5 rounded-2xl transition-all pp-shadow hover:border-red-100 group text-left"
             >
               <div className="w-14 h-14 rounded-[1.2rem] bg-red-50 text-red-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <LogOut className="w-7 h-7" />
+                <LuLogOut className="w-7 h-7" />
               </div>
               <div>
                 <h3 className="text-lg font-black text-red-600 tracking-tight">Log Out</h3>

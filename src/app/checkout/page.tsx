@@ -5,7 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
-import { Check, ShieldCheck, MapPin, CreditCard, Banknote, Smartphone, Plus, Trash2, Home, Briefcase, Loader2, PencilLine, Package, X } from "lucide-react";
+import { LuCheck, LuShieldCheck, LuMapPin, LuCreditCard, LuBanknote, LuSmartphone, LuPlus, LuTrash2, LuHouse, LuBriefcase, LuLoaderCircle, LuPencilLine, LuPackage, LuX } from "react-icons/lu";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { getAddresses, addAddress, autofillAddress, checkout, verifyPayment, failPayment, type CustomerAddress, deleteAddress, updateAddress } from "@/lib/api";
@@ -295,7 +295,7 @@ export default function CheckoutPage() {
             email: checkoutInfo.email,
             contact: checkoutInfo.phone,
           },
-          theme: { color: "#7c3aed" },
+          theme: { color: "#2172FF" },
         };
 
         const rzp = new (window as any).Razorpay(options);
@@ -414,7 +414,7 @@ export default function CheckoutPage() {
                     ? "pp-gradient text-white shadow-md"
                     : "bg-gray-200 text-gray-500"
                 }`}>
-                  {steps.findIndex(s => s.key === activeStep) > i ? <Check className="w-4 h-4" /> : step.num}
+                  {steps.findIndex(s => s.key === activeStep) > i ? <LuCheck className="w-4 h-4" /> : step.num}
                 </div>
                 <span className={`text-sm font-semibold hidden sm:block ${
                   steps.findIndex(s => s.key === activeStep) >= i ? "text-pp-primary" : "text-gray-400"
@@ -422,7 +422,7 @@ export default function CheckoutPage() {
               </div>
               {i < steps.length - 1 && (
                 <div className={`w-12 sm:w-24 h-0.5 rounded-full ${
-                  steps.findIndex(s => s.key === activeStep) > i ? "bg-pp-primary" : "bg-gray-200"
+                  steps.findIndex(s => s.key === activeStep) > i ? "bg-pp-primary" : "bg-gray-100"
                 }`} />
               )}
             </React.Fragment>
@@ -438,7 +438,7 @@ export default function CheckoutPage() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                        <MapPin className="w-6 h-6 text-pp-primary" />
+                        <LuMapPin className="w-6 h-6 text-pp-primary" />
                         Select Delivery Address
                       </h2>
                     </div>
@@ -460,7 +460,7 @@ export default function CheckoutPage() {
                                 {selectedAddressId === addr.id && <div className="w-2.5 h-2.5 rounded-full bg-pp-primary animate-in zoom-in duration-300" />}
                               </div>
                               <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                                addr.addressType === 'home' ? "bg-blue-50 text-blue-600" : "bg-orange-50 text-orange-600"
+                                addr.addressType === 'home' ? "bg-pp-cyan/10 text-pp-cyan" : "bg-pp-accent-warm/10 text-pp-accent-warm"
                               }`}>
                                 {addr.addressType}
                               </span>
@@ -471,17 +471,17 @@ export default function CheckoutPage() {
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button 
                                 onClick={(e) => handleEditClick(addr, e)} 
-                                className="text-gray-400 hover:text-pp-primary p-1.5 hover:bg-violet-50 rounded-lg transition-all"
+                                className="text-gray-400 hover:text-pp-primary p-1.5 hover:bg-pp-surface-alt rounded-lg transition-all"
                                 title="Edit"
                               >
-                                <PencilLine className="w-4 h-4" />
+                                <LuPencilLine className="w-4 h-4" />
                               </button>
                               <button 
                                 onClick={(e) => handleDeleteAddress(addr.id, e)} 
                                 className="text-gray-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-lg transition-all"
                                 title="Delete"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <LuTrash2 className="w-4 h-4" />
                               </button>
                             </div>
                           </div>
@@ -491,7 +491,7 @@ export default function CheckoutPage() {
                             <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{addr.deliveryAddress}</p>
                             <p className="text-sm text-gray-500 font-medium">{addr.postOffice}, {addr.district}, {addr.state} — {addr.pincode}</p>
                             <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-                              <Smartphone className="w-3.5 h-3.5 text-gray-400" />
+                              <LuSmartphone className="w-3.5 h-3.5 text-gray-400" />
                               <p className="text-sm text-gray-900 font-bold">{addr.phone}</p>
                             </div>
                           </div>
@@ -514,10 +514,10 @@ export default function CheckoutPage() {
                       {/* Add New Address Card */}
                       <div 
                         onClick={() => setShowAddressForm(true)}
-                        className="border-2 border-dashed border-gray-200 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-pp-primary hover:bg-violet-50/30 transition-all min-h-[220px] group bg-white/50"
+                        className="border-2 border-dashed border-gray-200 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-pp-primary hover:bg-pp-surface-alt transition-all min-h-[220px] group bg-white/50"
                       >
-                        <div className="w-12 h-12 rounded-full bg-violet-50 text-pp-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                          <Plus className="w-6 h-6" />
+                        <div className="w-12 h-12 rounded-full bg-pp-surface-alt text-pp-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <LuPlus className="w-6 h-6" />
                         </div>
                         <div className="text-center">
                           <span className="font-bold text-gray-900 block">Add New Address</span>
@@ -534,7 +534,7 @@ export default function CheckoutPage() {
                     <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-pp-primary/10 flex items-center justify-center">
-                          <MapPin className="w-5 h-5 text-pp-primary" />
+                          <LuMapPin className="w-5 h-5 text-pp-primary" />
                         </div>
                         <div>
                           <h2 className="font-black text-gray-900 text-lg">{editAddressId ? "Edit Address" : (addresses.length > 0 ? "Add New Address" : "Delivery Address")}</h2>
@@ -546,7 +546,7 @@ export default function CheckoutPage() {
                           onClick={() => { setShowAddressForm(false); setEditAddressId(null); }} 
                           className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 text-gray-500 transition-colors"
                         >
-                          <X className="w-5 h-5" />
+                          <LuX className="w-5 h-5" />
                           <span className="sr-only">Cancel</span>
                         </button>
                       )}
@@ -583,9 +583,9 @@ export default function CheckoutPage() {
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center lg:text-left">Address Type</span>
                             <div className="flex gap-3">
                               {(["home", "work"] as const).map((type) => (
-                                <label key={type} className={`flex-1 lg:flex-none flex items-center justify-center gap-3 px-6 py-3 rounded-2xl border-2 cursor-pointer transition-all ${formData.addressType === type ? "border-pp-primary bg-violet-50 text-pp-primary shadow-sm" : "border-gray-100 text-gray-500 hover:border-gray-200"}`}>
+                                <label key={type} className={`flex-1 lg:flex-none flex items-center justify-center gap-3 px-6 py-3 rounded-2xl border-2 cursor-pointer transition-all ${formData.addressType === type ? "border-pp-primary bg-pp-surface-alt text-pp-primary shadow-sm" : "border-gray-100 text-gray-500 hover:border-gray-200"}`}>
                                   <input type="radio" name="addressType" value={type} checked={formData.addressType === type} onChange={() => setFormData(p => ({ ...p, addressType: type }))} className="hidden" />
-                                  {type === "home" ? <Home className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
+                                  {type === "home" ? <LuHouse className="w-5 h-5" /> : <LuBriefcase className="w-5 h-5" />}
                                   <span className="text-sm font-bold capitalize">{type}</span>
                                 </label>
                               ))}
@@ -617,7 +617,7 @@ export default function CheckoutPage() {
                     <div>
                       <h2 className="text-xl font-black text-gray-900">Review Order</h2>
                       <div className="flex items-center gap-2 mt-1">
-                        <MapPin className="w-3.5 h-3.5 text-pp-primary" />
+                        <LuMapPin className="w-3.5 h-3.5 text-pp-primary" />
                         <p className="text-xs text-gray-500">
                           Delivering to <span className="font-bold text-gray-900">{selectedAddrObj.customerName}</span>
                         </p>
@@ -625,13 +625,13 @@ export default function CheckoutPage() {
                     </div>
                     <button 
                       onClick={() => setActiveStep("address")} 
-                      className="px-4 py-2 rounded-xl bg-violet-50 text-pp-primary text-xs font-black hover:bg-violet-100 transition-colors uppercase tracking-wider"
+                      className="px-4 py-2 rounded-xl bg-pp-surface-alt text-pp-primary text-xs font-black hover:bg-pp-surface-alt transition-colors uppercase tracking-wider"
                     >
                       Change
                     </button>
                   </div>
                   
-                  <div className="p-6 bg-violet-50/30 border-b border-gray-50">
+                  <div className="p-6 bg-pp-surface-alt border-b border-gray-50">
                     <p className="text-sm text-gray-600 leading-relaxed font-medium">
                       {selectedAddrObj.deliveryAddress}, {selectedAddrObj.district}, {selectedAddrObj.state}
                     </p>
@@ -644,7 +644,7 @@ export default function CheckoutPage() {
                           {item.imageUrl ? (
                             <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
                           ) : (
-                            <Package className="w-8 h-8 text-gray-200" />
+                            <LuPackage className="w-8 h-8 text-gray-200" />
                           )}
                         </div>
                         <div className="flex-1 space-y-1">
@@ -664,7 +664,7 @@ export default function CheckoutPage() {
 
                   <div className="p-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6 bg-gray-50/30">
                     <div className="flex items-center gap-3 text-gray-500">
-                      <ShieldCheck className="w-5 h-5 text-pp-success" />
+                      <LuShieldCheck className="w-5 h-5 text-pp-success" />
                       <span className="text-xs font-bold uppercase tracking-widest">Safe & Secure Delivery</span>
                     </div>
                     <div className="flex gap-4 w-full sm:w-auto">
@@ -697,7 +697,7 @@ export default function CheckoutPage() {
                     onClick={() => setSelectedPayment("cod")}
                     className={`border-2 rounded-xl p-5 cursor-pointer transition-all ${
                       selectedPayment === "cod"
-                        ? "border-pp-primary bg-violet-50/30"
+                        ? "border-pp-primary bg-pp-surface-alt"
                         : "border-gray-200 hover:border-pp-primary/30"
                     }`}
                   >
@@ -705,7 +705,7 @@ export default function CheckoutPage() {
                       <input type="radio" name="payment" id="cod" className="w-4 h-4 accent-pp-primary mt-1" checked={selectedPayment === "cod"} onChange={() => setSelectedPayment("cod")} />
                       <div className="flex flex-col gap-1 flex-1">
                         <label htmlFor="cod" className="text-sm font-bold text-gray-900 cursor-pointer flex items-center gap-2">
-                          <Banknote className="w-4 h-4 text-pp-primary" />
+                          <LuBanknote className="w-4 h-4 text-pp-primary" />
                           Cash on Delivery
                         </label>
                         <span className="text-xs text-pp-success font-semibold">Pay when you receive</span>
@@ -718,7 +718,7 @@ export default function CheckoutPage() {
                     onClick={() => setSelectedPayment("razorpay")}
                     className={`border-2 rounded-xl p-5 cursor-pointer transition-all ${
                       selectedPayment === "razorpay"
-                        ? "border-pp-primary bg-violet-50/30"
+                        ? "border-pp-primary bg-pp-surface-alt"
                         : "border-gray-200 hover:border-pp-primary/30"
                     }`}
                   >
@@ -726,12 +726,12 @@ export default function CheckoutPage() {
                       <input type="radio" name="payment" id="razorpay" className="w-4 h-4 accent-pp-primary mt-1" checked={selectedPayment === "razorpay"} onChange={() => setSelectedPayment("razorpay")} />
                       <div className="flex flex-col gap-1 flex-1">
                         <label htmlFor="razorpay" className="text-sm font-bold text-gray-900 cursor-pointer flex items-center gap-2">
-                          <CreditCard className="w-4 h-4 text-pp-primary" />
+                          <LuCreditCard className="w-4 h-4 text-pp-primary" />
                           Pay Online
                         </label>
                         <span className="text-xs text-gray-500">UPI, Credit/Debit Card, Net Banking, Wallets</span>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] px-2 py-0.5 bg-green-50 text-green-700 rounded font-bold">Powered by Razorpay</span>
+                          <span className="text-[10px] px-2 py-0.5 bg-pp-success/10 text-pp-success rounded font-bold">Powered by Razorpay</span>
                         </div>
                       </div>
                     </div>
@@ -745,7 +745,7 @@ export default function CheckoutPage() {
                   >
                     {isPlacingOrder ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <LuLoaderCircle className="w-5 h-5 animate-spin" />
                         {selectedPayment === "razorpay" ? "PROCESSING..." : "PLACING ORDER..."}
                       </>
                     ) : (
@@ -756,7 +756,7 @@ export default function CheckoutPage() {
                   </button>
                 </div>
                 <div className="p-5 bg-gray-50/50 flex items-center gap-2 text-gray-400 justify-center">
-                  <ShieldCheck className="w-4 h-4" />
+                  <LuShieldCheck className="w-4 h-4" />
                   <span className="text-[11px] font-bold uppercase tracking-wider">100% Secure & Encrypted Payments</span>
                 </div>
               </div>

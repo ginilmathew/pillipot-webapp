@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-pp-primary: #1f6fff;
-  --color-pp-primary-dark: #0e44c5;
-  --color-pp-accent: #ff6b57;
-  --color-pp-accent-warm: #ffbe5c;
-  --color-pp-success: #18b67a;
-  --color-pp-surface: #f5f7fb;
-  --color-pp-surface-alt: #edf2ff;
-  --color-pp-card: rgba(255, 255, 255, 0.84);
+  --color-pp-primary: #2172FF;
+  --color-pp-primary-dark: #0056D2;
+  --color-pp-accent: #EE4E5B;
+  --color-pp-accent-warm: #F67E36;
+  --color-pp-success: #88C022;
+  --color-pp-cyan: #22B1C3;
+  --color-pp-yellow: #FFB400;
+  --color-pp-surface: #F9FAFB;
+  --color-pp-surface-alt: #F0F4FF;
+  --color-pp-card: rgba(255, 255, 255, 0.88);
   --color-pp-card-strong: #ffffff;
-  --color-pp-dark: #081120;
-  --color-pp-muted: #63708a;
-  --color-pp-line: rgba(96, 119, 170, 0.16);
+  --color-pp-dark: #0F172A;
+  --color-pp-muted: #64748B;
+  --color-pp-line: rgba(148, 163, 184, 0.16);
 
   /* Typography scale tokens */
   --font-size-display: clamp(2rem, 4vw, 3.25rem);
@@ -93,12 +95,12 @@
 
 .pp-gradient {
   background:
-    radial-gradient(circle at top left, rgba(101, 197, 255, 0.55), transparent 28%),
-    linear-gradient(135deg, #0c1c33 0%, #1644a3 44%, #1f6fff 100%);
+    radial-gradient(circle at top left, rgba(34, 177, 195, 0.35), transparent 32%),
+    linear-gradient(135deg, #0056D2 0%, #2172FF 100%);
 }
 
 .pp-gradient-warm {
-  background: linear-gradient(135deg, #ff7b67 0%, #ffbe5c 100%);
+  background: linear-gradient(135deg, #EE4E5B 0%, #F67E36 100%);
 }
 
 .pp-gradient-soft {
@@ -152,13 +154,13 @@
 
 .pp-button-primary {
   background:
-    linear-gradient(135deg, #1f6fff 0%, #0f49cf 100%);
+    linear-gradient(135deg, #2172FF 0%, #0056D2 100%);
   color: white;
-  box-shadow: 0 18px 35px rgba(22, 68, 163, 0.28);
+  box-shadow: 0 18px 35px rgba(33, 114, 255, 0.28);
 }
 
 .pp-button-primary:hover {
-  box-shadow: 0 22px 45px rgba(22, 68, 163, 0.32);
+  box-shadow: 0 22px 45px rgba(33, 114, 255, 0.32);
 }
 
 .pp-button-secondary {
@@ -211,7 +213,7 @@
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  background: #ff6b57;
+  background: #EE4E5B;
   color: white;
 }
 
@@ -261,9 +263,9 @@
 
 html {
   background:
-    radial-gradient(circle at top left, rgba(31, 111, 255, 0.12), transparent 26%),
-    radial-gradient(circle at top right, rgba(255, 190, 92, 0.14), transparent 18%),
-    linear-gradient(180deg, #f8fbff 0%, #f4f7fb 52%, #eef3fb 100%);
+    radial-gradient(circle at top left, rgba(33, 114, 255, 0.08), transparent 26%),
+    radial-gradient(circle at top right, rgba(246, 126, 54, 0.08), transparent 18%),
+    linear-gradient(180deg, #F9FAFB 0%, #F3F4F6 100%);
   overflow-x: clip;
 }
 

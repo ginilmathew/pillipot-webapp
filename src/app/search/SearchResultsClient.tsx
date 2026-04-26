@@ -2,7 +2,7 @@
 
 import ProductCard from "@/components/product/ProductCard";
 import { Product } from "@/lib/api";
-import { Frown } from "lucide-react";
+import { LuFrown } from "react-icons/lu";
 import Link from "next/link";
 
 export default function SearchResultsClient({ products, query }: { products: Product[], query: string }) {
@@ -10,7 +10,7 @@ export default function SearchResultsClient({ products, query }: { products: Pro
     return (
       <div className="flex flex-col items-center justify-center rounded-[2rem] border border-white/60 bg-white/78 px-4 py-24 text-center pp-shadow">
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50">
-          <Frown className="h-10 w-10 text-slate-300" />
+          <LuFrown className="h-10 w-10 text-slate-300" />
         </div>
         <h2 className="mb-2 text-2xl font-black tracking-[-0.04em] text-slate-950">No results found for &quot;{query}&quot;</h2>
         <p className="mb-8 max-w-md text-sm leading-7 text-slate-500">
