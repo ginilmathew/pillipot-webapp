@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import WelcomePopup from "@/components/auth/WelcomePopup";
 
 const LoginModal = dynamic(() => import("@/components/auth/LoginModal"), { ssr: false });
+const ChangePasswordModal = dynamic(() => import("@/components/auth/ChangePasswordModal"), { ssr: false });
 
 interface AuthContextType {
   user: User | null;
@@ -51,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!loading && user && !showWelcomePopup) {
+    if (!loading && user && !showWelcomePopup && !user.mustChangePassword) {
       const welcomeShown = localStorage.getItem("pillipot_welcome_shown");
       if (!welcomeShown) {
         setShowWelcomePopup(true);
@@ -77,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     document.cookie = `pillipot_token=${newToken}; path=/; expires=${expires}; SameSite=Lax`;
 
     const welcomeShown = localStorage.getItem("pillipot_welcome_shown");
-    if (!welcomeShown) {
+    if (!welcomeShown && !newUser.mustChangePassword) {
       setShowWelcomePopup(true);
     }
     setIsLoginModalOpen(false);
@@ -127,7 +128,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={value}>
       {children}
       <LoginModal />
-      <WelcomePopup open={showWelcomePopup} onClose={closeWelcomePopup} />
+      <ChangePasswordModal
+        open={Boolean(user?.mustChangePassword)}
+        token={token}
+        onLogout={logoutAction}
+        onPasswordChanged={async () => {
+          if (!token) return;
+          const updated = await getMe(token);
+          if (updated) setUser(updated);
+        }}
+      />
+      <WelcomePopup open={showWelcomePopup && !user?.mustChangePassword} onClose={closeWelcomePopup} />
     </AuthContext.Provider>
   );
 }

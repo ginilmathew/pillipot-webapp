@@ -170,6 +170,7 @@ export interface User {
   username: string;
   name: string;
   role: string;
+  mustChangePassword?: boolean;
 }
 
 export type RegisterDto = Record<string, string>;
@@ -187,8 +188,18 @@ export async function login(username: string, password: string): Promise<{ acces
   }
 }
 
-export async function forgotPassword(username: string): Promise<{ message: string }> {
-  return fetchJson<{ message: string }>("/auth/customer/forgot-password", {
+export type ForgotPasswordResponse = {
+  message: string;
+  debug?: {
+    userFound?: boolean;
+    outboundReady?: boolean;
+    emailSent?: boolean;
+    temporaryPassword?: string;
+  };
+};
+
+export async function forgotPassword(username: string): Promise<ForgotPasswordResponse> {
+  return fetchJson<ForgotPasswordResponse>("/auth/customer/forgot-password", {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },

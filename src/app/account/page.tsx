@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { LuUser as UserIcon, LuPackage, LuHeart, LuLogOut, LuSettings } from "react-icons/lu";
 import Link from "next/link";
+import { changePasswordApi } from "@/lib/api";
 
 export default function AccountPage() {
   const { user, token, loading, logout } = useAuth();
