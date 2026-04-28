@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { LuX, LuMail, LuLock, LuLoaderCircle, LuArrowRight, LuCircleAlert, LuUser as UserIcon, LuPhone } from "react-icons/lu";
 import { useAuth } from "@/context/AuthContext";
-import { login as loginApi, register as registerApi } from "@/lib/api";
+import { forgotPassword, login as loginApi, register as registerApi } from "@/lib/api";
 
 export default function AuthModal() {
   const { 
@@ -12,18 +12,19 @@ export default function AuthModal() {
     login 
   } = useAuth();
   
-  const [isLoginView, setIsLoginView] = useState(true);
+  const [view, setView] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   // Synchronize internal view state with global modal state
   React.useEffect(() => {
-    if (isLoginModalOpen) setIsLoginView(true);
-    if (isRegisterModalOpen) setIsLoginView(false);
+    if (isLoginModalOpen) setView("login");
+    if (isRegisterModalOpen) setView("register");
   }, [isLoginModalOpen, isRegisterModalOpen]);
 
   if (!isLoginModalOpen && !isRegisterModalOpen) return null;
@@ -32,11 +33,14 @@ export default function AuthModal() {
     setIsLoginModalOpen(false);
     setIsRegisterModalOpen(false);
     setError(null);
+    setSuccess(null);
+    setView("login");
   };
 
   const handleSwitch = () => {
     setError(null);
-    if (isLoginView) {
+    setSuccess(null);
+    if (view === "login" || view === "forgot") {
       setIsLoginModalOpen(false);
       setIsRegisterModalOpen(true);
     } else {
@@ -49,6 +53,7 @@ export default function AuthModal() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
     try {
       const result = await loginApi(email, password);
       if (result) {
@@ -67,6 +72,7 @@ export default function AuthModal() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
     try {
       // Backend expects email and phoneNumber
       const result = await registerApi({ 
@@ -86,6 +92,40 @@ export default function AuthModal() {
       setLoading(false);
     }
   };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await forgotPassword(email);
+      if (res.debug?.userFound === false) {
+        setError("No customer account found for that email/username.");
+        return;
+      }
+      const temp = res.debug?.temporaryPassword;
+      const mailHint =
+        res.debug?.outboundReady === false
+          ? " (Mail is not configured in API; use the temporary password below.)"
+          : "";
+      setSuccess(
+        temp
+          ? `${res.message}${mailHint}\nTemporary password: ${temp}`
+          : res.message,
+      );
+      setPassword("");
+      setTimeout(() => setView("login"), 5000);
+    } catch (err: any) {
+      setError(err.message || "Failed to process request.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isLoginView = view === "login";
+  const isRegisterView = view === "register";
+  const isForgotView = view === "forgot";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -108,15 +148,17 @@ export default function AuthModal() {
         <div className="p-8">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-pp-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              {isLoginView ? <LuLock className="w-8 h-8 text-pp-primary" /> : <UserIcon className="w-8 h-8 text-pp-primary" />}
+              {isRegisterView ? <UserIcon className="w-8 h-8 text-pp-primary" /> : <LuLock className="w-8 h-8 text-pp-primary" />}
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
-              {isLoginView ? "Sign in to continue" : "Create an account"}
+              {isLoginView ? "Sign in to continue" : isForgotView ? "Reset Password" : "Create an account"}
             </h2>
             <p className="text-gray-500 mt-2 text-sm">
-              {isLoginView 
-                ? "Sign in to your account to add items to your cart and checkout." 
-                : "Join Pillipot to start shopping and tracking your orders."}
+              {isLoginView
+                ? "Sign in to your account to add items to your cart and checkout."
+                : isForgotView
+                  ? "Enter your email or username to receive a temporary password."
+                  : "Join Pillipot to start shopping and tracking your orders."}
             </p>
           </div>
 
@@ -127,8 +169,17 @@ export default function AuthModal() {
             </div>
           )}
 
-          <form onSubmit={isLoginView ? handleLogin : handleRegister} className="space-y-4">
-            {!isLoginView && (
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-2xl text-green-700 text-sm animate-in fade-in slide-in-from-top-2 whitespace-pre-line">
+              <p>{success}</p>
+            </div>
+          )}
+
+          <form
+            onSubmit={isLoginView ? handleLogin : isForgotView ? handleForgotPassword : handleRegister}
+            className="space-y-4"
+          >
+            {isRegisterView && (
               <>
                 <div className="space-y-1.5 animate-in slide-in-from-top-2">
                   <label className="text-sm font-semibold text-gray-700 ml-1">Full Name</label>
@@ -177,28 +228,45 @@ export default function AuthModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pp-primary/20 focus:border-pp-primary focus:bg-white transition-all text-sm"
-                  placeholder="Enter your email"
+                  placeholder="Enter your email or username"
                   required
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
-                  <LuLock className="w-5 h-5" />
+            {!isForgotView && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
+                  {isLoginView && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setError(null);
+                        setSuccess(null);
+                        setView("forgot");
+                      }}
+                      className="text-xs font-bold text-pp-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
                 </div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pp-primary/20 focus:border-pp-primary focus:bg-white transition-all text-sm"
-                  placeholder={isLoginView ? "Enter your password" : "Create a password"}
-                  required
-                />
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
+                    <LuLock className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pp-primary/20 focus:border-pp-primary focus:bg-white transition-all text-sm"
+                    placeholder={isLoginView ? "Enter your password" : "Create a password"}
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <button
               type="submit"
@@ -209,20 +277,36 @@ export default function AuthModal() {
                 <LuLoaderCircle className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  {isLoginView ? "Sign in" : "Create Account"} <LuArrowRight className="w-5 h-5" />
+                  {isLoginView ? "Sign in" : isForgotView ? "Send temporary password" : "Create Account"}{" "}
+                  <LuArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>
           </form>
 
           <p className="text-center mt-8 text-sm text-gray-500">
-            {isLoginView ? "Don't have an account? " : "Already have an account? "}
-            <button 
-              onClick={handleSwitch}
-              className="text-pp-primary font-bold hover:underline"
-            >
-              {isLoginView ? "Sign up for free" : "Sign in here"}
-            </button>
+            {isForgotView ? (
+              <button
+                onClick={() => {
+                  setError(null);
+                  setSuccess(null);
+                  setView("login");
+                }}
+                className="text-pp-primary font-bold hover:underline"
+              >
+                Back to sign in
+              </button>
+            ) : (
+              <>
+                {isLoginView ? "Don't have an account? " : "Already have an account? "}
+                <button 
+                  onClick={handleSwitch}
+                  className="text-pp-primary font-bold hover:underline"
+                >
+                  {isLoginView ? "Sign up for free" : "Sign in here"}
+                </button>
+              </>
+            )}
           </p>
         </div>
 
