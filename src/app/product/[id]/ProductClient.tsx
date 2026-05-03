@@ -96,7 +96,7 @@ export default function ProductClient({ product }: { product: Product }) {
   return (
     <>
     <div className="min-h-screen bg-pp-surface">
-      <main className="pp-container max-sm:p-0 sm:pb-10 sm:pt-6">
+      <main className="pp-container max-sm:!p-0 sm:pb-10 sm:pt-6">
         <div className="overflow-hidden sm:rounded-[2rem] max-sm:border-x-0 border-y sm:border border-white/60 bg-white/72 sm:pp-shadow">
         
         <div className="flex items-center justify-between px-4 pt-4">
