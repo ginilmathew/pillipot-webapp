@@ -32,6 +32,28 @@ export default function ProductClient({ product }: { product: Product }) {
   const [isHoverZoom, setIsHoverZoom] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
 
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (touchStart === null || touchEnd === null) return;
+    const distance = touchStart - touchEnd;
+    if (distance > 50) {
+      setSelectedIndex((i) => (i + 1) % allImages.length);
+    } else if (distance < -50) {
+      setSelectedIndex((i) => (i - 1 + allImages.length) % allImages.length);
+    }
+  };
+
   const allImages = [product.imageUrl, product.imageUrl2, product.imageUrl3].filter(Boolean) as string[];
   if (allImages.length === 0) {
     allImages.push(`data:image/svg+xml;base64,${btoa('<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="800" fill="#F3F4FB"/><path d="M400 330V470M330 400H470" stroke="#D1D5DB" stroke-width="4" stroke-linecap="round"/><circle cx="400" cy="400" r="100" stroke="#D1D5DB" stroke-width="4" stroke-dasharray="8 8"/><text x="400" y="550" text-anchor="middle" fill="#9CA3AF" font-family="sans-serif" font-size="20" font-weight="600" letter-spacing="0.1em">NO IMAGE AVAILABLE</text></svg>')}`);
@@ -74,8 +96,8 @@ export default function ProductClient({ product }: { product: Product }) {
   return (
     <>
     <div className="min-h-screen bg-pp-surface">
-      <main className="pp-container pb-10 pt-6">
-        <div className="overflow-hidden rounded-[2rem] border border-white/60 bg-white/72 pp-shadow">
+      <main className="pp-container max-sm:p-0 sm:pb-10 sm:pt-6">
+        <div className="overflow-hidden sm:rounded-[2rem] max-sm:border-x-0 border-y sm:border border-white/60 bg-white/72 sm:pp-shadow">
         
         <div className="flex items-center justify-between px-4 pt-4">
           <button 
@@ -120,6 +142,9 @@ export default function ProductClient({ product }: { product: Product }) {
                   onMouseLeave={() => setIsHoverZoom(false)}
                   onMouseMove={handleMouseMove}
                   onClick={() => setZoomOpen(true)}
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
                 >
                   <Image
                     src={allImages[selectedIndex]}
@@ -145,7 +170,7 @@ export default function ProductClient({ product }: { product: Product }) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="flex flex-row gap-2 sm:gap-3">
                 <button 
                   onClick={handleAddToCart} 
                   className="flex flex-1 items-center justify-center gap-2 rounded-full border border-pp-cyan/20 bg-pp-surface-alt py-4 text-sm font-bold text-pp-primary hover:-translate-y-0.5 hover:border-pp-cyan/40 hover:bg-white hover:shadow-[0_18px_40px_rgba(9,22,43,0.12)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pp-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
