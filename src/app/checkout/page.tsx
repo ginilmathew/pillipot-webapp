@@ -637,7 +637,7 @@ function CheckoutContent() {
           {activeStep === "summary" && (
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
               <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-pp-primary/5 overflow-hidden text-left">
-                <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
+                <div className="p-4 sm:p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
                   <div>
                     <h2 className="text-xl font-black text-gray-900">Review Order</h2>
                     <div className="flex items-center gap-2 mt-1">
@@ -655,7 +655,7 @@ function CheckoutContent() {
                   </button>
                 </div>
 
-                <div className="p-6 bg-pp-surface-alt border-b border-gray-50">
+                <div className="p-4 sm:p-6 bg-pp-surface-alt border-b border-gray-50">
                   <p className="text-sm text-gray-600 leading-relaxed font-medium">
                     {selectedAddrObj.deliveryAddress}, {selectedAddrObj.district}, {selectedAddrObj.state}
                   </p>
@@ -663,10 +663,10 @@ function CheckoutContent() {
 
                 <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto no-scrollbar">
                   {cart.map((item) => (
-                    <div key={item.id} className="p-6 flex gap-6 items-center group hover:bg-gray-50/50 transition-colors">
-                      <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-white shadow-sm flex items-center justify-center shrink-0 border border-gray-100 group-hover:scale-105 transition-transform duration-300">
+                    <div key={item.id} className="p-4 sm:p-6 flex gap-4 sm:gap-6 items-center group hover:bg-gray-50/50 transition-colors">
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-white shadow-sm flex items-center justify-center shrink-0 border border-gray-100 group-hover:scale-105 transition-transform duration-300">
                         {item.imageUrl ? (
-                          <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
+                          <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" unoptimized />
                         ) : (
                           <LuPackage className="w-8 h-8 text-gray-200" />
                         )}
@@ -686,7 +686,7 @@ function CheckoutContent() {
                   ))}
                 </div>
 
-                <div className="p-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6 bg-gray-50/30">
+                <div className="p-4 sm:p-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 bg-gray-50/30">
                   <div className="flex items-center gap-3 text-gray-500">
                     <LuShieldCheck className="w-5 h-5 text-pp-success" />
                     <span className="text-xs font-bold uppercase tracking-widest">Safe & Secure Delivery</span>
