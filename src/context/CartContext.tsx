@@ -106,7 +106,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (user && token) addToCartApi(token, product.id, 1);
       return [...prev, { ...product, cartQuantity: 1 }];
     });
-    success("Added to cart");
   }, [debouncedSync, success, token, user]);
 
   const removeFromCart = useCallback(async (productId: string) => {
@@ -118,7 +117,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         console.error("Cart sync failed", error);
       }
     }
-    success("Removed from cart");
   }, [success, token, user]);
 
   const updateQuantity = useCallback(async (productId: string, quantity: number) => {

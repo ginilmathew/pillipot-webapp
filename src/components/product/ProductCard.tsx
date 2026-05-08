@@ -34,11 +34,10 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/55 bg-white pp-shadow transition-all duration-300 ${
-        isOutOfStock
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/55 bg-white pp-shadow transition-all duration-300 ${isOutOfStock
           ? "opacity-70 grayscale-[0.06]"
           : "hover:-translate-y-1 hover:border-pp-cyan/30 hover:pp-shadow-hover"
-      }`}
+        }`}
     >
       {/* Wishlist button */}
       <button
@@ -46,11 +45,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           e.preventDefault();
           toggleWishlist(product);
         }}
-        className={`absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border bg-white shadow-sm transition-all duration-200 ${
-          wishlisted
+        className={`absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full border bg-white shadow-sm transition-all duration-200 ${wishlisted
             ? "border-red-100 bg-red-50 text-pp-accent"
             : "border-slate-200 text-slate-300 hover:border-red-100 hover:bg-red-50 hover:text-pp-accent"
-        }`}
+          }`}
         aria-label="Toggle wishlist"
       >
         <LuHeart className={`h-4 w-4 ${wishlisted ? "fill-current" : ""}`} />

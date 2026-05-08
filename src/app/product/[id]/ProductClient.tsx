@@ -143,7 +143,7 @@ export default function ProductClient({ product }: { product: Product }) {
                           className={`relative h-14 w-14 shrink-0 rounded-2xl border p-1 transition-all bg-white ${selectedIndex === i ? "border-[#2874f0] shadow-sm" : "border-slate-200 hover:border-slate-300"
                             }`}
                         >
-                          <Image src={img} alt={`${product.name} view ${i + 1}`} fill sizes="56px" className="object-contain" />
+                          <Image src={img} alt={`${product.name} view ${i + 1}`} fill sizes="56px" className="object-contain rounded-2xl" />
                         </button>
                       ))}
                     </div>
@@ -174,11 +174,16 @@ export default function ProductClient({ product }: { product: Product }) {
                           if (!user) { setIsLoginModalOpen(true); return; }
                           toggleWishlist(product);
                         }}
-                        className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm transition-all ${isInWishlist(product.id) ? "text-red-500" : "text-slate-300 hover:text-red-500"
+                        className={`absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm transition-all ${isInWishlist(product.id) ? "text-red-500" : "text-slate-300 hover:text-red-500"
                           }`}
                       >
                         <LuHeart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
                       </button>
+                      <div className="absolute bottom-4 left-4 z-10 sm:hidden">
+                        <div className="flex items-center gap-1 bg-pp-success text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                          {product.rating || 4.5} <LuStar className="w-3 h-3 fill-white" />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -191,9 +196,9 @@ export default function ProductClient({ product }: { product: Product }) {
                     </button>
                     <button
                       onClick={handleBuyNow}
-                      className="animate-attention pp-button-primary flex flex-1 items-center justify-center gap-2 rounded-xl py-4 text-sm font-bold hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(22,68,163,0.35)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pp-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                      className="animate-attention pp-button-primary flex flex-1 items-center justify-center gap-2 rounded-xl py-4 text-base font-bold hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(22,68,163,0.35)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pp-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                     >
-                      <LuZap className="w-5 h-5" /> BUY NOW
+                      <LuZap className="w-5 h-5 " /> Buy at {formatPrice(product.price)}
                     </button>
                   </div>
                 </div>
@@ -205,7 +210,7 @@ export default function ProductClient({ product }: { product: Product }) {
                   <h1 className="text-xl font-black leading-tight tracking-[-0.05em] text-slate-950 sm:text-2xl md:text-4xl">{product.name}</h1>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="hidden sm:flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-1 bg-pp-success text-white text-sm font-bold px-2.5 py-1 rounded-lg">
                     {product.rating || 4.5} <LuStar className="w-3.5 h-3.5 fill-white" />
                   </div>
@@ -285,8 +290,8 @@ export default function ProductClient({ product }: { product: Product }) {
                     {product.description && product.description.length > 150 ? (
                       <>
                         {isDescExpanded ? product.description : `${product.description.slice(0, 150)}...`}
-                        <button 
-                          onClick={() => setIsDescExpanded(!isDescExpanded)} 
+                        <button
+                          onClick={() => setIsDescExpanded(!isDescExpanded)}
                           className="ml-2 font-bold text-pp-primary hover:underline focus:outline-none"
                         >
                           {isDescExpanded ? "See Less" : "See More"}
@@ -312,51 +317,59 @@ export default function ProductClient({ product }: { product: Product }) {
                 )}
 
                 {/* Reviews Section */}
-                <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-8 pp-shadow">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-xl font-black text-slate-950">Customer Reviews</h3>
-                    {reviews.length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-pp-primary">{product.rating || 0}</span>
-                        <div className="flex gap-0.5">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <LuStar key={s} className={`w-4 h-4 ${s <= (product.rating || 0) ? "fill-pp-accent-warm text-pp-accent-warm" : "text-gray-100"}`} />
-                          ))}
+                <div className="flex flex-col gap-3">
+                  <div className="sm:hidden flex flex-wrap items-center gap-3 px-1">
+                    <div className="flex items-center gap-1 bg-pp-success text-white text-sm font-bold px-2.5 py-1 rounded-lg">
+                      {product.rating || 4.5} <LuStar className="w-3.5 h-3.5 fill-white" />
+                    </div>
+                    <span className="text-slate-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings & reviews</span>
+                  </div>
+                  <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-4 pp-shadow">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-xl font-black text-slate-950">Customer Reviews</h3>
+                      {reviews.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-black text-pp-primary">{product.rating || 0}</span>
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <LuStar key={s} className={`w-4 h-4 ${s <= (product.rating || 0) ? "fill-pp-accent-warm text-pp-accent-warm" : "text-gray-100"}`} />
+                            ))}
+                          </div>
                         </div>
+                      )}
+                    </div>
+
+                    {reviews.length === 0 ? (
+                      <div className="py-10 text-center">
+                        <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No reviews yet</p>
+                        <p className="text-xs text-slate-300 mt-2">Be the first to review this product after purchase!</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {reviews.map((review) => (
+                          <div key={review.id} className="p-3 rounded-3xl bg-pp-surface border border-white/60">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-pp-primary/10 flex items-center justify-center text-pp-primary font-black text-sm">
+                                  {review.customer?.customerName?.charAt(0).toUpperCase() || "?"}
+                                </div>
+                                <div>
+                                  <p className="text-sm font-black text-slate-950">{review.customer?.customerName || "Anonymous"}</p>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{new Date(review.createdAt).toLocaleDateString()}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 bg-pp-success/10 text-pp-success px-2 py-1 rounded-lg text-xs font-black">
+                                {review.rating} <LuStar className="w-3 h-3 fill-current" />
+                              </div>
+                            </div>
+                            <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                              {review.comment}
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
-
-                  {reviews.length === 0 ? (
-                    <div className="py-10 text-center">
-                      <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No reviews yet</p>
-                      <p className="text-xs text-slate-300 mt-2">Be the first to review this product after purchase!</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {reviews.map((review) => (
-                        <div key={review.id} className="p-6 rounded-3xl bg-pp-surface border border-white/60">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-pp-primary/10 flex items-center justify-center text-pp-primary font-black text-sm">
-                                {review.customer?.customerName?.charAt(0).toUpperCase() || "?"}
-                              </div>
-                              <div>
-                                <p className="text-sm font-black text-slate-950">{review.customer?.customerName || "Anonymous"}</p>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{new Date(review.createdAt).toLocaleDateString()}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1 bg-pp-success/10 text-pp-success px-2 py-1 rounded-lg text-xs font-black">
-                              {review.rating} <LuStar className="w-3 h-3 fill-current" />
-                            </div>
-                          </div>
-                          <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                            {review.comment}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
