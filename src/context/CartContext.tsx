@@ -39,6 +39,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (user && token) {
         setLoading(true);
         try {
+          // PRODUCTION BEST PRACTICE: Merge guest cart into user cart on login
+          const savedCart = localStorage.getItem("pillipot_cart");
+          if (savedCart) {
+            try {
+              const localItems = JSON.parse(savedCart);
+              if (Array.isArray(localItems) && localItems.length > 0) {
+                // Sync local items to server
+                await Promise.all(localItems.map(item => addToCartApi(token, item.id, item.cartQuantity)));
+                localStorage.removeItem("pillipot_cart"); // Clear after merge
+              }
+            } catch (e) {
+              console.error("Failed to merge guest cart", e);
+            }
+          }
+
           const apiItems = await fetchCart(token);
           const formattedItems = apiItems.map(item => ({
             ...item.product,

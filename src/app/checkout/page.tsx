@@ -10,7 +10,7 @@ import { Suspense } from "react";
 import { LuCheck, LuShieldCheck, LuMapPin, LuCreditCard, LuBanknote, LuSmartphone, LuPlus, LuTrash2, LuHouse, LuBriefcase, LuLoaderCircle, LuPencilLine, LuPackage, LuX, LuHeart, LuArrowLeft, LuLeaf } from "react-icons/lu";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { getAddresses, addAddress, autofillAddress, checkout, verifyPayment, failPayment, type CustomerAddress, deleteAddress, updateAddress } from "@/lib/api";
+import { getAddresses, addAddress, autofillAddress, checkout, verifyPayment, failPayment, type CustomerAddress, deleteAddress, updateAddress, getProduct } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
 import useSWR from "swr";
 import { swrKeys } from "@/lib/swrKeys";
@@ -21,19 +21,33 @@ function CheckoutContent() {
   const { cart: globalCart, cartTotal: globalCartTotal, cartMrpTotal: globalCartMrpTotal, cartCount: globalCartCount, clearCart, removeFromCart, loading: isCartLoading } = useCart();
   const { toggleWishlist } = useWishlist();
   const searchParams = useSearchParams();
-  const cartQuery = searchParams.get("cart");
+  const buyNowId = searchParams.get("buyNow");
+  const buyNowQty = parseInt(searchParams.get("qty") || "1");
 
   const [urlCart, setUrlCart] = useState<any[] | null>(null);
+  const [isUrlCartLoading, setIsUrlCartLoading] = useState(false);
 
   useEffect(() => {
-    if (cartQuery) {
-      try {
-        setUrlCart(JSON.parse(cartQuery));
-      } catch (e) {
-        console.error("Failed to parse cart query parameter");
+    const fetchBuyNowProduct = async () => {
+      if (buyNowId) {
+        setIsUrlCartLoading(true);
+        try {
+          const product = await getProduct(buyNowId);
+          if (product) {
+            setUrlCart([{
+              ...product,
+              cartQuantity: buyNowQty
+            }]);
+          }
+        } catch (e) {
+          console.error("Failed to fetch buy-now product");
+        } finally {
+          setIsUrlCartLoading(false);
+        }
       }
-    }
-  }, [cartQuery]);
+    };
+    fetchBuyNowProduct();
+  }, [buyNowId, buyNowQty]);
 
   const cart = urlCart || globalCart;
   const cartTotal = urlCart
@@ -897,7 +911,8 @@ function CheckoutContent() {
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Order Summary</h3>
             </div>
             
-            {isCartLoading && cart.length === 0 ? (
+            {/* Loading State for Buy Now */}
+            {(isCartLoading || isUrlCartLoading) && cart.length === 0 ? (
               <div className="p-6 space-y-4">
                 <div className="flex justify-between">
                   <div className="h-4 bg-gray-100 animate-shimmer rounded w-24" />

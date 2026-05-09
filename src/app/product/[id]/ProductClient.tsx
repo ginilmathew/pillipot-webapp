@@ -85,18 +85,8 @@ export default function ProductClient({ product }: { product: Product }) {
       setIsLoginModalOpen(true);
       return;
     }
-    const singleProduct = [{
-      id: product.id,
-      price: product.price,
-      originalPrice: product.originalPrice || product.price,
-      name: product.name,
-      cartQuantity: 1,
-      imageUrl: product.imageUrl,
-      codDeliveryCharge: product.codDeliveryCharge,
-      codDeliveryMilestones: product.codDeliveryMilestones,
-    }];
-    const queryString = `/checkout?cart=${encodeURIComponent(JSON.stringify(singleProduct))}`;
-    router.push(queryString);
+    // Production-grade: Only pass the ID. The checkout page will fetch the latest secure data from the server.
+    router.push(`/checkout?buyNow=${product.id}&qty=1`);
   };
 
   const formatPrice = (num: number) =>
