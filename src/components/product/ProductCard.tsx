@@ -22,7 +22,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const rating = product.rating || 0;
   const reviewsCount = product.reviewsCount ?? 0;
   const discount = product.discount ?? 0;
-  const originalPrice = product.originalPrice ?? product.price * 1.1;
+  const originalPrice = product.originalPrice || 0;
+  const hasDiscount = originalPrice > product.price;
   const isOutOfStock = (product.stockQuantity ?? 0) <= 0;
 
   const formatPrice = (num: number) =>
@@ -60,20 +61,28 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="relative block"
       >
         <div className="relative">
-          {/* Tag in the top-left corner */}
-          {product.tags && product.tags.length > 0 && (
-            <div className="absolute top-2 left-2">
-              {product.tags.map((t) => (
-                <span
-                  key={t}
-                  className="text-[11px] inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-white font-semibold shadow-md relative"
-                >
-                  <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-white rounded-full border border-red-500"></span>
-                  <span className="ml-3">{t}</span>
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Combined Badge Column (Tags + Discount) */}
+          <div className="absolute left-2 top-2 z-10 flex flex-col items-start gap-1.5">
+            {product.tags && product.tags.length > 0 && (
+              <div className="flex flex-col gap-1">
+                {product.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="text-[10px] inline-flex items-center rounded-full bg-red-500 px-2.5 py-1 text-white font-black uppercase tracking-wider shadow-md relative"
+                  >
+                    <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1.5 h-1.5 bg-white rounded-full border border-red-500"></span>
+                    <span className="ml-2.5">{t}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+
+
+
+            {product.brand ? (
+              <span className="pp-badge-brand text-[9px] font-bold shadow-sm">{product.brand}</span>
+            ) : null}
+          </div>
 
           {/* Product image */}
           <div className="block aspect-[4/3] w-full overflow-hidden rounded-lg bg-pp-surface">
@@ -87,15 +96,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Badges row */}
-        <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
-          {discount > 0 ? (
-            <span className="pp-badge-discount">{discount}% off</span>
-          ) : null}
-          {product.brand ? (
-            <span className="pp-badge-brand">{product.brand}</span>
-          ) : null}
-        </div>
+
 
         {/* Rating */}
         <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 shadow-sm">
@@ -124,21 +125,30 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="flex flex-1 flex-col gap-2 p-3"
       >
         {/* Product name */}
-        <h3 className="line-clamp-2 text-[0.88rem] font-semibold leading-[1.45] text-slate-800 group-hover:text-pp-primary">
-          {product.name}
+        <h3 className="flex items-center flex-wrap gap-2 text-[0.88rem] font-semibold leading-[1.45] text-slate-800 group-hover:text-pp-primary">
+          <span className="line-clamp-1">{product.name}</span>
+          {hasDiscount && (
+            <span className="pp-badge-discount px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider shadow-sm">
+              {discount}% off
+            </span>
+          )}
         </h3>
 
         {/* Price row */}
-        <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-0.5 pt-2">
-          <span className="pp-price-main">{formatPrice(product.price)}</span>
-          {discount > 0 ? (
-            <>
-              <span className="pp-price-strike">
-                {formatPrice(originalPrice)}
-              </span>
-              <span className="pp-price-save">Save {discount}%</span>
-            </>
-          ) : null}
+        <div className="mt-auto flex flex-col gap-1 pt-2">
+          {hasDiscount && (
+            <div className="flex items-center gap-1.5 opacity-80">
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Actual Price:</span>
+              <span className="text-[11px] text-slate-400 line-through decoration-pp-accent/30">{formatPrice(originalPrice)}</span>
+            </div>
+          )}
+          <div className="flex items-baseline gap-2">
+            {hasDiscount && <span className="text-[9px] font-black text-pp-primary uppercase tracking-wider">Our Price:</span>}
+            <span className="pp-price-main">{formatPrice(product.price)}</span>
+            {hasDiscount && (
+              <span className="pp-price-save">{discount}% off</span>
+            )}
+          </div>
         </div>
 
         {/* CTA hint */}

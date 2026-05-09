@@ -34,6 +34,7 @@ export default function ProductClient({ product }: { product: Product }) {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [isHoverZoom, setIsHoverZoom] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
@@ -219,14 +220,22 @@ export default function ProductClient({ product }: { product: Product }) {
                   <span className="text-slate-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings & reviews</span>
                 </div>
 
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <span className="text-3xl font-black tracking-[-0.05em] text-slate-950 md:text-4xl">{formatPrice(product.price)}</span>
-                  {(product.discount ?? 0) > 0 && (
-                    <>
-                      <span className="text-slate-400 line-through text-lg">{formatPrice(product.originalPrice || product.price)}</span>
-                      <span className="text-pp-success text-base font-bold">Save {formatPrice((product.originalPrice || product.price) - product.price)}</span>
-                    </>
+                <div className="flex flex-col gap-1">
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <div className="flex items-center gap-2 opacity-70">
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Actual Price:</span>
+                      <span className="text-xl text-slate-400 line-through decoration-pp-accent/40">{formatPrice(product.originalPrice)}</span>
+                    </div>
                   )}
+                  <div className="flex flex-wrap items-baseline gap-3">
+                    {product.originalPrice && product.originalPrice > product.price && (
+                      <span className="text-xs font-black text-pp-primary uppercase tracking-widest">Our Price:</span>
+                    )}
+                    <span className="text-3xl font-black tracking-[-0.05em] text-slate-950 md:text-4xl">{formatPrice(product.price)}</span>
+                    {product.originalPrice && product.originalPrice > product.price && (
+                      <span className="text-pp-success text-base font-bold">Save {formatPrice(product.originalPrice - product.price)} ({product.discount}% off)</span>
+                    )}
+                  </div>
                 </div>
 
                 {offers.length > 0 && (
@@ -348,7 +357,7 @@ export default function ProductClient({ product }: { product: Product }) {
                       </div>
                     ) : (
                       <div className="space-y-6">
-                        {reviews.map((review) => (
+                        {reviews.slice(0, visibleReviewsCount).map((review) => (
                           <div key={review.id} className="p-3 rounded-3xl bg-pp-surface border border-white/60">
                             <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center gap-3">
@@ -369,6 +378,15 @@ export default function ProductClient({ product }: { product: Product }) {
                             </p>
                           </div>
                         ))}
+
+                        {reviews.length > visibleReviewsCount && (
+                          <button
+                            onClick={() => setVisibleReviewsCount(prev => prev + 5)}
+                            className="w-full py-3 mt-4 rounded-2xl border-2 border-pp-primary/20 text-pp-primary font-bold hover:bg-pp-primary/5 transition-all text-sm uppercase tracking-widest"
+                          >
+                            View More Reviews ({reviews.length - visibleReviewsCount} remaining)
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>

@@ -140,7 +140,7 @@ export async function getProducts(
 
   try {
     return await fetchPublicJson<Product[]>(path, {
-      revalidate: search ? 60 : 300,
+      revalidate: 0,
       tags,
     });
   } catch {
@@ -151,7 +151,7 @@ export async function getProducts(
 export async function getProduct(id: string): Promise<Product | null> {
   try {
     return await fetchPublicJson<Product>(`/customer/products/${id}`, {
-      revalidate: 300,
+      revalidate: 0,
       tags: ["products", `product:${id}`],
     });
   } catch {
@@ -162,8 +162,8 @@ export async function getProduct(id: string): Promise<Product | null> {
 export async function getProductOffers(productId: string): Promise<ProductOffer[]> {
   try {
     return await fetchPublicJson<ProductOffer[]>(`/customer/offers/product/${productId}`, {
-      revalidate: 300,
-      tags: ["offers", `productOffers:${productId}`],
+      revalidate: 0,
+      tags: ["offers", `offers:${productId}`],
     });
   } catch {
     return [];

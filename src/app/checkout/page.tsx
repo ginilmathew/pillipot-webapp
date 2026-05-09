@@ -46,7 +46,7 @@ function CheckoutContent() {
     }, 0)
     : globalCartMrpTotal;
   const cartCount = urlCart
-    ? urlCart.reduce((acc, item) => acc + item.cartQuantity, 0)
+    ? urlCart.length
     : globalCartCount;
 
   const { error } = useToast();

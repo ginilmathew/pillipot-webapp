@@ -161,7 +161,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     0
   ), [cart]);
 
-  const cartCount = useMemo(() => cart.reduce((count, item) => count + item.cartQuantity, 0), [cart]);
+  const cartCount = useMemo(() => cart.length, [cart]);
 
   const value = useMemo(
     () => ({
