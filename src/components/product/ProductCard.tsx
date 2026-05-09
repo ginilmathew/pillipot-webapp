@@ -36,8 +36,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div
       className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/55 bg-white pp-shadow transition-all duration-300 ${isOutOfStock
-          ? "opacity-70 grayscale-[0.06]"
-          : "hover:-translate-y-1 hover:border-pp-cyan/30 hover:pp-shadow-hover"
+        ? "opacity-70 grayscale-[0.06]"
+        : "hover:-translate-y-1 hover:border-pp-cyan/30 hover:pp-shadow-hover"
         }`}
     >
       {/* Wishlist button */}
@@ -47,8 +47,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           toggleWishlist(product);
         }}
         className={`absolute right-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full border bg-white shadow-sm transition-all duration-200 ${wishlisted
-            ? "border-red-100 bg-red-50 text-pp-accent"
-            : "border-slate-200 text-slate-300 hover:border-red-100 hover:bg-red-50 hover:text-pp-accent"
+          ? "border-red-100 bg-red-50 text-pp-accent"
+          : "border-slate-200 text-slate-300 hover:border-red-100 hover:bg-red-50 hover:text-pp-accent"
           }`}
         aria-label="Toggle wishlist"
       >
@@ -145,9 +145,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-baseline gap-2">
             {hasDiscount && <span className="text-[9px] font-black text-pp-primary uppercase tracking-wider">Our Price:</span>}
             <span className="pp-price-main">{formatPrice(product.price)}</span>
-            {hasDiscount && (
-              <span className="pp-price-save">{discount}% off</span>
-            )}
+
           </div>
         </div>
 

@@ -226,19 +226,19 @@ export default function ProductClient({ product }: { product: Product }) {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  {product.originalPrice && product.originalPrice > product.price && (
+                  {!!product.originalPrice && product.originalPrice > product.price && (
                     <div className="flex items-center gap-2 opacity-70">
                       <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Actual Price:</span>
                       <span className="text-xl text-slate-400 line-through decoration-pp-accent/40">{formatPrice(product.originalPrice)}</span>
                     </div>
                   )}
                   <div className="flex flex-wrap items-baseline gap-3">
-                    {product.originalPrice && product.originalPrice > product.price && (
+                    {!!product.originalPrice && product.originalPrice > product.price && (
                       <span className="text-xs font-black text-pp-primary uppercase tracking-widest">Our Price:</span>
                     )}
                     <span className="text-3xl font-black tracking-[-0.05em] text-slate-950 md:text-4xl">{formatPrice(product.price)}</span>
-                    {product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-pp-success text-base font-bold">Save {formatPrice(product.originalPrice - product.price)} ({product.discount}% off)</span>
+                    {!!product.originalPrice && product.originalPrice > product.price && (
+                      <span className="text-pp-success text-base font-bold">Save {formatPrice(product.originalPrice - product.price)} </span>
                     )}
                   </div>
                 </div>
@@ -284,9 +284,10 @@ export default function ProductClient({ product }: { product: Product }) {
                 )}
 
                 <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
+                  <div className="flex flex-col items-center gap-1 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
                     <LuTruck className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />
                     <span className="text-[9px] font-semibold text-slate-700 md:text-xs">Free Delivery</span>
+                    <span className="text-[8px] text-slate-400 font-medium leading-tight">On eligible orders</span>
                   </div>
                   <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
                     <LuRotateCcw className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />

@@ -435,6 +435,9 @@ function CheckoutContent() {
 
   const finalTotal = cartTotal - offerDiscount + deliveryFee;
 
+  // On address/review steps, show total without delivery fee (only add it on payment step)
+  const displayTotal = activeStep === "payment" ? finalTotal : cartTotal - offerDiscount;
+
   const selectedAddrObj = addresses.find(a => a.id === selectedAddressId) || {
     customerName: formData.customerName,
     deliveryAddress: `${formData.flatBuilding}${formData.areaSector ? ", " + formData.areaSector : ""}`,
@@ -817,12 +820,14 @@ function CheckoutContent() {
                   <span className="text-pp-success font-semibold">- {formatPrice(cartMrpTotal - cartTotal)}</span>
                 </div>
               )}
-              <div className="flex justify-between">
-                <span className="text-gray-700">Delivery {selectedPayment === "cod" && codDeliveryFee > 0 ? "(COD)" : ""}</span>
-                <span className={deliveryFee > 0 ? "text-gray-900 font-semibold" : "text-pp-success font-semibold"}>
-                  {deliveryFee > 0 ? formatPrice(deliveryFee) : "Free"}
-                </span>
-              </div>
+              {activeStep === "payment" && (
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Delivery {selectedPayment === "cod" && codDeliveryFee > 0 ? "(COD)" : ""}</span>
+                  <span className={deliveryFee > 0 ? "text-gray-900 font-semibold" : "text-pp-success font-semibold"}>
+                    {deliveryFee > 0 ? formatPrice(deliveryFee) : "Free"}
+                  </span>
+                </div>
+              )}
               {offerDiscount > 0 && (
                 <div className="flex justify-between animate-in fade-in duration-300">
                   <div className="flex flex-col">
@@ -834,7 +839,7 @@ function CheckoutContent() {
               )}
               <div className="border-t border-dashed border-gray-200 pt-3 flex justify-between text-lg font-black text-gray-900">
                 <span>Total</span>
-                <span>{formatPrice(finalTotal)}</span>
+                <span>{formatPrice(displayTotal)}</span>
               </div>
             </div>
 
@@ -860,9 +865,9 @@ function CheckoutContent() {
               </div>
             </div>
 
-            {cartMrpTotal > finalTotal && (
+            {cartMrpTotal > displayTotal && (
               <div className="bg-pp-success/10 p-3 text-center border-t border-pp-success/10">
-                <p className="text-pp-success text-[11px] font-bold uppercase tracking-wide">You saved {formatPrice(cartMrpTotal - finalTotal)} on this order!</p>
+                <p className="text-pp-success text-[11px] font-bold uppercase tracking-wide">You saved {formatPrice(cartMrpTotal - displayTotal)} on this order!</p>
               </div>
             )}
           </div>
