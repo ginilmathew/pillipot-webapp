@@ -3,10 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { LuSearch, LuShoppingCart, LuUser, LuHeart, LuMenu, LuX, LuHouse, LuPackage, LuChevronDown, LuGrid2X2, LuLogOut } from "react-icons/lu";
+import { LuSearch, LuShoppingCart, LuUser, LuHeart, LuMenu, LuX, LuHouse, LuPackage, LuChevronDown, LuGrid2X2, LuLogOut, LuArrowRight } from "react-icons/lu";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import { getProducts, Product } from "@/lib/api";
 
 const mobileNav = [
   { label: "Home", href: "/", icon: LuHouse },
@@ -27,6 +28,10 @@ function HeaderContent() {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
+  const [suggestions, setSuggestions] = React.useState<Product[]>([]);
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const searchRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -34,20 +39,51 @@ function HeaderContent() {
       if (!target.closest(".user-menu-container")) {
         setUserMenuOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(target)) {
+        setShowSuggestions(false);
+      }
     };
 
-    if (userMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [userMenuOpen]);
+
+  // Handle Search Suggestions with Debounce
+  React.useEffect(() => {
+    if (!search.trim() || search.length < 1) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const results = await getProducts(undefined, search.trim());
+        setSuggestions(results.slice(0, 6)); // Top 6 suggestions
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error("Suggestion fetch failed", error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
 
     router.push(`/search?q=${encodeURIComponent(search.trim())}`);
+    setSearchOpen(false);
+    setShowSuggestions(false);
+  };
+
+  const navigateToProduct = (productId: string) => {
+    router.push(`/product/${productId}`);
+    setShowSuggestions(false);
     setSearchOpen(false);
   };
 
@@ -90,7 +126,7 @@ function HeaderContent() {
             <img className="h-12" src="/logopilli.png" alt="" />
           </Link>
 
-          <div className="ml-auto hidden items-center gap-3 md:flex">
+          <div className="ml-auto hidden items-center gap-3 md:flex" ref={searchRef}>
             <form onSubmit={handleSearch} className="relative w-[min(42vw,640px)] min-w-[280px]">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/58">
                 <LuSearch className="h-4 w-4" />
@@ -98,8 +134,9 @@ function HeaderContent() {
               <input
                 key={`desktop-${pathname}-${initialQuery}`}
                 type="text"
-                defaultValue={initialQuery}
+                value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => search.length > 0 && setShowSuggestions(true)}
                 placeholder="Search products, brands, categories..."
                 className="h-11 w-full rounded-full border border-white/14 bg-white/12 pl-11 pr-28 text-[0.875rem] font-medium text-white outline-none placeholder:text-white/48 focus:border-white/38 focus:bg-white/18"
               />
@@ -109,6 +146,55 @@ function HeaderContent() {
               >
                 Search
               </button>
+
+              {/* Clear Search Button (Desktop) */}
+              {search.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => { setSearch(""); setSuggestions([]); }}
+                  className="absolute right-[100px] top-1/2 -translate-y-1/2 p-1 text-white/40 hover:text-white transition-colors"
+                >
+                  <LuX className="h-4 w-4" />
+                </button>
+              )}
+
+              {/* Suggestions Dropdown (Desktop) */}
+              {showSuggestions && (suggestions.length > 0 || isSearching) && (
+                <div className="absolute top-full mt-2 w-full overflow-hidden rounded-[1.5rem] border border-white/20 bg-white/95 backdrop-blur-3xl shadow-2xl animate-in zoom-in slide-in-from-top-2">
+                  <div className="p-2">
+                    <p className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Suggestions</p>
+                    {isSearching && suggestions.length === 0 ? (
+                      <div className="px-4 py-6 text-center">
+                        <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-pp-primary border-t-transparent" />
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        {suggestions.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => navigateToProduct(item.id)}
+                            className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left transition hover:bg-slate-50 group"
+                          >
+                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-slate-100 bg-white p-1">
+                              {item.imageUrl ? (
+                                <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain" />
+                              ) : (
+                                <LuPackage className="h-full w-full text-slate-200" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-slate-900 truncate">{item.name}</p>
+                              <p className="text-[11px] font-bold text-pp-primary uppercase tracking-wider">{item.brand || "PILLIPOT"}</p>
+                            </div>
+                            <LuArrowRight className="h-4 w-4 text-slate-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </form>
 
             {user ? (
@@ -205,8 +291,9 @@ function HeaderContent() {
                 key={`mobile-${pathname}-${initialQuery}`}
                 type="text"
                 autoFocus
-                defaultValue={initialQuery}
+                value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => search.length > 0 && setShowSuggestions(true)}
                 placeholder="Search products, categories..."
                 className="h-12 w-full rounded-full border border-white/20 bg-white pl-11 pr-24 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 focus:border-sky-200 focus:ring-4 focus:ring-sky-200/40"
               />
@@ -216,6 +303,54 @@ function HeaderContent() {
               >
                 Go
               </button>
+
+              {/* Clear Search Button (Mobile) */}
+              {search.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => { setSearch(""); setSuggestions([]); }}
+                  className="absolute right-16 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <LuX className="h-5 w-5" />
+                </button>
+              )}
+
+              {/* Suggestions Dropdown (Mobile) */}
+              {showSuggestions && (suggestions.length > 0 || isSearching) && (
+                <div className="absolute top-full mt-3 w-full overflow-hidden rounded-[1.5rem] bg-white shadow-2xl border border-slate-100 max-h-[70vh] overflow-y-auto z-[60]">
+                  <div className="p-2">
+                    <p className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Products</p>
+                    {isSearching && suggestions.length === 0 ? (
+                      <div className="px-4 py-8 text-center">
+                        <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-pp-primary border-t-transparent" />
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        {suggestions.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => navigateToProduct(item.id)}
+                            className="flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left active:bg-slate-100"
+                          >
+                            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-white p-1">
+                              {item.imageUrl ? (
+                                <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain" />
+                              ) : (
+                                <LuPackage className="h-full w-full text-slate-200" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[15px] font-bold text-slate-900 truncate leading-tight">{item.name}</p>
+                              <p className="text-[11px] font-bold text-pp-primary uppercase tracking-wider mt-0.5">{item.brand || "PILLIPOT"}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </form>
           </div>
         )}
