@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { LuCheck, LuShieldCheck, LuMapPin, LuCreditCard, LuBanknote, LuSmartphone, LuPlus, LuTrash2, LuHouse, LuBriefcase, LuLoaderCircle, LuPencilLine, LuPackage, LuX } from "react-icons/lu";
+import { LuCheck, LuShieldCheck, LuMapPin, LuCreditCard, LuBanknote, LuSmartphone, LuPlus, LuTrash2, LuHouse, LuBriefcase, LuLoaderCircle, LuPencilLine, LuPackage, LuX, LuHeart, LuArrowLeft, LuLeaf } from "react-icons/lu";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { getAddresses, addAddress, autofillAddress, checkout, verifyPayment, failPayment, type CustomerAddress, deleteAddress, updateAddress } from "@/lib/api";
@@ -17,7 +18,8 @@ import { swrKeys } from "@/lib/swrKeys";
 type Step = "address" | "summary" | "payment";
 
 function CheckoutContent() {
-  const { cart: globalCart, cartTotal: globalCartTotal, cartMrpTotal: globalCartMrpTotal, cartCount: globalCartCount, clearCart } = useCart();
+  const { cart: globalCart, cartTotal: globalCartTotal, cartMrpTotal: globalCartMrpTotal, cartCount: globalCartCount, clearCart, removeFromCart } = useCart();
+  const { toggleWishlist } = useWishlist();
   const searchParams = useSearchParams();
   const cartQuery = searchParams.get("cart");
 
@@ -136,6 +138,7 @@ function CheckoutContent() {
     }, 500);
     return () => clearTimeout(timer);
   }, [formData.phone]);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -412,6 +415,22 @@ function CheckoutContent() {
     }
   };
 
+  const handleRemoveItem = (productId: string) => {
+    removeFromCart(productId);
+    // If URL cart was being used, we should probably update it too or clear it
+    if (urlCart) {
+      setUrlCart(prev => prev ? prev.filter(i => i.id !== productId) : null);
+    }
+  };
+
+  const handleSaveForLater = (product: any) => {
+    toggleWishlist(product);
+    removeFromCart(product.id);
+    if (urlCart) {
+      setUrlCart(prev => prev ? prev.filter(i => i.id !== product.id) : null);
+    }
+  };
+
   const offerProduct = appliedOffer ? cart.find(i => i.id === appliedOffer.productId) : null;
   const offerDiscount = offerProduct
     ? Math.round(offerProduct.price * (appliedOffer!.discountPercentage / 100) * offerProduct.cartQuantity)
@@ -453,25 +472,39 @@ function CheckoutContent() {
 
   return (
     <main className="flex-1 pp-container py-6">
-      <div className="flex items-center justify-center gap-2 mb-8">
-        {steps.map((step, i) => (
-          <React.Fragment key={step.key}>
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${steps.findIndex(s => s.key === activeStep) >= i
-                ? "pp-gradient text-white shadow-md"
-                : "bg-gray-200 text-gray-500"
+      {/* Progress Stepper - Perfectly Centered */}
+      <div className="flex flex-col items-center mb-16 px-4">
+        <div className="flex items-center justify-between w-full max-w-2xl relative">
+          {/* Progress Line Background */}
+          <div className="absolute top-5 left-0 w-full h-[2px] bg-gray-200 z-0"></div>
+          {/* Active Progress Line */}
+          <div 
+            className="absolute top-5 left-0 h-[2px] bg-pp-primary transition-all duration-500 z-0 shadow-[0_0_8px_rgba(43,127,255,0.3)]"
+            style={{ width: activeStep === "address" ? "0%" : activeStep === "summary" ? "50%" : "100%" }}
+          ></div>
+          
+          {steps.map((step, i) => {
+            const isActive = steps.findIndex(s => s.key === activeStep) >= i;
+            const isCompleted = steps.findIndex(s => s.key === activeStep) > i;
+            
+            return (
+              <div key={step.key} className="flex flex-col items-center gap-3 relative z-10 bg-[#f8f9fa] px-4">
+                <div className={`relative z-20 w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md transition-all duration-300 ${
+                  isActive 
+                    ? "bg-pp-primary text-white ring-4 ring-pp-primary/10" 
+                    : "bg-gray-200 text-gray-500"
                 }`}>
-                {steps.findIndex(s => s.key === activeStep) > i ? <LuCheck className="w-4 h-4" /> : step.num}
+                  {isCompleted ? <LuCheck className="w-5 h-5" /> : step.num}
+                </div>
+                <span className={`text-xs font-black uppercase tracking-widest transition-colors duration-300 ${
+                  isActive ? "text-pp-primary" : "text-gray-400"
+                }`}>
+                  {step.label}
+                </span>
               </div>
-              <span className={`text-sm font-semibold hidden sm:block ${steps.findIndex(s => s.key === activeStep) >= i ? "text-pp-primary" : "text-gray-400"
-                }`}>{step.label}</span>
-            </div>
-            {i < steps.length - 1 && (
-              <div className={`w-12 sm:w-24 h-0.5 rounded-full ${steps.findIndex(s => s.key === activeStep) > i ? "bg-pp-primary" : "bg-gray-100"
-                }`} />
-            )}
-          </React.Fragment>
-        ))}
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
@@ -546,7 +579,8 @@ function CheckoutContent() {
                               setActiveStep("summary");
                               window.scrollTo(0, 0);
                             }}
-                            className="mt-5 pp-gradient text-white w-full py-3 rounded-xl font-black text-sm shadow-pp hover:brightness-110 transition-all animate-in slide-in-from-bottom-2 duration-300 flex items-center justify-center gap-2"
+                            disabled={cartCount === 0}
+                            className="mt-5 pp-gradient text-white w-full py-3 rounded-xl font-black text-sm shadow-pp hover:brightness-110 transition-all animate-in slide-in-from-bottom-2 duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
                           >
                             DELIVER TO THIS ADDRESS
                           </button>
@@ -654,76 +688,105 @@ function CheckoutContent() {
           )}
 
           {activeStep === "summary" && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-pp-primary/5 overflow-hidden text-left">
-                <div className="p-4 sm:p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                  <div>
-                    <h2 className="text-xl font-black text-gray-900">Review Order</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <LuMapPin className="w-3.5 h-3.5 text-pp-primary" />
-                      <p className="text-xs text-gray-500">
-                        Delivering to <span className="font-bold text-gray-900">{selectedAddrObj.customerName}</span>
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-left">
+                {/* Review Header */}
+                <div className="p-6 border-b border-gray-100">
+                  <h2 className="text-2xl font-jakarta font-extrabold text-gray-900">Review Your Order</h2>
+                  <p className="text-sm text-gray-500 mt-1">Double check your details before we finalize your package.</p>
+                </div>
+
+                {/* Delivering To Section */}
+                <div className="p-6 bg-gray-50/50 border-b border-gray-100">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Delivering To</h3>
+                    <button 
+                      onClick={() => setActiveStep("address")}
+                      className="text-pp-primary font-bold text-xs hover:underline uppercase tracking-wider"
+                    >
+                      Change
+                    </button>
+                  </div>
+                  <div className="flex gap-4 items-start">
+                    <div className="bg-pp-primary/10 p-3 rounded-xl text-pp-primary">
+                      <LuMapPin className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">{selectedAddrObj.customerName}</p>
+                      <p className="text-sm text-gray-600 mt-0.5 leading-relaxed">
+                        {selectedAddrObj.deliveryAddress}, {selectedAddrObj.district}, {selectedAddrObj.state} — {selectedAddrObj.pincode}
                       </p>
+                      <div className="flex items-center gap-1.5 mt-2 text-gray-500">
+                        <LuSmartphone className="w-3.5 h-3.5" />
+                        <p className="text-xs font-medium">{formData.phone}</p>
+                      </div>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setActiveStep("address")}
-                    className="px-4 py-2 rounded-xl bg-pp-surface-alt text-pp-primary text-xs font-black hover:bg-pp-surface-alt transition-colors uppercase tracking-wider"
-                  >
-                    Change
-                  </button>
                 </div>
 
-                <div className="p-4 sm:p-6 bg-pp-surface-alt border-b border-gray-50">
-                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                    {selectedAddrObj.deliveryAddress}, {selectedAddrObj.district}, {selectedAddrObj.state}
-                  </p>
-                </div>
-
-                <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto no-scrollbar">
-                  {cart.map((item) => (
-                    <div key={item.id} className="p-4 sm:p-6 flex gap-4 sm:gap-6 items-center group hover:bg-gray-50/50 transition-colors">
-                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-white shadow-sm flex items-center justify-center shrink-0 border border-gray-100 group-hover:scale-105 transition-transform duration-300">
-                        {item.imageUrl ? (
-                          <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" unoptimized />
-                        ) : (
-                          <LuPackage className="w-8 h-8 text-gray-200" />
-                        )}
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <h3 className="text-base font-bold text-gray-900 group-hover:text-pp-primary transition-colors">{item.name}</h3>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">Qty: {item.cartQuantity}</span>
-                          <span className="text-xs text-pp-success font-bold uppercase tracking-wider">In Stock</span>
+                {/* Product List */}
+                <div className="p-6 space-y-6">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Items in Order ({cartCount})</h3>
+                  <div className="divide-y divide-gray-100">
+                    {cart.map((item) => (
+                      <div key={item.id} className="py-6 first:pt-0 last:pb-0 flex gap-6 items-center group">
+                        <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-white shadow-sm border border-gray-100 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                          {item.imageUrl ? (
+                            <Image src={item.imageUrl} alt={item.name} fill sizes="96px" className="object-cover" unoptimized />
+                          ) : (
+                            <LuPackage className="w-8 h-8 text-gray-200" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className="text-lg font-bold text-gray-900 group-hover:text-pp-primary transition-colors">{item.name}</h4>
+                            <p className="text-lg font-black text-gray-900">{formatPrice(item.price * item.cartQuantity)}</p>
+                          </div>
+                          <p className="text-sm text-gray-500 font-medium">Qty: {item.cartQuantity} | <span className="text-pp-success font-bold text-[10px] uppercase tracking-wider">In Stock</span></p>
+                          
+                          <div className="flex gap-4 mt-4">
+                            <button 
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="text-gray-400 hover:text-red-500 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                            >
+                              <LuTrash2 className="w-3.5 h-3.5" /> Remove
+                            </button>
+                            <button 
+                              onClick={() => handleSaveForLater(item)}
+                              className="text-gray-400 hover:text-pp-primary text-xs font-bold flex items-center gap-1.5 transition-colors"
+                            >
+                              <LuHeart className="w-3.5 h-3.5" /> Save for later
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <span className="block text-lg font-black text-gray-900">{formatPrice(item.price * item.cartQuantity)}</span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">({formatPrice(item.price)} each)</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
-                <div className="p-4 sm:p-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 bg-gray-50/30">
-                  <div className="flex items-center gap-3 text-gray-500">
-                    <LuShieldCheck className="w-5 h-5 text-pp-success" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Safe & Secure Delivery</span>
-                  </div>
-                  <div className="flex gap-4 w-full sm:w-auto">
-                    <button
-                      onClick={() => setActiveStep("address")}
-                      className="flex-1 sm:flex-none px-8 py-3 rounded-xl font-bold text-gray-400 hover:text-gray-600 transition-all uppercase text-sm"
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={() => { setActiveStep("payment"); window.scrollTo(0, 0); }}
-                      className="flex-1 sm:flex-none pp-gradient text-white px-2 py-4 rounded-2xl font-black shadow-xl hover:shadow-pp-primary/20 hover:-translate-y-0.5 transition-all text-sm uppercase tracking-widest whitespace-nowrap"
-                    >
-                      Proceed Payment
-                    </button>
-                  </div>
+                {/* Footer Buttons */}
+                <div className="p-6 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <button
+                    onClick={() => {
+                      if (cartCount === 0) {
+                        router.push("/");
+                      } else {
+                        setActiveStep("address");
+                        window.scrollTo(0, 0);
+                      }
+                    }}
+                    className="flex items-center gap-2 text-slate-500 hover:text-pp-primary font-bold transition-colors group"
+                  >
+                    <LuArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                    {cartCount === 0 ? "Return to Shop" : "Back to Shipping"}
+                  </button>
+                  <button
+                    onClick={() => { setActiveStep("payment"); window.scrollTo(0, 0); }}
+                    disabled={cartCount === 0}
+                    className="w-full sm:w-auto px-6 py-3 sm:px-12 sm:py-3.5 bg-pp-primary text-white font-black rounded-xl shadow-lg shadow-pp-primary/20 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs sm:text-sm uppercase tracking-widest disabled:opacity-50 disabled:grayscale disabled:scale-100"
+                  >
+                    Proceed to Payment
+                  </button>
                 </div>
               </div>
             </div>
@@ -781,8 +844,8 @@ function CheckoutContent() {
                 {/* Place Order Button */}
                 <button
                   onClick={handlePlaceOrder}
-                  disabled={isPlacingOrder}
-                  className="mt-4 pp-gradient text-white px-12 py-3.5 rounded-xl font-black shadow-lg hover:shadow-xl transition-all w-full flex items-center justify-center gap-2"
+                  disabled={isPlacingOrder || cartCount === 0}
+                  className="mt-4 pp-gradient text-white px-12 py-3.5 rounded-xl font-black shadow-lg hover:shadow-xl transition-all w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
                 >
                   {isPlacingOrder ? (
                     <>
@@ -804,74 +867,94 @@ function CheckoutContent() {
           )}
         </div>
 
-        <div
-          className={`lg:w-[340px] w-full self-start ${activeStep === "address" ? "lg:mt-14" : ""} lg:sticky lg:top-32`}
+        <aside
+          className={`lg:w-[360px] w-full self-start flex flex-col gap-6 ${activeStep === "address" ? "lg:mt-[44px]" : ""} lg:sticky lg:top-32`}
         >
-          <div className="bg-white rounded-2xl border border-gray-100 pp-shadow overflow-hidden">
-            <h2 className="text-xs font-bold text-gray-400 tracking-widest p-5 border-b border-gray-100 uppercase">Price Details</h2>
-            <div className="p-5 space-y-3 text-sm">
-              <div className="flex justify-between text-gray-700">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-6">
+            <h3 className="font-jakarta font-extrabold text-gray-900 mb-6">Order Summary</h3>
+            
+            <div className="space-y-4 text-sm">
+              <div className="flex justify-between text-gray-500">
                 <span>Subtotal ({cartCount} items)</span>
-                <span>{formatPrice(cartMrpTotal)}</span>
+                <span className="font-bold text-gray-900">{formatPrice(cartMrpTotal)}</span>
               </div>
+              
+              <div className="flex justify-between text-gray-500">
+                <span>Shipping</span>
+                <span className="font-bold text-pp-success">FREE</span>
+              </div>
+
+              <div className="flex justify-between text-gray-500">
+                <span>Estimated Tax</span>
+                <span className="font-bold text-gray-900">{formatPrice(0)}</span>
+              </div>
+
               {cartMrpTotal > cartTotal && (
-                <div className="flex justify-between">
-                  <span className="text-gray-700">Discount</span>
-                  <span className="text-pp-success font-semibold">- {formatPrice(cartMrpTotal - cartTotal)}</span>
+                <div className="flex justify-between text-gray-500">
+                  <span>Discount</span>
+                  <span className="font-bold text-pp-success">-{formatPrice(cartMrpTotal - cartTotal)}</span>
                 </div>
               )}
-              {activeStep === "payment" && (
-                <div className="flex justify-between">
-                  <span className="text-gray-700">Delivery {selectedPayment === "cod" && codDeliveryFee > 0 ? "(COD)" : ""}</span>
-                  <span className={deliveryFee > 0 ? "text-gray-900 font-semibold" : "text-pp-success font-semibold"}>
-                    {deliveryFee > 0 ? formatPrice(deliveryFee) : "Free"}
-                  </span>
-                </div>
-              )}
+
               {offerDiscount > 0 && (
-                <div className="flex justify-between animate-in fade-in duration-300">
+                <div className="flex justify-between text-gray-500 animate-in fade-in duration-300">
                   <div className="flex flex-col">
-                    <span className="text-gray-700">Offer Discount</span>
-                    <span className="text-[10px] text-pp-primary font-bold uppercase">Code: {appliedOffer?.code}</span>
+                    <span>Offer Discount</span>
+                    <span className="text-[10px] text-pp-primary font-bold uppercase tracking-wider">Code: {appliedOffer?.code}</span>
                   </div>
-                  <span className="text-pp-success font-semibold">- {formatPrice(offerDiscount)}</span>
+                  <span className="font-bold text-pp-success">-{formatPrice(offerDiscount)}</span>
                 </div>
               )}
-              <div className="border-t border-dashed border-gray-200 pt-3 flex justify-between text-lg font-black text-gray-900">
-                <span>Total</span>
-                <span>{formatPrice(displayTotal)}</span>
-              </div>
-            </div>
 
-            <div className="p-5 border-t border-gray-100 bg-gray-50/30">
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Promo Code</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                    placeholder="Enter code"
-                    className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-pp-primary transition-all uppercase font-bold"
-                  />
-                  <button
-                    onClick={handleApplyPromo}
-                    disabled={isLoading || !promoCode.trim()}
-                    className="px-4 py-2 rounded-xl bg-pp-primary text-white text-xs font-black shadow-md hover:brightness-110 disabled:grayscale transition-all"
-                  >
-                    APPLY
-                  </button>
+              <div className="pt-4 border-t border-gray-100 mt-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-gray-900 text-lg">Total</span>
+                  <span className="font-jakarta font-black text-pp-primary text-2xl">{formatPrice(displayTotal)}</span>
                 </div>
               </div>
             </div>
 
-            {cartMrpTotal > displayTotal && (
-              <div className="bg-pp-success/10 p-3 text-center border-t border-pp-success/10">
-                <p className="text-pp-success text-[11px] font-bold uppercase tracking-wide">You saved {formatPrice(cartMrpTotal - displayTotal)} on this order!</p>
+            {/* Promo Code */}
+            <div className="mt-8">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 ml-1">Promo Code</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  placeholder="Enter code"
+                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pp-primary transition-all uppercase font-bold"
+                />
+                <button
+                  onClick={handleApplyPromo}
+                  disabled={isLoading || !promoCode.trim()}
+                  className="bg-gray-100 px-6 rounded-xl font-bold text-xs hover:bg-gray-200 transition-colors uppercase tracking-widest disabled:opacity-50"
+                >
+                  Apply
+                </button>
               </div>
-            )}
+            </div>
+
+            {/* Carbon Neutral Note */}
+            <div className="mt-6 p-3 bg-pp-success/5 rounded-xl flex gap-3 border border-pp-success/10">
+              <LuLeaf className="w-5 h-5 text-pp-success shrink-0" />
+              <p className="text-[10px] text-pp-success font-medium leading-relaxed">
+                Your order qualifies for carbon-neutral shipping at no extra cost!
+              </p>
+            </div>
           </div>
-        </div>
+
+          {/* Buyer Protection Card */}
+          <div className="bg-pp-primary/5 rounded-2xl p-6 border border-pp-primary/10">
+            <div className="flex items-center gap-3 mb-3 text-pp-primary">
+              <LuShieldCheck className="w-6 h-6" />
+              <h4 className="font-bold text-sm">Buyer Protection</h4>
+            </div>
+            <p className="text-xs text-pp-primary/70 leading-relaxed font-medium">
+              Get a full refund if the item is not as described.
+            </p>
+          </div>
+        </aside>
       </div>
     </main>
   );

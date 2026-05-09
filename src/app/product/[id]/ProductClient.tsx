@@ -22,6 +22,7 @@ export default function ProductClient({ product }: { product: Product }) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { user, setIsLoginModalOpen } = useAuth();
   const { success } = useToast();
+  const isOutOfStock = product.stockQuantity <= 0;
 
   const [deliveryDateStr, setDeliveryDateStr] = useState("");
   const [isDescExpanded, setIsDescExpanded] = useState(false);
@@ -286,17 +287,25 @@ export default function ProductClient({ product }: { product: Product }) {
               <div className="hidden sm:flex gap-4">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-full border-2 border-pp-primary text-pp-primary px-6 py-4 font-bold hover:bg-pp-primary/5 active:scale-95 transition-all"
+                  disabled={isOutOfStock}
+                  className={`flex-1 flex items-center justify-center gap-2 rounded-full border-2 border-pp-primary text-pp-primary px-6 py-4 font-bold hover:bg-pp-primary/5 active:scale-95 transition-all ${isOutOfStock ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
                 >
                   <LuShoppingCart className="w-5 h-5" />
                   {isInCart ? "GO TO CART" : "ADD TO CART"}
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="animate-attention flex-1 flex items-center justify-center gap-2 rounded-full bg-pp-primary text-white px-6 py-4 font-bold shadow-lg shadow-pp-primary/25 hover:scale-[1.02] active:scale-95 transition-all"
+                  disabled={isOutOfStock}
+                  className={`flex-1 flex items-center justify-center gap-2 rounded-full bg-pp-primary text-white px-6 py-4 font-bold shadow-lg shadow-pp-primary/25 hover:scale-[1.02] active:scale-95 transition-all ${isOutOfStock ? "opacity-50 grayscale cursor-not-allowed shadow-none" : "animate-attention"}`}
                 >
-                  <LuZap className="w-5 h-5" />
-                  Buy at {formatPrice(product.price)}
+                  {isOutOfStock ? (
+                    <>OUT OF STOCK</>
+                  ) : (
+                    <>
+                      <LuZap className="w-5 h-5" />
+                      Buy at {formatPrice(product.price)}
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -405,15 +414,23 @@ export default function ProductClient({ product }: { product: Product }) {
           <div className="flex gap-3 sm:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-sm p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_30px_rgba(0,0,0,0.08)] border-t border-slate-100">
             <button
               onClick={handleAddToCart}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-pp-primary text-pp-primary py-4 text-sm font-bold hover:bg-pp-primary/5 transition-all active:scale-95"
+              disabled={isOutOfStock}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-pp-primary text-pp-primary py-4 text-sm font-bold hover:bg-pp-primary/5 transition-all active:scale-95 ${isOutOfStock ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
             >
               <LuShoppingCart className="w-5 h-5" /> {isInCart ? "GO TO CART" : "ADD TO CART"}
             </button>
             <button
               onClick={handleBuyNow}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-pp-primary text-white py-4 text-sm font-bold shadow-lg shadow-pp-primary/20 transition-all active:scale-95"
+              disabled={isOutOfStock}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-full bg-pp-primary text-white py-4 text-sm font-bold shadow-lg shadow-pp-primary/20 transition-all active:scale-95 ${isOutOfStock ? "opacity-50 grayscale cursor-not-allowed shadow-none" : ""}`}
             >
-              <LuZap className="w-5 h-5" /> Buy at {formatPrice(product.price)}
+              {isOutOfStock ? (
+                <>OUT OF STOCK</>
+              ) : (
+                <>
+                  <LuZap className="w-5 h-5" /> Buy at {formatPrice(product.price)}
+                </>
+              )}
             </button>
           </div>
 

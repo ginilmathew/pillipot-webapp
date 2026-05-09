@@ -109,15 +109,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [debouncedSync, success, token, user]);
 
   const removeFromCart = useCallback(async (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
-    if (user && token) {
+    let exists = false;
+    setCart((prev) => {
+      exists = prev.some(item => item.id === productId);
+      if (!exists) return prev;
+      return prev.filter((item) => item.id !== productId);
+    });
+
+    // Only sync with server if the item was actually in the global cart
+    // prevents 404 when removing "Buy Now" items from URL
+    if (exists && user && token) {
       try {
-        await updateCartQuantityApi(token, productId, 0); 
+        await updateCartQuantityApi(token, productId, 0);
       } catch (error) {
         console.error("Cart sync failed", error);
       }
     }
-  }, [success, token, user]);
+  }, [token, user]);
 
   const updateQuantity = useCallback(async (productId: string, quantity: number) => {
     const item = cart.find((entry) => entry.id === productId);
