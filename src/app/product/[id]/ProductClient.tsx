@@ -17,7 +17,8 @@ import { getProductOffers, getProductReviews } from "@/lib/api";
 
 export default function ProductClient({ product }: { product: Product }) {
   const router = useRouter();
-  const { addToCart } = useCart();
+  const { addToCart, cart } = useCart();
+  const isInCart = cart.some(item => item.id === product.id);
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { user, setIsLoginModalOpen } = useAuth();
   const { success } = useToast();
@@ -67,6 +68,10 @@ export default function ProductClient({ product }: { product: Product }) {
   }
 
   const handleAddToCart = () => {
+    if (isInCart) {
+      router.push("/cart");
+      return;
+    }
     if (!user) {
       setIsLoginModalOpen(true);
       return;
@@ -195,7 +200,7 @@ export default function ProductClient({ product }: { product: Product }) {
                       onClick={handleAddToCart}
                       className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-pp-cyan/20 bg-pp-surface-alt py-4 text-sm font-bold text-pp-primary hover:-translate-y-0.5 hover:border-pp-cyan/40 hover:bg-white hover:shadow-[0_18px_40px_rgba(9,22,43,0.12)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pp-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                     >
-                      <LuShoppingCart className="w-5 h-5" /> ADD TO CART
+                      <LuShoppingCart className="w-5 h-5" /> {isInCart ? "GO TO CART" : "ADD TO CART"}
                     </button>
                     <button
                       onClick={handleBuyNow}
