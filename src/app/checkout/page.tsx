@@ -513,7 +513,7 @@ function CheckoutContent() {
           {activeStep === "address" && (
             <div className="space-y-4">
               {/* Saved Addresses */}
-              {addresses.length > 0 && !showAddressForm && (
+              {!showAddressForm && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
@@ -546,70 +546,71 @@ function CheckoutContent() {
                       </>
                     ) : (
                       addresses.map((addr) => (
-                      <div
-                        key={addr.id}
-                        onClick={() => setSelectedAddressId(addr.id)}
-                        className={`group relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col h-full bg-white ${selectedAddressId === addr.id
-                          ? "border-pp-primary shadow-lg ring-4 ring-pp-primary/5"
-                          : "border-gray-100 hover:border-pp-primary/30 hover:shadow-md"
-                          }`}
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${selectedAddressId === addr.id ? "border-pp-primary" : "border-gray-300 group-hover:border-gray-400"}`}>
-                              {selectedAddressId === addr.id && <div className="w-2.5 h-2.5 rounded-full bg-pp-primary animate-in zoom-in duration-300" />}
+                        <div
+                          key={addr.id}
+                          onClick={() => setSelectedAddressId(addr.id)}
+                          className={`group relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col h-full bg-white ${selectedAddressId === addr.id
+                            ? "border-pp-primary shadow-lg ring-4 ring-pp-primary/5"
+                            : "border-gray-100 hover:border-pp-primary/30 hover:shadow-md"
+                            }`}
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${selectedAddressId === addr.id ? "border-pp-primary" : "border-gray-300 group-hover:border-gray-400"}`}>
+                                {selectedAddressId === addr.id && <div className="w-2.5 h-2.5 rounded-full bg-pp-primary animate-in zoom-in duration-300" />}
+                              </div>
+                              <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${addr.addressType === 'home' ? "bg-pp-cyan/10 text-pp-cyan" : "bg-pp-accent-warm/10 text-pp-accent-warm"
+                                }`}>
+                                {addr.addressType}
+                              </span>
+                              {addr.isDefault && (
+                                <span className="text-[10px] px-2.5 py-0.5 bg-pp-primary/10 text-pp-primary rounded-full font-bold uppercase tracking-wider">Default</span>
+                              )}
                             </div>
-                            <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${addr.addressType === 'home' ? "bg-pp-cyan/10 text-pp-cyan" : "bg-pp-accent-warm/10 text-pp-accent-warm"
-                              }`}>
-                              {addr.addressType}
-                            </span>
-                            {addr.isDefault && (
-                              <span className="text-[10px] px-2.5 py-0.5 bg-pp-primary/10 text-pp-primary rounded-full font-bold uppercase tracking-wider">Default</span>
-                            )}
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={(e) => handleEditClick(addr, e)}
+                                className="text-gray-400 hover:text-pp-primary p-1.5 hover:bg-pp-surface-alt rounded-lg transition-all"
+                                title="Edit"
+                              >
+                                <LuPencilLine className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={(e) => handleDeleteAddress(addr.id, e)}
+                                className="text-gray-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-lg transition-all"
+                                title="Delete"
+                              >
+                                <LuTrash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => handleEditClick(addr, e)}
-                              className="text-gray-400 hover:text-pp-primary p-1.5 hover:bg-pp-surface-alt rounded-lg transition-all"
-                              title="Edit"
-                            >
-                              <LuPencilLine className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(e) => handleDeleteAddress(addr.id, e)}
-                              className="text-gray-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-lg transition-all"
-                              title="Delete"
-                            >
-                              <LuTrash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
 
-                        <div className="flex-1 text-left space-y-1">
-                          <h3 className="font-extrabold text-gray-900 text-base">{addr.customerName}</h3>
-                          <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{addr.deliveryAddress}</p>
-                          <p className="text-sm text-gray-500 font-medium">{addr.postOffice}, {addr.district}, {addr.state} — {addr.pincode}</p>
-                          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-                            <LuSmartphone className="w-3.5 h-3.5 text-gray-400" />
-                            <p className="text-sm text-gray-900 font-bold">{addr.phone}</p>
+                          <div className="flex-1 text-left space-y-1">
+                            <h3 className="font-extrabold text-gray-900 text-base">{addr.customerName}</h3>
+                            <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{addr.deliveryAddress}</p>
+                            <p className="text-sm text-gray-500 font-medium">{addr.postOffice}, {addr.district}, {addr.state} — {addr.pincode}</p>
+                            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+                              <LuSmartphone className="w-3.5 h-3.5 text-gray-400" />
+                              <p className="text-sm text-gray-900 font-bold">{addr.phone}</p>
+                            </div>
                           </div>
-                        </div>
 
-                        {selectedAddressId === addr.id && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveStep("summary");
-                              window.scrollTo(0, 0);
-                            }}
-                            disabled={cartCount === 0}
-                            className="mt-5 pp-gradient text-white w-full py-3 rounded-xl font-black text-sm shadow-pp hover:brightness-110 transition-all animate-in slide-in-from-bottom-2 duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
-                          >
-                            DELIVER TO THIS ADDRESS
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                          {selectedAddressId === addr.id && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveStep("summary");
+                                window.scrollTo(0, 0);
+                              }}
+                              disabled={cartCount === 0}
+                              className="mt-5 pp-gradient text-white w-full py-3 rounded-xl font-black text-sm shadow-pp hover:brightness-110 transition-all animate-in slide-in-from-bottom-2 duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
+                            >
+                              DELIVER TO THIS ADDRESS
+                            </button>
+                          )}
+                        </div>
+                      ))
+                    )}
 
                     {/* Add New Address Card */}
                     <div
