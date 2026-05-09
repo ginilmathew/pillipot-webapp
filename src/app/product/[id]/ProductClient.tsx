@@ -4,7 +4,7 @@ import { useState, useRef, useLayoutEffect } from "react";
 import { type Product } from "@/lib/api";
 import Image from "next/image";
 import Link from "next/link";
-import { LuStar, LuShoppingCart, LuZap, LuShieldCheck, LuTag, LuTruck, LuRotateCcw, LuHeart, LuX, LuChevronLeft, LuChevronRight, LuPlay, LuCalendarDays } from "react-icons/lu";
+import { LuStar, LuShoppingCart, LuZap, LuTag, LuTruck, LuRotateCcw, LuHeart, LuX, LuChevronLeft, LuChevronRight, LuPlay, LuCalendarDays } from "react-icons/lu";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useRouter } from "next/navigation";
@@ -117,289 +117,306 @@ export default function ProductClient({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="min-h-screen bg-pp-surface">
-        <main className="pp-container max-sm:!px-0 max-sm:!pt-0 max-sm:!pb-[calc(7rem+env(safe-area-inset-bottom))] sm:pb-10 sm:pt-6">
-          <div className="overflow-hidden sm:rounded-[2rem] max-sm:border-x-0 border-y sm:border border-white/60 bg-white/72 sm:pp-shadow">
+      <div className="min-h-screen bg-[#f8f9fa]">
+        <main className="pp-container max-sm:!px-4 max-sm:!pt-4 max-sm:!pb-[calc(7rem+env(safe-area-inset-bottom))] sm:pb-12 sm:pt-6">
 
-            <div className="flex items-center justify-between px-4 pt-4">
-              <button
-                onClick={() => router.back()}
-                className="group flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-500 hover:border-pp-cyan/30 hover:bg-pp-surface-alt hover:text-pp-primary"
+          {/* Breadcrumbs & Back */}
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-1.5 text-pp-primary font-bold text-sm hover:bg-pp-primary/5 px-4 py-2 rounded-full transition-colors border border-pp-primary/20"
+            >
+              <LuChevronLeft className="w-4 h-4" />
+              Back
+            </button>
+            <nav className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 opacity-80">
+              <Link href="/" className="hover:text-pp-primary">Home</Link>
+              <span className="text-slate-300">›</span>
+              <Link href={`/category/${product.categoryId}`} className="truncate max-w-[150px] hover:text-pp-primary">View Series</Link>
+              <span className="text-slate-300">›</span>
+              <span className="truncate max-w-[200px] font-semibold text-slate-700">{product.name}</span>
+            </nav>
+          </div>
+
+          {/* Product Hero Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+
+            {/* Left: Gallery */}
+            <div className="lg:col-span-6 flex flex-col sm:flex-row gap-3">
+              {/* Thumbnail strip */}
+              <div className="flex flex-row sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-y-auto no-scrollbar sm:max-h-[480px]">
+                {allImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedIndex(i)}
+                    className={`relative w-[72px] h-[72px] shrink-0 rounded-xl overflow-hidden border-2 transition-all bg-white ${
+                      selectedIndex === i
+                        ? "border-pp-primary shadow-md ring-2 ring-pp-primary/20 ring-offset-1"
+                        : "border-slate-200 hover:border-pp-primary/50"
+                    }`}
+                  >
+                    <Image src={img} alt={`${product.name} view ${i + 1}`} fill sizes="72px" className="object-cover" />
+                  </button>
+                ))}
+              </div>
+
+              {/* Main image */}
+              <div
+                ref={imageRef}
+                className="relative flex-1 aspect-square max-h-[380px] sm:max-h-[420px] rounded-[2rem] overflow-hidden bg-slate-100 cursor-zoom-in order-1 sm:order-2 group shadow-[0_10px_40px_-10px_rgba(43,127,255,0.15)]"
+                onMouseEnter={() => setIsHoverZoom(true)}
+                onMouseLeave={() => setIsHoverZoom(false)}
+                onMouseMove={handleMouseMove}
+                onClick={() => setZoomOpen(true)}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
               >
-                <LuChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-                Back
-              </button>
-              <nav className="hidden items-center gap-1.5 text-xs text-slate-500 opacity-80 sm:flex">
-                <Link href="/" className="hover:text-pp-primary">Home</Link>
-                <span className="text-slate-300">›</span>
-                <Link href={`/category/${product.categoryId}`} className="truncate max-w-[150px] hover:text-pp-primary">View Series</Link>
-                <span className="text-slate-300">›</span>
-                <span className="truncate max-w-[200px] font-medium text-slate-700">{product.name}</span>
-              </nav>
+                <Image
+                  src={allImages[selectedIndex]}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className={`object-cover transition-transform duration-500 ${isHoverZoom ? "scale-110" : "scale-100 group-hover:scale-105"}`}
+                  style={isHoverZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : {}}
+                  priority
+                />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!user) { setIsLoginModalOpen(true); return; }
+                    toggleWishlist(product);
+                  }}
+                  className={`absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md border border-white/60 transition-all hover:scale-110 ${
+                    isInWishlist(product.id) ? "text-red-500" : "text-slate-300 hover:text-red-400"
+                  }`}
+                >
+                  <LuHeart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
+                </button>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-5 p-4 sm:gap-6 lg:flex-row">
+            {/* Right: Product Details */}
+            <div className="lg:col-span-6 flex flex-col justify-center gap-5">
 
-              <div className="lg:w-[40%] flex flex-col gap-4">
-                <div className="lg:sticky lg:top-4 flex flex-col gap-4">
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-y-auto no-scrollbar sm:max-h-[450px]">
-                      {allImages.map((img, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setSelectedIndex(i)}
-                          className={`relative h-14 w-14 shrink-0 rounded-2xl border p-1 transition-all bg-white ${selectedIndex === i ? "border-[#2874f0] shadow-sm" : "border-slate-200 hover:border-slate-300"
-                            }`}
-                        >
-                          <Image src={img} alt={`${product.name} view ${i + 1}`} fill sizes="56px" className="object-contain rounded-2xl" />
-                        </button>
-                      ))}
-                    </div>
-
-                    <div
-                      ref={imageRef}
-                      className="relative order-1 aspect-[4/5] flex-1 cursor-zoom-in overflow-hidden rounded-[1.8rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] p-4 sm:order-2 sm:aspect-square"
-                      onMouseEnter={() => setIsHoverZoom(true)}
-                      onMouseLeave={() => setIsHoverZoom(false)}
-                      onMouseMove={handleMouseMove}
-                      onClick={() => setZoomOpen(true)}
-                      onTouchStart={onTouchStart}
-                      onTouchMove={onTouchMove}
-                      onTouchEnd={onTouchEnd}
-                    >
-                      <Image
-                        src={allImages[selectedIndex]}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 40vw"
-                        className={`object-contain transition-transform duration-200 ${isHoverZoom ? "scale-200" : "scale-100"}`}
-                        style={isHoverZoom ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : {}}
-                        priority
-                      />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (!user) { setIsLoginModalOpen(true); return; }
-                          toggleWishlist(product);
-                        }}
-                        className={`absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm transition-all ${isInWishlist(product.id) ? "text-red-500" : "text-slate-300 hover:text-red-500"
-                          }`}
-                      >
-                        <LuHeart className={`w-5 h-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
-                      </button>
-                      <div className="absolute bottom-4 left-4 z-10 sm:hidden">
-                        <div className="flex items-center gap-1 bg-pp-success text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-                          {product.rating || 4.5} <LuStar className="w-3 h-3 fill-white" />
-                        </div>
-                      </div>
-                    </div>
+              {/* Brand & Title */}
+              <div>
+                <p className="text-pp-primary font-bold text-xs uppercase tracking-widest mb-1">{product.brand || "Pillipot"}</p>
+                <h1 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight text-slate-950">{product.name}</h1>
+                <div className="flex items-center gap-2.5 mt-3">
+                  <div className="flex items-center gap-1 bg-green-500 text-white px-2.5 py-1 rounded-lg text-sm font-bold">
+                    {product.rating || 4.5} <LuStar className="w-3.5 h-3.5 fill-white ml-0.5" />
                   </div>
-
-                  <div className="flex flex-row gap-2 sm:gap-3 max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:z-[100] max-sm:bg-white max-sm:p-3 max-sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))] max-sm:shadow-[0_-10px_30px_rgba(0,0,0,0.08)]">
-                    <button
-                      onClick={handleAddToCart}
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-pp-cyan/20 bg-pp-surface-alt py-4 text-sm font-bold text-pp-primary hover:-translate-y-0.5 hover:border-pp-cyan/40 hover:bg-white hover:shadow-[0_18px_40px_rgba(9,22,43,0.12)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pp-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                    >
-                      <LuShoppingCart className="w-5 h-5" /> {isInCart ? "GO TO CART" : "ADD TO CART"}
-                    </button>
-                    <button
-                      onClick={handleBuyNow}
-                      className="animate-attention pp-button-primary flex flex-1 items-center justify-center gap-2 rounded-xl py-4 text-base font-bold hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(22,68,163,0.35)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pp-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                    >
-                      <LuZap className="w-5 h-5 " /> Buy at {formatPrice(product.price)}
-                    </button>
-                  </div>
+                  <span className="text-slate-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings &amp; reviews</span>
                 </div>
               </div>
 
-              <div className="lg:w-[60%] flex flex-col gap-6">
-                <div>
-                  <p className="text-pp-primary text-xs font-bold uppercase tracking-widest mb-1">{product.brand || "Pillipot"}</p>
-                  <h1 className="text-xl font-black leading-tight tracking-[-0.05em] text-slate-950 sm:text-2xl md:text-4xl">{product.name}</h1>
-                </div>
+              {/* Pricing */}
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-black text-slate-950">{formatPrice(product.price)}</span>
+                {!!product.originalPrice && product.originalPrice > product.price && (
+                  <>
+                    <span className="text-slate-400 line-through text-lg font-medium">{formatPrice(product.originalPrice)}</span>
+                    <span className="text-green-600 font-bold text-sm">{Math.round((1 - product.price / product.originalPrice) * 100)}% OFF</span>
+                  </>
+                )}
+              </div>
 
-                <div className="hidden sm:flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-1 bg-pp-success text-white text-sm font-bold px-2.5 py-1 rounded-lg">
-                    {product.rating || 4.5} <LuStar className="w-3.5 h-3.5 fill-white" />
-                  </div>
-                  <span className="text-slate-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings & reviews</span>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  {!!product.originalPrice && product.originalPrice > product.price && (
-                    <div className="flex items-center gap-2 opacity-70">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Actual Price:</span>
-                      <span className="text-xl text-slate-400 line-through decoration-pp-accent/40">{formatPrice(product.originalPrice)}</span>
-                    </div>
-                  )}
-                  <div className="flex flex-wrap items-baseline gap-3">
-                    {!!product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-xs font-black text-pp-primary uppercase tracking-widest">Our Price:</span>
-                    )}
-                    <span className="text-3xl font-black tracking-[-0.05em] text-slate-950 md:text-4xl">{formatPrice(product.price)}</span>
-                    {!!product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-pp-success text-base font-bold">Save {formatPrice(product.originalPrice - product.price)} </span>
-                    )}
-                  </div>
-                </div>
-
-                {offers.length > 0 && (
-                  <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
-                    <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-slate-900">Available Offers</h3>
-                    <ul className="space-y-2.5">
-                      {offers.map((offer, i) => (
-                        <li key={i} className="flex gap-2.5 text-sm text-slate-700">
-                          <LuTag className="w-4 h-4 text-pp-primary shrink-0 mt-0.5" />
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold">{offer.title}</span>
-                              {offer.minQuantity > 1 && (
-                                <span className="rounded-full bg-pp-cyan/10 px-2 py-0.5 text-[10px] font-bold text-pp-primary">
-                                  MIN QTY: {offer.minQuantity}
-                                </span>
-                              )}
-                            </div>
-                            {offer.description && <span className="text-xs text-slate-500 opacity-80">{offer.description}</span>}
-                            {offer.code && (
-                              <div className="mt-1 flex items-center gap-2">
-                                <span className="text-[10px] font-black tracking-widest text-pp-primary uppercase">Code: {offer.code}</span>
-                                <button
-                                  onClick={() => {
-                                    if (offer.code) {
-                                      navigator.clipboard.writeText(offer.code);
-                                      success("Code copied!");
-                                    }
-                                  }}
-                                  className="text-[10px] font-bold text-pp-primary hover:underline"
-                                >
-                                  COPY
-                                </button>
-                              </div>
+              {/* Offers */}
+              {offers.length > 0 && (
+                <div className="rounded-2xl border border-pp-primary/10 bg-pp-primary/5 p-4">
+                  <h3 className="mb-2 text-xs font-black uppercase tracking-widest text-slate-700">Available Offers</h3>
+                  <ul className="space-y-2">
+                    {offers.map((offer, i) => (
+                      <li key={i} className="flex gap-2 text-sm text-slate-600">
+                        <LuTag className="w-4 h-4 text-pp-primary shrink-0 mt-0.5" />
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold">{offer.title}</span>
+                            {offer.minQuantity > 1 && (
+                              <span className="rounded-full bg-pp-primary/10 px-2 py-0.5 text-[10px] font-bold text-pp-primary">
+                                MIN QTY: {offer.minQuantity}
+                              </span>
                             )}
                           </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  <div className="flex flex-col items-center gap-1 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
-                    <LuTruck className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />
-                    <span className="text-[9px] font-semibold text-slate-700 md:text-xs">Free Delivery</span>
-                    <span className="text-[8px] text-slate-400 font-medium leading-tight">On eligible orders</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
-                    <LuRotateCcw className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />
-                    <span className="text-[9px] font-semibold text-slate-700 md:text-xs">3 Day Returns</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2 rounded-[1.4rem] border border-white/60 bg-white/82 p-3 text-center pp-shadow md:p-4">
-                    <LuCalendarDays className="w-5 h-5 md:w-6 md:h-6 text-pp-primary" />
-                    <span className="text-[9px] font-semibold text-slate-700 md:text-xs">
-                      {deliveryDateStr ? `Delivery by ${deliveryDateStr}` : "Calculating..."}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
-                  <h3 className="mb-3 text-base font-black text-slate-950">Product Description</h3>
-                  <div className="text-sm leading-7 text-slate-600">
-                    {product.description && product.description.length > 150 ? (
-                      <>
-                        {isDescExpanded ? product.description : `${product.description.slice(0, 150)}...`}
-                        <button
-                          onClick={() => setIsDescExpanded(!isDescExpanded)}
-                          className="ml-2 font-bold text-pp-primary hover:underline focus:outline-none"
-                        >
-                          {isDescExpanded ? "See Less" : "See More"}
-                        </button>
-                      </>
-                    ) : (
-                      product.description
-                    )}
-                  </div>
-                </div>
-
-                {product.videoUrl && (
-                  <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-5 pp-shadow">
-                    <h3 className="mb-3 flex items-center gap-2 text-base font-black text-slate-950">
-                      <LuPlay className="w-4 h-4 text-pp-primary" /> Product Video
-                    </h3>
-                    <div className="relative aspect-video overflow-hidden rounded-[1.4rem] bg-black/5">
-                      <video controls className="w-full h-full">
-                        <source src={product.videoUrl} />
-                      </video>
-                    </div>
-                  </div>
-                )}
-
-                {/* Reviews Section */}
-                <div className="flex flex-col gap-3">
-                  <div className="sm:hidden flex flex-wrap items-center gap-3 px-1">
-                    <div className="flex items-center gap-1 bg-pp-success text-white text-sm font-bold px-2.5 py-1 rounded-lg">
-                      {product.rating || 4.5} <LuStar className="w-3.5 h-3.5 fill-white" />
-                    </div>
-                    <span className="text-slate-500 text-sm">{(product.reviewsCount || 0).toLocaleString()} ratings & reviews</span>
-                  </div>
-                  <div className="rounded-[1.8rem] border border-white/60 bg-white/86 p-4 pp-shadow">
-                    <div className="flex items-center justify-between mb-8">
-                      <h3 className="text-xl font-black text-slate-950">Customer Reviews</h3>
-                      {reviews.length > 0 && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl font-black text-pp-primary">{product.rating || 0}</span>
-                          <div className="flex gap-0.5">
-                            {[1, 2, 3, 4, 5].map((s) => (
-                              <LuStar key={s} className={`w-4 h-4 ${s <= (product.rating || 0) ? "fill-pp-accent-warm text-pp-accent-warm" : "text-gray-100"}`} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {reviews.length === 0 ? (
-                      <div className="py-10 text-center">
-                        <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No reviews yet</p>
-                        <p className="text-xs text-slate-300 mt-2">Be the first to review this product after purchase!</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-6">
-                        {reviews.slice(0, visibleReviewsCount).map((review) => (
-                          <div key={review.id} className="p-3 rounded-3xl bg-pp-surface border border-white/60">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-pp-primary/10 flex items-center justify-center text-pp-primary font-black text-sm">
-                                  {review.customer?.customerName?.charAt(0).toUpperCase() || "?"}
-                                </div>
-                                <div>
-                                  <p className="text-sm font-black text-slate-950">{review.customer?.customerName || "Anonymous"}</p>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{new Date(review.createdAt).toLocaleDateString()}</p>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-1 bg-pp-success/10 text-pp-success px-2 py-1 rounded-lg text-xs font-black">
-                                {review.rating} <LuStar className="w-3 h-3 fill-current" />
-                              </div>
+                          {offer.description && <span className="text-xs text-slate-500 opacity-80">{offer.description}</span>}
+                          {offer.code && (
+                            <div className="mt-1 flex items-center gap-2">
+                              <span className="text-[10px] font-black tracking-widest text-pp-primary uppercase">Code: {offer.code}</span>
+                              <button
+                                onClick={() => {
+                                  if (offer.code) {
+                                    navigator.clipboard.writeText(offer.code);
+                                    success("Code copied!");
+                                  }
+                                }}
+                                className="text-[10px] font-bold text-pp-primary hover:underline"
+                              >
+                                COPY
+                              </button>
                             </div>
-                            <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                              {review.comment}
-                            </p>
-                          </div>
-                        ))}
-
-                        {reviews.length > visibleReviewsCount && (
-                          <button
-                            onClick={() => setVisibleReviewsCount(prev => prev + 5)}
-                            className="w-full py-3 mt-4 rounded-2xl border-2 border-pp-primary/20 text-pp-primary font-bold hover:bg-pp-primary/5 transition-all text-sm uppercase tracking-widest"
-                          >
-                            View More Reviews ({reviews.length - visibleReviewsCount} remaining)
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
+              )}
+
+              {/* Trust Badges */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="flex flex-col items-center gap-1 rounded-xl border border-slate-100 bg-white p-3 text-center shadow-sm">
+                  <LuTruck className="w-5 h-5 text-pp-primary" />
+                  <span className="text-[10px] font-bold text-slate-700">Free Delivery</span>
+                  <span className="text-[9px] text-slate-400 leading-tight">On eligible orders</span>
+                </div>
+                <div className="flex flex-col items-center gap-1 rounded-xl border border-slate-100 bg-white p-3 text-center shadow-sm">
+                  <LuRotateCcw className="w-5 h-5 text-pp-primary" />
+                  <span className="text-[10px] font-bold text-slate-700">3 Day Returns</span>
+                  <span className="text-[9px] text-slate-400 leading-tight">Hassle-free swap</span>
+                </div>
+                <div className="flex flex-col items-center gap-1 rounded-xl border border-slate-100 bg-white p-3 text-center shadow-sm">
+                  <LuCalendarDays className="w-5 h-5 text-pp-primary" />
+                  <span className="text-[10px] font-bold text-slate-700">{deliveryDateStr ? `Delivery by ${deliveryDateStr}` : "Calculating..."}</span>
+                  <span className="text-[9px] text-slate-400 leading-tight">Fast tracking</span>
+                </div>
+              </div>
+
+              {/* Action buttons – desktop */}
+              <div className="hidden sm:flex gap-4">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-full border-2 border-pp-primary text-pp-primary px-6 py-4 font-bold hover:bg-pp-primary/5 active:scale-95 transition-all"
+                >
+                  <LuShoppingCart className="w-5 h-5" />
+                  {isInCart ? "GO TO CART" : "ADD TO CART"}
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  className="animate-attention flex-1 flex items-center justify-center gap-2 rounded-full bg-pp-primary text-white px-6 py-4 font-bold shadow-lg shadow-pp-primary/25 hover:scale-[1.02] active:scale-95 transition-all"
+                >
+                  <LuZap className="w-5 h-5" />
+                  Buy at {formatPrice(product.price)}
+                </button>
               </div>
             </div>
           </div>
+
+          {/* Description + Reviews Bento Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            {/* Product Description */}
+            <div className="lg:col-span-7 bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-8 shadow-sm">
+              <h3 className="text-xl font-black text-slate-950 mb-4">Product Description</h3>
+              <div className="text-sm leading-6 text-slate-600">
+                {product.description ? (
+                  <>
+                    <p className={isDescExpanded ? "" : "line-clamp-3"}>
+                      {product.description}
+                    </p>
+                    <button
+                      onClick={() => setIsDescExpanded(!isDescExpanded)}
+                      className="mt-2 font-bold text-pp-primary hover:underline focus:outline-none text-xs"
+                    >
+                      {isDescExpanded ? "See Less" : "See More"}
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-slate-400 italic">No description available.</p>
+                )}
+              </div>
+
+              {product.videoUrl && (
+                <div className="mt-6">
+                  <h4 className="flex items-center gap-2 text-sm font-black text-slate-700 mb-3">
+                    <LuPlay className="w-4 h-4 text-pp-primary" /> Product Video
+                  </h4>
+                  <div className="relative aspect-video overflow-hidden rounded-2xl bg-black/5">
+                    <video controls className="w-full h-full">
+                      <source src={product.videoUrl} />
+                    </video>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Customer Reviews */}
+            <div className="lg:col-span-5 bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-8 shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-xl font-black text-slate-950">Customer Reviews</h3>
+                {reviews.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-black text-pp-primary">{product.rating || 0}</span>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <LuStar key={s} className={`w-3.5 h-3.5 ${s <= (product.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-200"}`} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {reviews.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center py-10 text-center">
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No Reviews Yet</p>
+                  <p className="text-xs text-slate-300 mt-2">Be the first to review this product after purchase!</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1 no-scrollbar">
+                    {reviews.slice(0, visibleReviewsCount).map((review) => {
+                      const initial = review.customer?.customerName?.charAt(0).toUpperCase() || "?";
+                      return (
+                        <div key={review.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-9 h-9 rounded-full bg-pp-primary/10 flex items-center justify-center text-pp-primary font-black text-sm shrink-0">
+                                {initial}
+                              </div>
+                              <div>
+                                <p className="font-bold text-slate-900 text-sm leading-none">{review.customer?.customerName || "Anonymous"}</p>
+                                <p className="text-[10px] text-slate-400 mt-0.5">{new Date(review.createdAt).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg shrink-0">
+                              <span className="text-xs font-bold text-amber-700">{review.rating}</span>
+                              <LuStar className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-500 italic leading-relaxed">&ldquo;{review.comment}&rdquo;</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {reviews.length > visibleReviewsCount && (
+                    <button
+                      onClick={() => setVisibleReviewsCount((prev) => prev + 5)}
+                      className="w-full py-3 mt-4 text-pp-primary font-bold hover:bg-pp-primary/5 rounded-xl transition-colors text-sm"
+                    >
+                      Load More Reviews ({reviews.length - visibleReviewsCount}+)
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile fixed action buttons */}
+          <div className="flex gap-3 sm:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-sm p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_30px_rgba(0,0,0,0.08)] border-t border-slate-100">
+            <button
+              onClick={handleAddToCart}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-pp-primary text-pp-primary py-4 text-sm font-bold hover:bg-pp-primary/5 transition-all active:scale-95"
+            >
+              <LuShoppingCart className="w-5 h-5" /> {isInCart ? "GO TO CART" : "ADD TO CART"}
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-pp-primary text-white py-4 text-sm font-bold shadow-lg shadow-pp-primary/20 transition-all active:scale-95"
+            >
+              <LuZap className="w-5 h-5" /> Buy at {formatPrice(product.price)}
+            </button>
+          </div>
+
         </main>
       </div>
 
@@ -409,12 +426,9 @@ export default function ProductClient({ product }: { product: Product }) {
           <button onClick={() => setZoomOpen(false)} className="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 z-10">
             <LuX className="w-5 h-5" />
           </button>
-
-          {/* Image counter */}
           <div className="absolute top-4 left-4 text-white/60 text-sm font-medium">
             {selectedIndex + 1} / {allImages.length}
           </div>
-
           {allImages.length > 1 && (
             <>
               <button onClick={(e) => { e.stopPropagation(); goPrev(); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30">
@@ -425,26 +439,16 @@ export default function ProductClient({ product }: { product: Product }) {
               </button>
             </>
           )}
-
           <div className="relative w-[90vw] h-[80vh] max-w-4xl" onClick={(e) => e.stopPropagation()}>
-            <Image
-              src={allImages[selectedIndex]}
-              alt={product.name}
-              fill
-              sizes="90vw"
-              className="object-contain"
-            />
+            <Image src={allImages[selectedIndex]} alt={product.name} fill sizes="90vw" className="object-contain" />
           </div>
-
-          {/* Thumbnail strip */}
           {allImages.length > 1 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
               {allImages.map((img, i) => (
                 <button
                   key={i}
                   onClick={(e) => { e.stopPropagation(); setSelectedIndex(i); }}
-                  className={`relative w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${selectedIndex === i ? "border-white shadow-lg" : "border-white/30 opacity-60 hover:opacity-100"
-                    }`}
+                  className={`relative w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${selectedIndex === i ? "border-white shadow-lg" : "border-white/30 opacity-60 hover:opacity-100"}`}
                 >
                   <Image src={img} alt="" fill sizes="56px" className="object-cover" />
                 </button>
