@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans, Inter, Sora } from "next/font/google";
 import "./globals.css";
 import Script from 'next/script'
 import Providers from "./providers";
@@ -16,6 +16,11 @@ const jakarta = Plus_Jakarta_Sans({
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
@@ -41,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${jakarta.variable} ${inter.variable} font-sans h-full antialiased`}
+      className={`${outfit.variable} ${jakarta.variable} ${inter.variable} ${sora.variable} font-sans h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

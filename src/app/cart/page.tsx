@@ -6,7 +6,7 @@ import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LuTrash2, LuPlus, LuMinus, LuShieldCheck, LuArrowRight, LuShoppingBag, LuPackage } from "react-icons/lu";
+import { LuTrash2, LuPlus, LuMinus, LuShieldCheck, LuArrowRight, LuShoppingBag, LuPackage, LuCheck } from "react-icons/lu";
 
 export default function CartPage() {
   const router = useRouter();
@@ -36,22 +36,22 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="flex flex-col min-h-screen bg-pp-surface">
+      <div className="flex flex-col min-h-screen bg-slate-50">
         <Header />
-        <main className="flex-1 pp-container px-4 py-8 md:py-10">
-          <div className="mx-auto max-w-2xl rounded-[2rem] border border-white/60 bg-white/78 p-6 text-center pp-shadow md:p-8">
-            <div className="mb-5 flex justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-pp-surface-alt md:h-24 md:w-24">
-                <LuShoppingBag className="h-10 w-10 text-pp-primary/40 md:h-12 md:w-12" />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 md:py-12">
+          <div className="mx-auto max-w-2xl rounded-[2rem] border border-slate-100 bg-white p-10 text-center shadow-xl shadow-slate-200/50">
+            <div className="mb-8 flex justify-center">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-50 text-pp-primary/30">
+                <LuShoppingBag className="h-12 w-12" />
               </div>
             </div>
-            <h2 className="mb-2 text-2xl font-black tracking-[-0.04em] text-slate-950 md:text-3xl">Your cart is empty</h2>
-            {/* <p className="mx-auto mb-6 max-w-md text-sm leading-7 text-slate-500">
-              Looks like you haven&apos;t added anything yet. Start exploring and add your favorite products to the bag.
-            </p> */}
+            <h2 className="mb-3 text-3xl font-black font-sora text-slate-900">Your cart is empty</h2>
+            <p className="mx-auto mb-8 max-w-md text-sm leading-7 text-slate-500 font-medium">
+              Looks like you haven&apos;t added anything yet. Explore our curated collections to find something special.
+            </p>
             <Link
               href="/"
-              className="pp-button-primary inline-flex rounded-full px-8 py-3 text-sm font-bold"
+              className="bg-pp-primary text-white rounded-full px-10 py-4 text-sm font-bold shadow-lg shadow-pp-primary/25 hover:scale-105 active:scale-95 transition-all inline-block"
             >
               EXPLORE PRODUCTS
             </Link>
@@ -63,126 +63,135 @@ export default function CartPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-pp-surface">
+    <div className="flex flex-col min-h-screen bg-[#f1f5f9]">
       <Header />
 
-      <main className="flex-1 pp-container px-4 py-5 md:py-6">
-        <div className="mb-5 rounded-[1.6rem] border border-white/60 bg-white/68 p-4 pp-shadow md:mb-6 md:rounded-[2rem] md:p-5">
-          <h1 className="text-2xl font-black tracking-[-0.05em] text-slate-950 md:text-3xl">Shopping Cart ({cartCount})</h1>
-          <p className="mt-2 text-sm text-slate-500">Review quantities, savings, and delivery details before checkout.</p>
-        </div>
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
+        {/* Cart Intro Section */}
+        <section className="bg-white rounded-2xl p-6 sm:p-8 mb-8 shadow-sm border border-slate-100">
+          <h1 className="text-3xl font-black font-sora text-slate-900 mb-2">Shopping Cart ({cartCount})</h1>
+          <p className="text-slate-500 font-medium">Review quantities, savings, and delivery details before checkout.</p>
+        </section>
 
-        <div className="flex flex-col items-start gap-5 lg:flex-row lg:gap-6">
-          <div className="flex w-full flex-1 flex-col gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Cart Items List */}
+          <section className="lg:col-span-2 space-y-6">
             {cart.map((item) => (
               <div
                 key={item.id}
-                className={`flex flex-col gap-4 rounded-[1.5rem] border border-white/60 bg-white/82 p-4 pp-shadow transition-all sm:flex-row sm:items-center sm:gap-4 md:rounded-[1.8rem] md:p-5 ${syncingItems[item.id] ? "opacity-70 pointer-events-none sm:pointer-events-auto" : "opacity-100"
-                  }`}
+                className={`bg-white rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6 shadow-sm border border-slate-100 transition hover:shadow-md ${
+                  syncingItems[item.id] ? "opacity-70 grayscale pointer-events-none" : "opacity-100"
+                }`}
               >
-                <div className="flex items-center gap-3 sm:min-w-0 sm:flex-1">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[1rem] border border-slate-100 bg-[linear-gradient(180deg,#f8fbff_0%,#eef4ff_100%)] md:h-24 md:w-24 md:rounded-[1.2rem]">
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        fill
-                        sizes="(max-width: 768px) 80px, 96px"
-                        className="object-contain p-2"
-                      />
-                    ) : (
-                      <LuPackage className="m-auto h-8 w-8 text-gray-300" />
+                <div className="w-32 h-32 flex-shrink-0 bg-slate-50 rounded-2xl p-3 relative group overflow-hidden">
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.name}
+                      fill
+                      sizes="128px"
+                      className="object-contain p-2 mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <LuPackage className="h-10 w-10 text-slate-200" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex-grow text-center sm:text-left min-w-0">
+                  <p className="text-[10px] font-bold text-pp-primary uppercase tracking-[0.2em] mb-1">{item.brand || "PILLIPOT"}</p>
+                  <h3 className="text-xl font-bold font-sora text-slate-800 capitalize truncate">{item.name}</h3>
+                  <div className="mt-2 flex items-baseline justify-center sm:justify-start gap-2">
+                    <span className="text-2xl font-black text-slate-900">{formatPrice(item.price)}</span>
+                    {item.originalPrice && item.originalPrice > item.price && (
+                      <>
+                        <span className="text-slate-400 line-through text-sm">{formatPrice(item.originalPrice)}</span>
+                        <span className="text-green-600 font-bold text-xs bg-green-50 px-2 py-0.5 rounded-md">
+                          {Math.round((1 - item.price / item.originalPrice) * 100)}% Off
+                        </span>
+                      </>
                     )}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-pp-primary">{item.brand}</p>
-                    <h3 className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-slate-900 md:text-base">{item.name}</h3>
-                    <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                      <span className="text-lg font-black text-slate-950">{formatPrice(item.price)}</span>
-                      {(item.discount ?? 0) > 0 && item.originalPrice && (
-                        <>
-                          <span className="text-xs text-slate-400 line-through">{formatPrice(item.originalPrice)}</span>
-                          <span className="text-xs font-bold text-pp-success">{item.discount}% Off</span>
-                        </>
-                      )}
-                    </div>
-                    <p className="mt-1 text-xs text-slate-400">Dispatch in 24 hours</p>
-                  </div>
+                  <p className="text-slate-400 text-xs mt-3 font-bold flex items-center justify-center sm:justify-start gap-1 uppercase tracking-wider">
+                    <LuCheck className="h-3.5 w-3.5 text-green-500" />
+                    Dispatch in 24 hours
+                  </p>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
-                  <div className="flex flex-col items-start gap-2 sm:items-end">
-                    <div className="flex items-center overflow-hidden rounded-full border border-slate-200 bg-slate-50">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.cartQuantity - 1)}
-                        disabled={item.cartQuantity <= 1 || syncingItems[item.id]}
-                        className="flex h-8 w-8 items-center justify-center hover:bg-white disabled:cursor-not-allowed disabled:opacity-30"
-                      >
-                        <LuMinus className="h-3 w-3" />
-                      </button>
-                      <span className="w-9 text-center text-sm font-bold">
-                        {syncingItems[item.id] ? "..." : item.cartQuantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.cartQuantity + 1)}
-                        disabled={item.cartQuantity >= (item.stockQuantity || 99) || syncingItems[item.id]}
-                        className="flex h-8 w-8 items-center justify-center hover:bg-white disabled:cursor-not-allowed disabled:opacity-30"
-                      >
-                        <LuPlus className="h-3 w-3" />
-                      </button>
-                    </div>
-                    {item.stockQuantity && item.stockQuantity < 10 && (
-                      <span className="text-[10px] font-bold text-pp-accent">Only {item.stockQuantity} left</span>
-                    )}
+                <div className="flex flex-col items-center sm:items-end gap-6 shrink-0">
+                  <div className="flex items-center border-2 border-slate-100 rounded-full p-1 bg-slate-50">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.cartQuantity - 1)}
+                      disabled={item.cartQuantity <= 1 || syncingItems[item.id]}
+                      className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-pp-primary transition hover:bg-white rounded-full disabled:opacity-20"
+                    >
+                      <LuMinus className="h-4 w-4" />
+                    </button>
+                    <span className="px-4 font-black text-slate-800 text-sm min-w-[3rem] text-center">
+                      {syncingItems[item.id] ? "..." : item.cartQuantity}
+                    </span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.cartQuantity + 1)}
+                      disabled={item.cartQuantity >= (item.stockQuantity || 99) || syncingItems[item.id]}
+                      className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-pp-primary transition hover:bg-white rounded-full disabled:opacity-20"
+                    >
+                      <LuPlus className="h-4 w-4" />
+                    </button>
                   </div>
-
                   <button
                     onClick={() => removeFromCart(item.id)}
                     disabled={syncingItems[item.id]}
-                    className="rounded-xl p-2 text-slate-400 hover:bg-red-50 hover:text-pp-accent disabled:opacity-30"
+                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                   >
-                    <LuTrash2 className="h-4 w-4" />
+                    <LuTrash2 className="h-6 w-6" />
                   </button>
                 </div>
               </div>
             ))}
-          </div>
+          </section>
 
-          <div className="w-full lg:sticky lg:top-20 lg:w-[330px]">
-            <div className="overflow-hidden rounded-[1.6rem] border border-white/60 bg-white/82 pp-shadow md:rounded-[1.8rem]">
-              <h2 className="border-b border-slate-100 p-4 text-xs font-black uppercase tracking-[0.22em] text-slate-400 md:p-5">Price Details</h2>
-              <div className="space-y-4 p-4 md:p-5">
-                <div className="flex justify-between text-sm text-slate-700">
-                  <span>Price ({cartCount} item{cartCount > 1 ? 's' : ''})</span>
-                  <span>{formatPrice(cartMrpTotal)}</span>
+          {/* Price Details Sidebar */}
+          <aside className="space-y-6 lg:sticky lg:top-24">
+            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-50">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Price Details</h3>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between font-medium text-sm">
+                  <span className="text-slate-500">Price ({cartCount} items)</span>
+                  <span className="text-slate-900">{formatPrice(cartMrpTotal)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-700">Discount</span>
-                  <span className="text-pp-success font-semibold">- {formatPrice(cartMrpTotal - cartTotal)}</span>
+                <div className="flex justify-between font-medium text-sm">
+                  <span className="text-slate-500">Discount</span>
+                  <span className="text-green-600">- {formatPrice(cartMrpTotal - cartTotal)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-700">Prepaid Delivery</span>
-                  <span className="text-pp-success font-semibold uppercase">Free</span>
+                <div className="flex justify-between font-medium text-sm">
+                  <span className="text-slate-500">Prepaid Delivery</span>
+                  <span className="text-green-600 font-bold uppercase tracking-wider">Free</span>
                 </div>
                 {codDeliveryFee > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-700">COD Delivery</span>
-                    <span className="font-semibold text-slate-950">{formatPrice(codDeliveryFee)}</span>
+                  <div className="flex justify-between font-medium text-sm">
+                    <span className="text-slate-500">COD Delivery</span>
+                    <span className="text-slate-900">{formatPrice(codDeliveryFee)}</span>
                   </div>
                 )}
-                <div className="flex justify-between border-t border-dashed border-slate-200 pt-4 text-base font-black text-slate-950">
-                  <span>Total</span>
-                  <div className="text-right">
-                    <span>{formatPrice(cartTotal)}</span>
-                    {codDeliveryFee > 0 && (
-                      <p className="text-[10px] text-slate-400 font-normal mt-0.5">+ {formatPrice(codDeliveryFee)} if COD</p>
-                    )}
+                
+                <div className="border-t border-dashed border-slate-200 pt-5 mt-6">
+                  <div className="flex justify-between items-end">
+                    <span className="text-xl font-black font-sora text-slate-900">Total</span>
+                    <div className="text-right">
+                      <div className="text-2xl font-black text-slate-900">{formatPrice(cartTotal)}</div>
+                      {codDeliveryFee > 0 && (
+                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">+ {formatPrice(codDeliveryFee)} IF COD</div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="border-t border-slate-100 bg-pp-success/10 p-4">
-                <p className="text-pp-success font-semibold text-xs text-center">
-                  🎉 You save {formatPrice(cartMrpTotal - cartTotal)} on this order
+              <div className="bg-green-50/50 p-4 text-center border-t border-green-100">
+                <p className="text-green-700 font-bold text-xs uppercase tracking-wider">
+                  🥳 You save {formatPrice(cartMrpTotal - cartTotal)} on this order
                 </p>
               </div>
             </div>
@@ -193,17 +202,17 @@ export default function CartPage() {
                 router.push("/checkout");
               }}
               disabled={Object.values(syncingItems).some(isSyncing => isSyncing)}
-              className="pp-button-primary mt-4 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold disabled:cursor-wait disabled:opacity-50"
+              className="w-full bg-pp-primary text-white py-5 rounded-full font-black font-sora text-lg flex items-center justify-center gap-3 shadow-lg shadow-pp-primary/30 hover:brightness-110 active:scale-95 transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:grayscale disabled:cursor-wait"
             >
-              {Object.values(syncingItems).some(isSyncing => isSyncing) ? "SAVING CHANGES..." : "PROCEED TO CHECKOUT"}
-              <LuArrowRight className="w-4 h-4" />
+              {Object.values(syncingItems).some(isSyncing => isSyncing) ? "SAVING..." : "PROCEED TO CHECKOUT"}
+              <LuArrowRight className="w-6 h-6" />
             </button>
 
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-400">
-              <LuShieldCheck className="w-5 h-5 shrink-0" />
-              <span>Safe & secure payments. 100% authentic products.</span>
+            <div className="flex items-center justify-center gap-2 text-slate-400 px-4">
+              <LuShieldCheck className="h-5 w-5 shrink-0" />
+              <span className="text-[10px] font-bold uppercase tracking-wider leading-tight text-center">Safe & secure payments. 100% authentic products.</span>
             </div>
-          </div>
+          </aside>
         </div>
       </main>
 
