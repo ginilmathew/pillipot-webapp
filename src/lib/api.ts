@@ -73,6 +73,8 @@ export interface Product {
   originalPrice?: number;
   discount?: number;
   tags?: string[];
+  codDeliveryCharge?: number;
+  codDeliveryMilestones?: { quantity: number; charge: number }[];
 }
 
 export interface ProductOffer {

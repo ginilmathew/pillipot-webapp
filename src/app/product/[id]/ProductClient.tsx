@@ -85,6 +85,8 @@ export default function ProductClient({ product }: { product: Product }) {
       name: product.name,
       cartQuantity: 1,
       imageUrl: product.imageUrl,
+      codDeliveryCharge: product.codDeliveryCharge,
+      codDeliveryMilestones: product.codDeliveryMilestones,
     }];
     const queryString = `/checkout?cart=${encodeURIComponent(JSON.stringify(singleProduct))}`;
     router.push(queryString);

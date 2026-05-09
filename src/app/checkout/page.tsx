@@ -62,7 +62,7 @@ function CheckoutContent() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<"cod" | "razorpay">("razorpay");
+  const [selectedPayment, setSelectedPayment] = useState<"cod" | "razorpay">("cod");
   const [editAddressId, setEditAddressId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -417,7 +417,23 @@ function CheckoutContent() {
     ? Math.round(offerProduct.price * (appliedOffer!.discountPercentage / 100) * offerProduct.cartQuantity)
     : 0;
 
-  const finalTotal = cartTotal - offerDiscount;
+  const codDeliveryFee = cart.length > 0
+    ? Math.max(0, ...cart.map((item) => {
+        let charge = Number(item.codDeliveryCharge || 0);
+        if (item.codDeliveryMilestones && item.codDeliveryMilestones.length > 0) {
+          const sorted = [...item.codDeliveryMilestones].sort((a, b) => b.quantity - a.quantity);
+          const matching = sorted.find((m) => item.cartQuantity >= m.quantity);
+          if (matching) {
+            charge = Number(matching.charge);
+          }
+        }
+        return charge;
+      }))
+    : 0;
+  
+  const deliveryFee = selectedPayment === "cod" ? codDeliveryFee : 0;
+
+  const finalTotal = cartTotal - offerDiscount + deliveryFee;
 
   const selectedAddrObj = addresses.find(a => a.id === selectedAddressId) || {
     customerName: formData.customerName,
@@ -802,8 +818,10 @@ function CheckoutContent() {
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-gray-700">Delivery</span>
-                <span className="text-pp-success font-semibold">Free</span>
+                <span className="text-gray-700">Delivery {selectedPayment === "cod" && codDeliveryFee > 0 ? "(COD)" : ""}</span>
+                <span className={deliveryFee > 0 ? "text-gray-900 font-semibold" : "text-pp-success font-semibold"}>
+                  {deliveryFee > 0 ? formatPrice(deliveryFee) : "Free"}
+                </span>
               </div>
               {offerDiscount > 0 && (
                 <div className="flex justify-between animate-in fade-in duration-300">

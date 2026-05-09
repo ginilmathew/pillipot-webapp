@@ -20,6 +20,20 @@ export default function CartPage() {
     }).format(num);
   };
 
+  const codDeliveryFee = cart.length > 0
+    ? Math.max(0, ...cart.map((item) => {
+        let charge = Number(item.codDeliveryCharge || 0);
+        if (item.codDeliveryMilestones && item.codDeliveryMilestones.length > 0) {
+          const sorted = [...item.codDeliveryMilestones].sort((a, b) => b.quantity - a.quantity);
+          const matching = sorted.find((m) => item.cartQuantity >= m.quantity);
+          if (matching) {
+            charge = Number(matching.charge);
+          }
+        }
+        return charge;
+      }))
+    : 0;
+
   if (cart.length === 0) {
     return (
       <div className="flex flex-col min-h-screen bg-pp-surface">
@@ -92,7 +106,7 @@ export default function CartPage() {
                         </>
                       )}
                     </div>
-                    <p className="mt-1 text-xs text-slate-400">Free delivery by Mon, Apr 22</p>
+                    <p className="mt-1 text-xs text-slate-400">Dispatch in 24 hours</p>
                   </div>
                 </div>
 
@@ -147,12 +161,23 @@ export default function CartPage() {
                   <span className="text-pp-success font-semibold">- {formatPrice(cartMrpTotal - cartTotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-700">Delivery</span>
+                  <span className="text-slate-700">Prepaid Delivery</span>
                   <span className="text-pp-success font-semibold uppercase">Free</span>
                 </div>
+                {codDeliveryFee > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-700">COD Delivery</span>
+                    <span className="font-semibold text-slate-950">{formatPrice(codDeliveryFee)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-dashed border-slate-200 pt-4 text-base font-black text-slate-950">
                   <span>Total</span>
-                  <span>{formatPrice(cartTotal)}</span>
+                  <div className="text-right">
+                    <span>{formatPrice(cartTotal)}</span>
+                    {codDeliveryFee > 0 && (
+                      <p className="text-[10px] text-slate-400 font-normal mt-0.5">+ {formatPrice(codDeliveryFee)} if COD</p>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="border-t border-slate-100 bg-pp-success/10 p-4">
