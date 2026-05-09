@@ -461,7 +461,8 @@ function CheckoutContent() {
     customerName: formData.customerName,
     deliveryAddress: `${formData.flatBuilding}${formData.areaSector ? ", " + formData.areaSector : ""}`,
     district: formData.district,
-    state: formData.state
+    state: formData.state,
+    pincode: formData.pincode
   };
 
   const steps = [
