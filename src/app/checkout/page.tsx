@@ -18,7 +18,7 @@ import { swrKeys } from "@/lib/swrKeys";
 type Step = "address" | "summary" | "payment";
 
 function CheckoutContent() {
-  const { cart: globalCart, cartTotal: globalCartTotal, cartMrpTotal: globalCartMrpTotal, cartCount: globalCartCount, clearCart, removeFromCart } = useCart();
+  const { cart: globalCart, cartTotal: globalCartTotal, cartMrpTotal: globalCartMrpTotal, cartCount: globalCartCount, clearCart, removeFromCart, loading: isCartLoading } = useCart();
   const { toggleWishlist } = useWishlist();
   const searchParams = useSearchParams();
   const cartQuery = searchParams.get("cart");
@@ -523,7 +523,29 @@ function CheckoutContent() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {addresses.map((addr) => (
+                    {/* Address Shimmer Effect */}
+                    {isAddressesLoading && addresses.length === 0 ? (
+                      <>
+                        {[...Array(2)].map((_, i) => (
+                          <div key={i} className="p-5 rounded-2xl border border-gray-100 bg-white space-y-4">
+                            <div className="flex justify-between items-center">
+                              <div className="h-5 bg-gray-100 animate-shimmer rounded-full w-24" />
+                              <div className="h-4 bg-gray-100 animate-shimmer rounded w-16" />
+                            </div>
+                            <div className="space-y-2">
+                              <div className="h-6 bg-gray-100 animate-shimmer rounded w-3/4" />
+                              <div className="h-4 bg-gray-100 animate-shimmer rounded w-full" />
+                              <div className="h-4 bg-gray-100 animate-shimmer rounded w-5/6" />
+                            </div>
+                            <div className="pt-4 border-t border-gray-50 flex gap-2">
+                              <div className="h-4 bg-gray-100 animate-shimmer rounded w-4" />
+                              <div className="h-4 bg-gray-100 animate-shimmer rounded w-24" />
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    ) : (
+                      addresses.map((addr) => (
                       <div
                         key={addr.id}
                         onClick={() => setSelectedAddressId(addr.id)}
@@ -868,81 +890,112 @@ function CheckoutContent() {
           )}
         </div>
 
-        <aside
-          className={`lg:w-[360px] w-full self-start flex flex-col gap-6 ${activeStep === "address" ? "lg:mt-[44px]" : ""} lg:sticky lg:top-32`}
-        >
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-6">
-            <h3 className="font-jakarta font-extrabold text-gray-900 mb-6">Order Summary</h3>
+        <aside className="w-full lg:w-[380px] space-y-6 lg:sticky lg:top-24">
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-50">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Order Summary</h3>
+            </div>
             
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between text-gray-500">
-                <span>Subtotal ({cartCount} items)</span>
-                <span className="font-bold text-gray-900">{formatPrice(cartMrpTotal)}</span>
-              </div>
-              
-              <div className="flex justify-between text-gray-500">
-                <span>Shipping</span>
-                <span className="font-bold text-pp-success">FREE</span>
-              </div>
-
-              <div className="flex justify-between text-gray-500">
-                <span>Estimated Tax</span>
-                <span className="font-bold text-gray-900">{formatPrice(0)}</span>
-              </div>
-
-              {cartMrpTotal > cartTotal && (
-                <div className="flex justify-between text-gray-500">
-                  <span>Discount</span>
-                  <span className="font-bold text-pp-success">-{formatPrice(cartMrpTotal - cartTotal)}</span>
+            {isCartLoading && cart.length === 0 ? (
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between">
+                  <div className="h-4 bg-gray-100 animate-shimmer rounded w-24" />
+                  <div className="h-4 bg-gray-100 animate-shimmer rounded w-16" />
                 </div>
-              )}
-
-              {offerDiscount > 0 && (
-                <div className="flex justify-between text-gray-500 animate-in fade-in duration-300">
-                  <div className="flex flex-col">
-                    <span>Offer Discount</span>
-                    <span className="text-[10px] text-pp-primary font-bold uppercase tracking-wider">Code: {appliedOffer?.code}</span>
+                <div className="flex justify-between">
+                  <div className="h-4 bg-gray-100 animate-shimmer rounded w-16" />
+                  <div className="h-4 bg-gray-100 animate-shimmer rounded w-12" />
+                </div>
+                <div className="flex justify-between">
+                  <div className="h-4 bg-gray-100 animate-shimmer rounded w-28" />
+                  <div className="h-4 bg-gray-100 animate-shimmer rounded w-10" />
+                </div>
+                <div className="border-t border-dashed border-gray-100 pt-5 mt-4">
+                  <div className="flex justify-between items-end">
+                    <div className="h-6 bg-gray-100 animate-shimmer rounded w-20" />
+                    <div className="h-8 bg-gray-100 animate-shimmer rounded w-24" />
                   </div>
-                  <span className="font-bold text-pp-success">-{formatPrice(offerDiscount)}</span>
-                </div>
-              )}
-
-              <div className="pt-4 border-t border-gray-100 mt-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-900 text-lg">Total</span>
-                  <span className="font-jakarta font-black text-pp-primary text-2xl">{formatPrice(displayTotal)}</span>
                 </div>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="p-6 space-y-4">
+                  <div className="flex justify-between font-medium text-sm text-gray-500">
+                    <span>Subtotal ({cartCount} items)</span>
+                    <span className="font-bold text-gray-900">{formatPrice(cartMrpTotal)}</span>
+                  </div>
+                  <div className="flex justify-between font-medium text-sm text-gray-500">
+                    <span>Shipping</span>
+                    <span className="text-pp-success font-bold uppercase tracking-wider">Free</span>
+                  </div>
+                  <div className="flex justify-between font-medium text-sm text-gray-500">
+                    <span>Estimated Tax</span>
+                    <span className="font-bold text-gray-900">{formatPrice(0)}</span>
+                  </div>
+                  
+                  {cartMrpTotal > cartTotal && (
+                    <div className="flex justify-between text-sm text-gray-500">
+                      <span>Discount</span>
+                      <span className="font-bold text-pp-success">-{formatPrice(cartMrpTotal - cartTotal)}</span>
+                    </div>
+                  )}
 
-            {/* Promo Code */}
-            <div className="mt-8">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 ml-1">Promo Code</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  placeholder="Enter code"
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pp-primary transition-all uppercase font-bold"
-                />
-                <button
-                  onClick={handleApplyPromo}
-                  disabled={isLoading || !promoCode.trim()}
-                  className="bg-gray-100 px-6 rounded-xl font-bold text-xs hover:bg-gray-200 transition-colors uppercase tracking-widest disabled:opacity-50"
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
+                  {offerDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-gray-500 animate-in fade-in duration-300">
+                      <div className="flex flex-col">
+                        <span>Offer Discount</span>
+                        <span className="text-[10px] text-pp-primary font-bold uppercase tracking-wider">Code: {appliedOffer?.code}</span>
+                      </div>
+                      <span className="font-bold text-pp-success">-{formatPrice(offerDiscount)}</span>
+                    </div>
+                  )}
 
-            {/* Carbon Neutral Note */}
-            <div className="mt-6 p-3 bg-pp-success/5 rounded-xl flex gap-3 border border-pp-success/10">
-              <LuLeaf className="w-5 h-5 text-pp-success shrink-0" />
-              <p className="text-[10px] text-pp-success font-medium leading-relaxed">
-                Your order qualifies for carbon-neutral shipping at no extra cost!
-              </p>
-            </div>
+                  <div className="border-t border-dashed border-slate-200 pt-5 mt-6">
+                    <div className="flex justify-between items-end">
+                      <span className="text-xl font-black font-sora text-slate-900">Total</span>
+                      <div className="text-right">
+                        <div className="text-2xl font-black text-pp-primary">
+                          {formatPrice(displayTotal)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 pt-0 space-y-4 border-t border-gray-50">
+                  <div className="space-y-2 mt-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Promo Code</p>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                        placeholder="ENTER CODE"
+                        className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold focus:ring-4 focus:ring-pp-primary/10 outline-none placeholder:text-gray-300 transition-all"
+                      />
+                      <button 
+                        onClick={() => {
+                          if (promoCode === "SAVE10") {
+                            setAppliedOffer({ productId: "all", discountPercentage: 10, code: "SAVE10" });
+                            setPromoCode("");
+                          }
+                        }}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-500 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-green-50/50 p-4 rounded-xl border border-green-100 flex gap-3 items-center">
+                    <LuLeaf className="w-5 h-5 text-green-600 shrink-0" />
+                    <p className="text-[10px] font-bold text-green-700 leading-tight">
+                      Your order qualifies for carbon-neutral shipping at no extra cost!
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Buyer Protection Card */}
