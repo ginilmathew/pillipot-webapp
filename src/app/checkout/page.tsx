@@ -50,6 +50,32 @@ function CheckoutContent() {
   }, [buyNowId, buyNowQty]);
 
   const cart = urlCart || globalCart;
+  const [enrichedCart, setEnrichedCart] = useState<any[]>([]);
+
+  // Enrichment: Fetch full product details for each cart item to get latest COD rules
+  useEffect(() => {
+    const enrich = async () => {
+      if (cart.length > 0) {
+        try {
+          const enriched = await Promise.all(cart.map(async (item) => {
+            // Aggressive check: if any known charge field exists and is > 0, we might skip
+            const hasData = (item.codDeliveryCharge || item.cod_delivery_charge || item.codCharge || item.cod_charge);
+            if (hasData && item.codDeliveryMilestones) return item;
+
+            const fullProd = await getProduct(item.id);
+            return fullProd ? { ...item, ...fullProd } : item;
+          }));
+          setEnrichedCart(enriched);
+        } catch (e) {
+          console.error("Cart enrichment failed", e);
+        }
+      }
+    };
+    enrich();
+  }, [cart]);
+
+  const displayCart = enrichedCart.length > 0 ? enrichedCart : cart;
+
   const cartTotal = urlCart
     ? urlCart.reduce((acc, item) => acc + item.price * item.cartQuantity, 0)
     : globalCartTotal;
@@ -450,11 +476,45 @@ function CheckoutContent() {
     ? Math.round(offerProduct.price * (appliedOffer!.discountPercentage / 100) * offerProduct.cartQuantity)
     : 0;
 
-  const codDeliveryFee = cart.length > 0
-    ? Math.max(0, ...cart.map((item) => {
-        let charge = Number(item.codDeliveryCharge || 0);
-        if (item.codDeliveryMilestones && item.codDeliveryMilestones.length > 0) {
-          const sorted = [...item.codDeliveryMilestones].sort((a, b) => b.quantity - a.quantity);
+  const codDeliveryFee = displayCart.length > 0
+    ? Math.max(0, ...displayCart.map((item: any) => {
+        // Aggressive fallback for various backend naming conventions
+        let charge = Number(
+          item.cod_delivery_charge ?? 
+          item.codDeliveryCharge ?? 
+          item.cod_charge ?? 
+          item.codCharge ?? 
+          item.delivery_charge ??
+          item.deliveryCharge ??
+          0
+        );
+        
+        let milestones = 
+          item.cod_delivery_milestones || 
+          item.codDeliveryMilestones || 
+          item.quantity_based_rules ||
+          item.cod_rules ||
+          item.codRules;
+
+        // Support string format from admin: "1:80, 3:59"
+        if (typeof milestones === "string" && milestones.trim() !== "") {
+          try {
+            const rules = milestones.split(",").map((r: string) => {
+              const parts = r.split(":").map(s => s.trim());
+              if (parts.length === 2) {
+                const [q, c] = parts.map(s => parseInt(s));
+                return { quantity: q, charge: c };
+              }
+              return null;
+            }).filter((r: any) => r !== null && !isNaN(r.quantity) && !isNaN(r.charge));
+            milestones = rules;
+          } catch (e) {
+            console.error("Failed to parse milestones string", e);
+          }
+        }
+
+        if (Array.isArray(milestones) && milestones.length > 0) {
+          const sorted = [...milestones].sort((a, b) => b.quantity - a.quantity);
           const matching = sorted.find((m) => item.cartQuantity >= m.quantity);
           if (matching) {
             charge = Number(matching.charge);
@@ -942,7 +1002,11 @@ function CheckoutContent() {
                   </div>
                   <div className="flex justify-between font-medium text-sm text-gray-500">
                     <span>Shipping</span>
-                    <span className="text-pp-success font-bold uppercase tracking-wider">Free</span>
+                    {activeStep === "payment" && deliveryFee > 0 ? (
+                      <span className="font-bold text-gray-900">{formatPrice(deliveryFee)}</span>
+                    ) : (
+                      <span className="text-pp-success font-bold uppercase tracking-wider">Free</span>
+                    )}
                   </div>
                   <div className="flex justify-between font-medium text-sm text-gray-500">
                     <span>Estimated Tax</span>
