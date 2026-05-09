@@ -17,6 +17,7 @@ export default function AuthModal() {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -70,6 +71,10 @@ export default function AuthModal() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -262,6 +267,25 @@ export default function AuthModal() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pp-primary/20 focus:border-pp-primary focus:bg-white transition-all text-sm"
                     placeholder={isLoginView ? "Enter your password" : "Create a password"}
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
+            {isRegisterView && (
+              <div className="space-y-1.5 animate-in slide-in-from-top-2">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Confirm Password</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pp-primary transition-colors">
+                    <LuLock className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pp-primary/20 focus:border-pp-primary focus:bg-white transition-all text-sm"
+                    placeholder="Confirm your password"
                     required
                   />
                 </div>
