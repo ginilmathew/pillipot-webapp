@@ -12,6 +12,13 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Pillipot — Your Marketplace",
   description: "Shop the best products at unbeatable prices. Electronics, fashion, home & more with free delivery.",
+  icons: {
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: "/favicon.png",
+    shortcut: "/favicon.png",
+  },
 };
 
 // LoginModal moved to AuthProvider to support dynamic imports (client-only)
